@@ -105,6 +105,24 @@ class Scholarship extends Model
 
     /* ---------------- النطاقات ---------------- */
 
+    /**
+     * بحث نصّي غير حسّاس لحالة الأحرف يعمل على PostgreSQL و MySQL و SQLite معاً
+     * (ilike خاصة بـ PostgreSQL وحدها).
+     */
+    public function scopeWhereLike(Builder $query, string $column, string $term): Builder
+    {
+        return $query->whereRaw('LOWER('.$query->getGrammar()->wrap($column).') LIKE ?', [
+            '%'.mb_strtolower($term).'%',
+        ]);
+    }
+
+    public function scopeOrWhereLike(Builder $query, string $column, string $term): Builder
+    {
+        return $query->orWhereRaw('LOWER('.$query->getGrammar()->wrap($column).') LIKE ?', [
+            '%'.mb_strtolower($term).'%',
+        ]);
+    }
+
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('status', ScholarshipStatus::Published);

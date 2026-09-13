@@ -1,13 +1,26 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin;
+use App\Http\Controllers\Api\V1\AiToolController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\SessionController;
+use App\Http\Controllers\Api\V1\ContactController;
+use App\Http\Controllers\Api\V1\CvOrderController;
+use App\Http\Controllers\Api\V1\DashboardController;
+use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\MetaController;
+use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\ProfileItemController;
+use App\Http\Controllers\Api\V1\SavedScholarshipController;
+use App\Http\Controllers\Api\V1\ScholarshipController;
+use App\Http\Controllers\Api\V1\SettingsController;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| مسارات واجهة منحتي البرمجية — الإصدار الأول
+| واجهة منحتي البرمجية — الإصدار الأول
 |--------------------------------------------------------------------------
 | المصادقة بتوكنات Sanctum: كل توكن يمثّل جهازاً، وهو ما يغذّي
 | شاشة "الجلسات والأجهزة النشطة" ويتيح إنهاء أي جهاز على حدة.
@@ -15,42 +28,124 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
 
-    /* ---------------- عام (بدون مصادقة) ---------------- */
+    /* ================= عام (بدون مصادقة) ================= */
+
+    Route::get('meta', [MetaController::class, 'index'])->name('meta.index');
+    Route::get('stats', [MetaController::class, 'stats'])->name('meta.stats');
+    Route::post('contact', [ContactController::class, 'store'])
+        ->middleware('throttle:6,1')
+        ->name('contact.store');
 
     Route::prefix('auth')->group(function (): void {
-        Route::post('register', [AuthController::class, 'register'])
-            ->middleware('throttle:10,1')
-            ->name('auth.register');
-
-        Route::post('login', [AuthController::class, 'login'])
-            ->middleware('throttle:10,1')
-            ->name('auth.login');
-
-        Route::post('forgot-password', [PasswordResetController::class, 'forgot'])
-            ->middleware('throttle:6,1')
-            ->name('auth.forgot');
-
-        Route::post('resend-code', [PasswordResetController::class, 'resend'])
-            ->middleware('throttle:6,1')
-            ->name('auth.resend');
-
-        Route::post('verify-code', [PasswordResetController::class, 'verify'])
-            ->middleware('throttle:10,1')
-            ->name('auth.verify');
-
-        Route::post('reset-password', [PasswordResetController::class, 'reset'])
-            ->middleware('throttle:6,1')
-            ->name('auth.reset');
+        Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+        Route::post('forgot-password', [PasswordResetController::class, 'forgot'])->middleware('throttle:6,1');
+        Route::post('resend-code', [PasswordResetController::class, 'resend'])->middleware('throttle:6,1');
+        Route::post('verify-code', [PasswordResetController::class, 'verify'])->middleware('throttle:10,1');
+        Route::post('reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:6,1');
     });
 
-    /* ---------------- يتطلّب تسجيل دخول ---------------- */
+    /*
+     * المنح متاحة للزوار، لكن المصادقة الاختيارية تضيف
+     * نسبة المطابقة وحالة الحفظ عندما يكون المستخدم مسجّلاً.
+     */
+    Route::middleware('auth.optional')->group(function (): void {
+        Route::get('scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
+        Route::get('scholarships/featured', [ScholarshipController::class, 'featured'])->name('scholarships.featured');
+        Route::get('scholarships/facets', [ScholarshipController::class, 'facets'])->name('scholarships.facets');
+        Route::get('scholarships/{scholarship}', [ScholarshipController::class, 'show'])->name('scholarships.show');
+    });
+
+    /* ================= يتطلّب تسجيل دخول ================= */
 
     Route::middleware(['auth:sanctum', 'active'])->group(function (): void {
+
+        /* ---- الحساب والجلسات ---- */
         Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
 
         Route::get('sessions', [SessionController::class, 'index'])->name('sessions.index');
         Route::delete('sessions/all', [SessionController::class, 'destroyAll'])->name('sessions.destroy-all');
         Route::delete('sessions/{token}', [SessionController::class, 'destroy'])->name('sessions.destroy');
+
+        /* ---- لوحة الطالب ---- */
+        Route::get('dashboard', [DashboardController::class, 'overview'])->name('dashboard.overview');
+
+        /* ---- الملف الأكاديمي ---- */
+        Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
+        Route::get('profile/completion', [ProfileController::class, 'completion'])->name('profile.completion');
+        Route::put('profile', [ProfileController::class, 'updatePersonalInfo'])->name('profile.update');
+
+        Route::post('profile/{type}', [ProfileItemController::class, 'store'])->name('profile.items.store');
+        Route::put('profile/{type}/{id}', [ProfileItemController::class, 'update'])->name('profile.items.update');
+        Route::delete('profile/{type}/{id}', [ProfileItemController::class, 'destroy'])->name('profile.items.destroy');
+
+        /* ---- المحفوظات ---- */
+        Route::get('saved', [SavedScholarshipController::class, 'index'])->name('saved.index');
+        Route::post('saved/{scholarship}', [SavedScholarshipController::class, 'toggle'])->name('saved.toggle');
+
+        /* ---- المستندات ---- */
+        Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
+        Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+        /* ---- الإشعارات ---- */
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread');
+        Route::post('notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
+        Route::post('notifications/{notification}/read', [NotificationController::class, 'markRead'])->name('notifications.read');
+
+        /* ---- الإعدادات ---- */
+        Route::put('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password');
+        Route::put('settings/privacy', [SettingsController::class, 'updatePrivacy'])->name('settings.privacy');
+        Route::put('settings/notifications', [SettingsController::class, 'updateNotifications'])->name('settings.notifications');
+        Route::put('settings/locale', [SettingsController::class, 'updateLocale'])->name('settings.locale');
+        Route::post('settings/deactivate', [SettingsController::class, 'deactivate'])->name('settings.deactivate');
+        Route::delete('settings/account', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
+        /* ---- أدوات الذكاء الاصطناعي ---- */
+        Route::get('ai-tools', [AiToolController::class, 'index'])->name('ai-tools.index');
+        Route::post('ai-tools/{key}/run', [AiToolController::class, 'run'])
+            ->middleware('throttle:20,1')
+            ->name('ai-tools.run');
+
+        /* ---- طلبات صياغة السيرة الذاتية ---- */
+        Route::get('cv-orders/active', [CvOrderController::class, 'active'])->name('cv-orders.active');
+        Route::get('cv-orders/readiness', [CvOrderController::class, 'readiness'])->name('cv-orders.readiness');
+        Route::post('cv-orders', [CvOrderController::class, 'store'])->name('cv-orders.store');
+        Route::get('cv-orders/{cvOrder}', [CvOrderController::class, 'show'])->name('cv-orders.show');
+        Route::post('cv-orders/{cvOrder}/notes', [CvOrderController::class, 'addNote'])->name('cv-orders.notes');
+
+        /* ================= لوحة الإدارة ================= */
+
+        Route::prefix('admin')
+            ->middleware('role:admin,moderator')
+            ->group(function (): void {
+                Route::get('dashboard', [Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+
+                Route::get('scholarships', [Admin\ScholarshipController::class, 'index'])->name('admin.scholarships.index');
+                Route::post('scholarships', [Admin\ScholarshipController::class, 'store'])->name('admin.scholarships.store');
+                Route::get('scholarships/{scholarship}', [Admin\ScholarshipController::class, 'show'])->name('admin.scholarships.show');
+                Route::put('scholarships/{scholarship}', [Admin\ScholarshipController::class, 'update'])->name('admin.scholarships.update');
+                Route::patch('scholarships/{scholarship}/status', [Admin\ScholarshipController::class, 'setStatus'])->name('admin.scholarships.status');
+                Route::delete('scholarships/{scholarship}', [Admin\ScholarshipController::class, 'destroy'])->name('admin.scholarships.destroy');
+
+                Route::get('users', [Admin\UserController::class, 'index'])->name('admin.users.index');
+                Route::get('users/export', [Admin\UserController::class, 'export'])->name('admin.users.export');
+                Route::patch('users/{user}/status', [Admin\UserController::class, 'setStatus'])->name('admin.users.status');
+                Route::patch('users/{user}/role', [Admin\UserController::class, 'setRole'])->name('admin.users.role');
+
+                Route::get('ai-tools', [Admin\AiToolController::class, 'index'])->name('admin.ai-tools.index');
+                Route::patch('ai-tools/{aiTool}/toggle', [Admin\AiToolController::class, 'toggle'])->name('admin.ai-tools.toggle');
+
+                Route::get('orders', [Admin\OrderController::class, 'index'])->name('admin.orders.index');
+                Route::patch('orders/{cvOrder}/advance', [Admin\OrderController::class, 'advance'])->name('admin.orders.advance');
+
+                Route::get('notifications', [Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
+                Route::post('notifications/broadcast', [Admin\NotificationController::class, 'broadcast'])->name('admin.notifications.broadcast');
+
+                Route::get('reports', [Admin\ReportController::class, 'index'])->name('admin.reports');
+                Route::get('settings', [Admin\SettingsController::class, 'index'])->name('admin.settings');
+            });
     });
 });
