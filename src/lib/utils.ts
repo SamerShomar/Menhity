@@ -122,13 +122,23 @@ export function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** توليد slug صالح للروابط من نص عربي أو إنجليزي */
+/**
+ * توليد slug صالح للروابط.
+ * تُزال العلامات اللاتينية (Türkiye ← turkiye) وتبقى الحروف العربية
+ * كما هي عندما لا يوجد بديل لاتيني.
+ */
 export function slugify(input: string): string {
-  const base = input
+  const normalized = input
     .trim()
     .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "-")
-    .replace(/^-+|-+$/g, "");
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // علامات التشكيل اللاتينية
+    .replace(/[ıİ]/g, "i")
+    .replace(/[øØ]/g, "o")
+    .replace(/[ßẞ]/g, "ss")
+    .replace(/[æÆ]/g, "ae");
+
+  const base = normalized.replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "");
   return base || `item-${Date.now().toString(36)}`;
 }
 

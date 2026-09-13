@@ -96,7 +96,10 @@ export default async function DashboardPage() {
       {/* --- الترحيب --- */}
       <section className="relative overflow-hidden rounded-2xl bg-navy-700 p-7 text-white">
         <div className="absolute inset-0 bg-gradient-to-l from-navy-600 via-navy-700 to-navy-900" />
-        <span className="absolute -end-6 -top-6 text-[120px] leading-none opacity-10" aria-hidden="true">
+        <span
+          className="pointer-events-none absolute end-6 top-1/2 hidden -translate-y-1/2 text-[88px] leading-none opacity-15 sm:block"
+          aria-hidden="true"
+        >
           🎓
         </span>
 

@@ -18,6 +18,12 @@ function slugify(input: string): string {
   return input
     .trim()
     .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[ıİ]/g, "i")
+    .replace(/[øØ]/g, "o")
+    .replace(/[ßẞ]/g, "ss")
+    .replace(/[æÆ]/g, "ae")
     .replace(/[^\p{L}\p{N}]+/gu, "-")
     .replace(/^-+|-+$/g, "");
 }

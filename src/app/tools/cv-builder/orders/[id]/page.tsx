@@ -172,7 +172,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                         {!isLast && (
                           <span
                             className={cn(
-                              "absolute end-[13px] top-7 h-[calc(100%-1.25rem)] w-0.5",
+                              "absolute start-[13px] top-7 h-[calc(100%-1.25rem)] w-0.5",
                               event.status === "DONE"
                                 ? "bg-[color:var(--color-success)]"
                                 : "bg-ink-200",

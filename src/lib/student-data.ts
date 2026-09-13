@@ -27,8 +27,12 @@ export async function getOrCreateProfile(userId: string) {
     select: { fullName: true },
   });
 
-  await prisma.studentProfile.create({
-    data: { userId, fullNameAr: user.fullName },
+  // upsert بدل create: التخطيط والصفحة قد ينفّذان هذه الدالة معاً،
+  // فيحاولان الإنشاء في نفس اللحظة ويصطدمان بقيد التفرّد.
+  await prisma.studentProfile.upsert({
+    where: { userId },
+    create: { userId, fullNameAr: user.fullName },
+    update: {},
   });
 
   return prisma.studentProfile.findUniqueOrThrow({

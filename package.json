@@ -11,7 +11,8 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "smoke": "node scripts/smoke-test.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -43,6 +44,7 @@
     "dotenv": "^17.4.2",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.3.5",
+    "playwright": "^1.63.0",
     "postcss": "^8.5.28",
     "prisma": "^7.10.0",
     "tailwindcss": "^4.3.3",
