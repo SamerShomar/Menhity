@@ -1,18 +1,14 @@
-node_modules/
-.next/
-out/
-build/
-.env
-.env*.local
-*.log
-npm-debug.log*
+# ---- عام ----
 .DS_Store
-/public/uploads/*
-!/public/uploads/.gitkeep
-/prisma/generated
-next-env.d.ts
-.tsbuildinfo
-*.tsbuildinfo
+*.log
+.idea/
+.vscode/
+*.swp
 
-# لقطات فحص الدخان
+# ---- الواجهة الأمامية ----
+node_modules/
+dist/
+.vite/
+
+# ---- لقطات فحص الدخان ----
 .smoke-shots/
