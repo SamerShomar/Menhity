@@ -22,6 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'active' => EnsureUserIsActive::class,
             'auth.optional' => OptionalAuthenticate::class,
         ]);
+
+        // لا توجد شاشة دخول على الخادم — الزائر غير المصادق يحصل على 401 بصيغة JSON
+        $middleware->redirectGuestsTo(fn () => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // كل مسارات api تُعيد JSON دائماً

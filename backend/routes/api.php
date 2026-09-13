@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function (): void {
     /* ================= عام (بدون مصادقة) ================= */
 
     Route::get('meta', [MetaController::class, 'index'])->name('meta.index');
+    Route::get('ai-tools', [AiToolController::class, 'index'])->name('ai-tools.index');
     Route::get('stats', [MetaController::class, 'stats'])->name('meta.stats');
     Route::post('contact', [ContactController::class, 'store'])
         ->middleware('throttle:6,1')
@@ -103,8 +104,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('settings/deactivate', [SettingsController::class, 'deactivate'])->name('settings.deactivate');
         Route::delete('settings/account', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
-        /* ---- أدوات الذكاء الاصطناعي ---- */
-        Route::get('ai-tools', [AiToolController::class, 'index'])->name('ai-tools.index');
+        /* ---- أدوات الذكاء الاصطناعي (التشغيل فقط؛ القائمة عامة) ---- */
         Route::post('ai-tools/{key}/run', [AiToolController::class, 'run'])
             ->middleware('throttle:20,1')
             ->name('ai-tools.run');
