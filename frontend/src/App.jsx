@@ -1,6 +1,13 @@
 import { Route, Routes } from "react-router-dom";
 
-import { DashboardLayout, GuestOnly, PublicLayout, RequireAuth } from "@/components/layout/Layouts";
+import {
+  AdminLayout,
+  DashboardLayout,
+  GuestOnly,
+  PublicLayout,
+  RequireAdmin,
+  RequireAuth,
+} from "@/components/layout/Layouts";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 
 import LandingPage from "@/pages/public/Landing";
@@ -31,6 +38,16 @@ import ToolsHubPage from "@/pages/tools/ToolsHub";
 import ToolRunPage from "@/pages/tools/ToolRun";
 import CvWizardPage from "@/pages/tools/CvWizard";
 import CvOrderTrackingPage from "@/pages/tools/CvOrderTracking";
+
+import AdminDashboardPage from "@/pages/admin/Dashboard";
+import AdminScholarshipsPage from "@/pages/admin/Scholarships";
+import AdminScholarshipFormPage from "@/pages/admin/ScholarshipForm";
+import AdminUsersPage from "@/pages/admin/Users";
+import AdminAiToolsPage from "@/pages/admin/AiTools";
+import AdminOrdersPage from "@/pages/admin/Orders";
+import AdminNotificationsPage from "@/pages/admin/Notifications";
+import AdminReportsPage from "@/pages/admin/Reports";
+import AdminSettingsPage from "@/pages/admin/Settings";
 
 export function App() {
   return (
@@ -64,6 +81,22 @@ export function App() {
             <Route path="/tools/cv-builder" element={<CvWizardPage />} />
             <Route path="/tools/cv-builder/:id" element={<CvOrderTrackingPage />} />
             <Route path="/tools/:key" element={<ToolRunPage />} />
+          </Route>
+        </Route>
+
+        {/* ---------- لوحة الإدارة ---------- */}
+        <Route element={<RequireAdmin />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboardPage />} />
+            <Route path="/admin/scholarships" element={<AdminScholarshipsPage />} />
+            <Route path="/admin/scholarships/new" element={<AdminScholarshipFormPage />} />
+            <Route path="/admin/scholarships/:slug" element={<AdminScholarshipFormPage />} />
+            <Route path="/admin/users" element={<AdminUsersPage />} />
+            <Route path="/admin/ai-tools" element={<AdminAiToolsPage />} />
+            <Route path="/admin/orders" element={<AdminOrdersPage />} />
+            <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
+            <Route path="/admin/reports" element={<AdminReportsPage />} />
+            <Route path="/admin/settings" element={<AdminSettingsPage />} />
           </Route>
         </Route>
 

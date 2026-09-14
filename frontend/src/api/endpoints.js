@@ -107,7 +107,8 @@ export const adminApi = {
   setUserStatus: (id, status, reason) =>
     api.patch(`/admin/users/${id}/status`, { status, reason }).then((r) => r.data),
   setUserRole: (id, role) => api.patch(`/admin/users/${id}/role`, { role }).then((r) => r.data),
-  exportUsersUrl: () => `${api.defaults.baseURL}/admin/users/export`,
+  /** تنزيل CSV عبر الـ API حتى يُرسَل توكن المصادقة مع الطلب */
+  exportUsers: () => api.get("/admin/users/export", { responseType: "blob" }).then((r) => r.data),
 
   aiTools: () => api.get("/admin/ai-tools").then((r) => r.data),
   toggleAiTool: (key) => api.patch(`/admin/ai-tools/${key}/toggle`).then((r) => r.data),
