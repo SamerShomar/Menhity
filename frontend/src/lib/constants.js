@@ -12,6 +12,7 @@ export const DASHBOARD_NAV = [
   { to: "/dashboard/profile", label: "الملف الأكاديمي", icon: "UserRound" },
   { to: "/dashboard/saved", label: "المحفوظات", icon: "Bookmark" },
   { to: "/dashboard/documents", label: "المستندات", icon: "FileText" },
+  { to: "/dashboard/notifications", label: "الإشعارات", icon: "Bell" },
   { to: "/dashboard/settings", label: "الإعدادات", icon: "Settings" },
 ];
 

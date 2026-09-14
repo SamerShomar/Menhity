@@ -21,7 +21,7 @@ const SIZES = {
 const BASE =
   "inline-flex items-center justify-center font-semibold transition-all duration-150 " +
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-500 " +
-  "disabled:cursor-not-allowed disabled:opacity-60 select-none";
+  "disabled:cursor-not-allowed disabled:opacity-60 select-none whitespace-nowrap";
 
 export function Button({
   variant = "primary",

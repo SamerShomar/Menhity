@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 
-import { GuestOnly, PublicLayout } from "@/components/layout/Layouts";
+import { DashboardLayout, GuestOnly, PublicLayout, RequireAuth } from "@/components/layout/Layouts";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 
 import LandingPage from "@/pages/public/Landing";
@@ -20,6 +20,18 @@ import VerifyCodePage from "@/pages/auth/VerifyCode";
 import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import ResetSuccessPage from "@/pages/auth/ResetSuccess";
 
+import DashboardOverviewPage from "@/pages/dashboard/Overview";
+import ProfilePage from "@/pages/dashboard/Profile";
+import SavedPage from "@/pages/dashboard/Saved";
+import DocumentsPage from "@/pages/dashboard/Documents";
+import NotificationsPage from "@/pages/dashboard/Notifications";
+import SettingsPage from "@/pages/dashboard/Settings";
+
+import ToolsHubPage from "@/pages/tools/ToolsHub";
+import ToolRunPage from "@/pages/tools/ToolRun";
+import CvWizardPage from "@/pages/tools/CvWizard";
+import CvOrderTrackingPage from "@/pages/tools/CvOrderTracking";
+
 export function App() {
   return (
     <>
@@ -36,10 +48,30 @@ export function App() {
           <Route path="/reset-success" element={<ResetSuccessPage />} />
         </Route>
 
+        {/* ---------- لوحة الطالب ---------- */}
+        <Route element={<RequireAuth />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<DashboardOverviewPage />} />
+            <Route path="/dashboard/profile" element={<ProfilePage />} />
+            <Route path="/dashboard/saved" element={<SavedPage />} />
+            <Route path="/dashboard/documents" element={<DocumentsPage />} />
+            <Route path="/dashboard/notifications" element={<NotificationsPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
+          </Route>
+
+          {/* أدوات تتطلّب تسجيل دخول — بعرض الصفحة كاملاً */}
+          <Route element={<PublicLayout />}>
+            <Route path="/tools/cv-builder" element={<CvWizardPage />} />
+            <Route path="/tools/cv-builder/:id" element={<CvOrderTrackingPage />} />
+            <Route path="/tools/:key" element={<ToolRunPage />} />
+          </Route>
+        </Route>
+
         {/* ---------- الصفحات العامة ---------- */}
         <Route element={<PublicLayout />}>
           <Route index element={<LandingPage />} />
           <Route path="/scholarships" element={<ScholarshipsPage />} />
+          <Route path="/tools" element={<ToolsHubPage />} />
           <Route path="/scholarships/:slug" element={<ScholarshipDetailPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/contact" element={<ContactPage />} />

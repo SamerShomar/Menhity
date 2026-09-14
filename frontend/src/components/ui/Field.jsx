@@ -31,12 +31,12 @@ function FieldHint({ children }) {
   return <p className="mt-1.5 text-[11px] leading-relaxed text-ink-400">{children}</p>;
 }
 
-export function Input({ label, error, hint, icon, required, labelHint, className, id, ...props }) {
+export function Input({ label, error, hint, icon, required, labelHint, className, inputClassName, id, ...props }) {
   const autoId = useId();
   const fieldId = id ?? autoId;
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", className)}>
       {label && (
         <Label htmlFor={fieldId} required={required} hint={labelHint}>
           {label}
@@ -46,7 +46,7 @@ export function Input({ label, error, hint, icon, required, labelHint, className
         <input
           id={fieldId}
           aria-invalid={error ? true : undefined}
-          className={cn(FIELD_BASE, "h-11", icon && "pe-10", className)}
+          className={cn(FIELD_BASE, "h-11", icon && "pe-10", inputClassName)}
           {...props}
         />
         {icon && (
@@ -61,13 +61,13 @@ export function Input({ label, error, hint, icon, required, labelHint, className
   );
 }
 
-export function PasswordInput({ label, error, hint, required, className, id, ...props }) {
+export function PasswordInput({ label, error, hint, required, className, inputClassName, id, ...props }) {
   const autoId = useId();
   const fieldId = id ?? autoId;
   const [visible, setVisible] = useState(false);
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", className)}>
       {label && (
         <Label htmlFor={fieldId} required={required}>
           {label}
@@ -78,7 +78,7 @@ export function PasswordInput({ label, error, hint, required, className, id, ...
           id={fieldId}
           type={visible ? "text" : "password"}
           aria-invalid={error ? true : undefined}
-          className={cn(FIELD_BASE, "h-11 pe-11", className)}
+          className={cn(FIELD_BASE, "h-11 pe-11", inputClassName)}
           {...props}
         />
         <button
@@ -96,12 +96,12 @@ export function PasswordInput({ label, error, hint, required, className, id, ...
   );
 }
 
-export function Textarea({ label, error, hint, required, counter, className, id, rows = 4, ...props }) {
+export function Textarea({ label, error, hint, required, counter, className, inputClassName, id, rows = 4, ...props }) {
   const autoId = useId();
   const fieldId = id ?? autoId;
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", className)}>
       {label && (
         <Label htmlFor={fieldId} required={required}>
           {label}
@@ -111,7 +111,7 @@ export function Textarea({ label, error, hint, required, counter, className, id,
         id={fieldId}
         rows={rows}
         aria-invalid={error ? true : undefined}
-        className={cn(FIELD_BASE, "resize-y py-3 leading-relaxed", className)}
+        className={cn(FIELD_BASE, "resize-y py-3 leading-relaxed", inputClassName)}
         {...props}
       />
       <div className="flex items-start justify-between gap-3">
@@ -128,12 +128,12 @@ export function Textarea({ label, error, hint, required, counter, className, id,
 const SELECT_ARROW =
   "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")";
 
-export function Select({ label, error, hint, required, className, id, children, ...props }) {
+export function Select({ label, error, hint, required, className, inputClassName, id, children, ...props }) {
   const autoId = useId();
   const fieldId = id ?? autoId;
 
   return (
-    <div className="w-full">
+    <div className={cn("w-full", className)}>
       {label && (
         <Label htmlFor={fieldId} required={required}>
           {label}
@@ -142,7 +142,7 @@ export function Select({ label, error, hint, required, className, id, children, 
       <select
         id={fieldId}
         aria-invalid={error ? true : undefined}
-        className={cn(FIELD_BASE, "h-11 cursor-pointer appearance-none pe-3", className)}
+        className={cn(FIELD_BASE, "h-11 cursor-pointer appearance-none pe-3", inputClassName)}
         style={{ backgroundImage: SELECT_ARROW, backgroundRepeat: "no-repeat", backgroundPosition: "left 0.875rem center" }}
         {...props}
       >
