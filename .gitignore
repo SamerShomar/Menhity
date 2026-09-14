@@ -1,0 +1,14 @@
+# ---- عام ----
+.DS_Store
+*.log
+.idea/
+.vscode/
+*.swp
+
+# ---- الواجهة الأمامية ----
+node_modules/
+dist/
+.vite/
+
+# ---- لقطات فحص الدخان ----
+.smoke-shots/
