@@ -25,6 +25,7 @@
 - [متغيرات البيئة](#متغيرات-البيئة)
 - [أوامر مفيدة](#أوامر-مفيدة)
 - [ملاحظات تشغيلية](#ملاحظات-تشغيلية)
+- [النشر](#النشر)
 
 ---
 
@@ -305,6 +306,17 @@ npm run build     # بناء نسخة الإنتاج إلى dist/
 npm run preview   # معاينة نسخة الإنتاج
 npm run lint      # فحص الكود
 ```
+
+---
+
+## النشر
+
+المشروع جاهز للنشر مجاناً: قاعدة البيانات على **Neon**، والخادم على **Render**،
+والواجهة على **Cloudflare Pages** — الخطوات كاملة بالعربية في
+[DEPLOYMENT.md](DEPLOYMENT.md).
+
+ملفات النشر الجاهزة: `backend/Dockerfile` · `backend/docker-entrypoint.sh` · `render.yaml`
+· `frontend/public/_redirects` · `frontend/vercel.json`
 
 ---
 
