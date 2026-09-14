@@ -25,6 +25,13 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // لا توجد شاشة دخول على الخادم — الزائر غير المصادق يحصل على 401 بصيغة JSON
         $middleware->redirectGuestsTo(fn () => null);
+
+        /*
+         * منصّات الاستضافة (Render وRailway وغيرها) تنهي TLS عند وسيط أمامها،
+         * فبدون الثقة به تُبنى روابط الترقيم بـ http وتُحجب كمحتوى مختلط
+         * على واجهة تعمل بـ https.
+         */
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // كل مسارات api تُعيد JSON دائماً
