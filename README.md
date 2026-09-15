@@ -91,7 +91,7 @@
 | التنسيق | Tailwind CSS v4 (RTL كامل بالخصائص المنطقية) |
 | طلبات HTTP | Axios مع اعتراض 401 وتوحيد رسائل الخطأ |
 | الأيقونات | lucide-react عبر سجل أيقونات صريح |
-| الذكاء الاصطناعي | Google Gemini (مجاني) أو Anthropic Claude — اختياري، يعمل بوضع محاكاة بدونهما |
+| الذكاء الاصطناعي | Cloudflare Workers AI أو Google Gemini (كلاهما مجاني) أو Anthropic Claude — اختياري، يعمل بوضع محاكاة بدونها |
 | الاختبارات | PHPUnit (39 اختباراً · 129 تأكيداً) |
 | تنسيق الكود | Laravel Pint · oxlint |
 
@@ -276,9 +276,11 @@ docs/
 | `APP_URL` | ✅ | عنوان الخادم — يُبنى منه رابط المستندات |
 | `DB_CONNECTION` | ✅ | `pgsql` |
 | `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | ✅ | بيانات الاتصال بقاعدة البيانات |
+| `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` | ❌ | Cloudflare Workers AI — حصة يومية مجانية بلا بطاقة دفع (يلزم المتغيّران معاً) |
+| `CLOUDFLARE_MODEL` | ❌ | اسم نموذج Workers AI؛ الافتراضي `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
 | `GEMINI_API_KEY` | ❌ | مفتاح Google Gemini — طبقة مجانية بحدود يومية |
 | `ANTHROPIC_API_KEY` | ❌ | مفتاح Anthropic — بالاستهلاك المدفوع |
-| `AI_PROVIDER` | ❌ | `gemini` أو `anthropic`؛ بدونه يُختار أول مفتاح مضبوط |
+| `AI_PROVIDER` | ❌ | `cloudflare` أو `gemini` أو `anthropic`؛ بدونه يُختار أول مزوّد مضبوطة بياناته |
 
 بدون أي مفتاح تعمل أدوات الذكاء الاصطناعي بوضع المحاكاة، فيبقى المشروع قابلاً للتشغيل
 والعرض فور استنساخه.
@@ -337,7 +339,7 @@ npm run lint      # فحص الكود
 |---|---|---|
 | إرسال البريد الإلكتروني | رموز التحقق تُطبع في سجل الخادم أثناء التطوير | ربط مزوّد بريد (Resend / SES / SMTP) |
 | تسجيل الدخول بـ Google / Apple | الأزرار موجودة وتعرض رسالة توضيحية | إضافة بيانات اعتماد OAuth |
-| توليد الذكاء الاصطناعي | يعمل بوضع المحاكاة | إضافة `GEMINI_API_KEY` (مجاني) أو `ANTHROPIC_API_KEY` |
+| توليد الذكاء الاصطناعي | يعمل بوضع المحاكاة | إضافة `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` أو `GEMINI_API_KEY` (كلاهما مجاني) أو `ANTHROPIC_API_KEY` |
 | تخزين الملفات | قرص `public` المحلي | نقله إلى تخزين سحابي (S3 / R2) عند النشر |
 | أرشفة المنح المنتهية آلياً | الحالة تُحدَّث يدوياً من لوحة الإدارة | إضافة مهمة مجدولة (scheduler) |
 
