@@ -33,7 +33,9 @@ export default function ToolsHubPage() {
         {aiConfigured === false ? (
           <Alert tone="warning" className="mx-auto mt-8 max-w-3xl" title="وضع المحاكاة">
             مفتاح الذكاء الاصطناعي غير مضبوط على الخادم، لذا تُعيد الأدوات نصوصاً توضيحية جاهزة بدل
-            التوليد الفعلي. أضف <span className="num">ANTHROPIC_API_KEY</span> في ملف البيئة لتفعيل التوليد.
+            التوليد الفعلي. أضف بيانات مزوّد في ملف البيئة لتفعيل التوليد — مثل{" "}
+            <span className="num">CLOUDFLARE_ACCOUNT_ID</span> و<span className="num">CLOUDFLARE_API_TOKEN</span>{" "}
+            (مجاني).
           </Alert>
         ) : null}
 

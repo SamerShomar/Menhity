@@ -19,11 +19,22 @@ return [
 
     'ai' => [
         /*
-         * المزوّد المستخدم: gemini أو anthropic.
+         * المزوّد المستخدم: cloudflare أو gemini أو anthropic.
          * بلا قيمة يُختار تلقائياً أول مزوّد مضبوط مفتاحه،
          * وإن لم يُضبط أي مفتاح تعمل الأدوات بوضع المحاكاة.
          */
         'provider' => env('AI_PROVIDER'),
+
+        'cloudflare' => [
+            'account_id' => env('CLOUDFLARE_ACCOUNT_ID'),
+            'api_token' => env('CLOUDFLARE_API_TOKEN'),
+
+            /*
+             * قائمة نماذج Workers AI تتغيّر، والنموذج قد يُسحب فيرجع 404.
+             * عدّل CLOUDFLARE_MODEL وحده عندها دون لمس الكود.
+             */
+            'model' => env('CLOUDFLARE_MODEL', '@cf/meta/llama-3.3-70b-instruct-fp8-fast'),
+        ],
 
         'gemini' => [
             'api_key' => env('GEMINI_API_KEY'),

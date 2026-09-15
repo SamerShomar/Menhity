@@ -9,6 +9,7 @@ use App\Models\StudentProfile;
 use App\Models\User;
 use App\Services\Ai\AiProvider;
 use App\Services\Ai\ClaudeProvider;
+use App\Services\Ai\CloudflareProvider;
 use App\Services\Ai\GeminiProvider;
 use Illuminate\Support\Facades\Log;
 use RuntimeException;
@@ -17,7 +18,7 @@ use Throwable;
 /**
  * طبقة أدوات الذكاء الاصطناعي.
  *
- * تختار الخدمة المزوّد المضبوط مفتاحه (Gemini أو Claude)، وإن لم يُضبط أي
+ * تختار الخدمة المزوّد المضبوط مفتاحه (Cloudflare أو Gemini أو Claude)، وإن لم يُضبط أي
  * مفتاح تعمل الأدوات بوضع المحاكاة حتى يبقى المشروع قابلاً للتشغيل والعرض
  * فور استنساخه دون أي اشتراك.
  */
@@ -56,6 +57,7 @@ class AiService
     private function provider(): ?AiProvider
     {
         $providers = [
+            'cloudflare' => fn () => new CloudflareProvider,
             'gemini' => fn () => new GeminiProvider,
             'anthropic' => fn () => new ClaudeProvider,
         ];
@@ -124,7 +126,7 @@ class AiService
             ];
         }
 
-        // --- الاتصال الفعلي بـ Claude ---
+        // --- الاتصال الفعلي بالمزوّد ---
         try {
             $output = $this->generate($toolKey, $profile, $userText, $target);
 
@@ -327,7 +329,7 @@ class AiService
     private function mockOutput(string $toolKey, StudentProfile $profile): string
     {
         $name = $profile->full_name_ar ?? 'المتقدّم';
-        $notice = PHP_EOL.PHP_EOL.'— هذه نسخة تجريبية مولّدة بوضع المحاكاة. لتفعيل التوليد الفعلي أضف ANTHROPIC_API_KEY في ملف .env —';
+        $notice = PHP_EOL.PHP_EOL.'— هذه نسخة تجريبية مولّدة بوضع المحاكاة. لتفعيل التوليد الفعلي أضف مفتاح مزوّد ذكاء اصطناعي في ملف .env —';
 
         $body = match ($toolKey) {
             'cv-builder' => <<<TEXT
