@@ -45,7 +45,11 @@ return [
             'port' => env('MAIL_PORT', 2525),
             'username' => env('MAIL_USERNAME'),
             'password' => env('MAIL_PASSWORD'),
-            'timeout' => null,
+            /*
+             * بلا مهلة يعلّق الطلب كاملاً عند إعداد SMTP خاطئ أو خادم
+             * لا يستجيب — ورسائل التحقق تُرسَل داخل طلب التسجيل نفسه.
+             */
+            'timeout' => (int) env('MAIL_TIMEOUT', 15),
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
 

@@ -91,7 +91,7 @@ class MailTestCommand extends Command
 
             str_contains($error, '534') => 'Gmail يطلب كلمة مرور تطبيق. فعّل التحقق بخطوتين ثم أنشئ App Password.',
 
-            stripos($error, 'Connection could not be established') !== false || stripos($error, 'timed out') !== false => 'تعذّر الوصول إلى خادم البريد. راجع MAIL_HOST و MAIL_PORT (587 مع MAIL_SCHEME=tls).',
+            stripos($error, 'Connection could not be established') !== false || stripos($error, 'timed out') !== false => 'تعذّر الوصول إلى خادم البريد. راجع MAIL_HOST و MAIL_PORT (587 مع MAIL_SCHEME=smtp، أو 465 مع smtps).',
 
             str_contains($error, '550') || stripos($error, 'not verified') !== false || stripos($error, 'domain') !== false => 'المزوّد يرفض عنوان المُرسِل. يجب أن يكون MAIL_FROM_ADDRESS على نطاق موثَّق لديه '
                     .'(أو نفس بريد الحساب مع Gmail).',
