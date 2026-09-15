@@ -169,16 +169,20 @@ Railway تستضيف **الخادم وقاعدة البيانات معاً** ف�
 3. داخل المشروع: **New** ← **Database** ← **Add PostgreSQL**.
    تُنشأ خدمة باسم `Postgres` وتوفّر متغيّر `DATABASE_URL` تلقائياً.
 
-### ٢. اضبط خدمة الخادم
+### ٢. اضبط مجلد الجذر — افعلها فوراً ⚠️
 
-من إعدادات خدمة `Menhity`:
+**Settings** ← قسم **Source** ← حقل **Root Directory** ← اكتب:
 
-| الإعداد | القيمة |
-|---|---|
-| **Root Directory** | `backend` |
-| **Builder** | يُكتشف تلقائياً من `railway.json` (Dockerfile) |
+```
+backend
+```
 
-> إن لم تضبط **Root Directory** على `backend` فلن تجد Railway ملف `Dockerfile` وسيفشل البناء.
+> **هذه أهم خطوة، وأكثر ما يُنسى.** تبدأ Railway أول نشر تلقائياً بمجرّد ربط
+> المستودع، وقبل أن تضبط هذا الحقل تبني من **جذر المستودع** — فلا تجد
+> `backend/Dockerfile` ولا `backend/railway.json`، وتسقط إلى مُحلّلها التلقائي
+> (`railpack`) الذي يرى مجلد `frontend/` ويحاول بناء مشروع Node، فيفشل.
+>
+> أول نشر فاشل هنا **متوقّع وطبيعي** — اضبط الحقل ثم أعد النشر.
 
 ### ٣. متغيّرات البيئة
 
@@ -231,6 +235,44 @@ Root Directory = `frontend`، وستكتشف Railway مشروع Vite وتبني�
 
 **Settings** ← **Networking** ← **Custom Domain**. تعطيك Railway سجل `CNAME` تضيفه
 عند مسجّل نطاقك. النطاق نفسه تشتريه من جهة أخرى — Railway لا تبيع نطاقات.
+
+---
+
+## استكشاف أخطاء النشر
+
+### البناء يفشل ويطبع السجل قائمة ملفات الجذر مع كلمة `railpack`
+
+```
+[railway] prepare railpack-v0.39.0
+    ├── frontend/
+    ├── .gitignore
+    ├── README.md
+    └── render.yaml
+```
+
+**السبب**: `Root Directory` غير مضبوط على `backend`، فبنت Railway من جذر المستودع.
+**الحل**: راجع الخطوة ٢ أعلاه، ثم **Deployments** ← **⋮** ← **Redeploy**.
+
+عند النجاح سترى في السجل `Using detected Dockerfile` بدل `railpack`.
+
+### النشر ينجح لكن فحص الصحة يفشل
+
+تحقّق من سجل التشغيل (**Deploy Logs** لا **Build Logs**). الأسباب الشائعة:
+
+| الرسالة | السبب | الحل |
+|---|---|---|
+| `SQLSTATE[08006] connection refused` | `DB_URL` خاطئ أو غير مربوط | تأكد أنه `${{Postgres.DATABASE_URL}}` حرفياً |
+| `No application encryption key` | `APP_KEY` ناقص | ولّده بـ `php artisan key:generate --show` وأضفه |
+| `could not find driver` | امتداد PostgreSQL ناقص | لا يحدث مع الـ Dockerfile الجاهز — تأكد أن Railway تستخدمه لا `railpack` |
+
+### الموقع يفتح لكن بلا أي بيانات
+
+CORS يمنع الواجهة. تأكد أن `FRONTEND_URL` في Railway يطابق رابط الواجهة **تماماً**
+بلا شرطة مائلة في آخره، ثم أعد النشر.
+
+### البيانات التجريبية تتكرّر مع كل نشر
+
+`SEED_ON_DEPLOY` ما زال `true`. غيّره إلى `false`.
 
 ---
 
