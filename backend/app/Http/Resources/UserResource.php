@@ -25,6 +25,7 @@ class UserResource extends JsonResource
             'status_label' => $this->status->label(),
             'is_admin_level' => $this->role->isAdminLevel(),
             'suspension_reason' => $this->suspension_reason,
+            'email_verified' => $this->hasVerifiedEmail(),
             'locale' => $this->locale,
             'timezone' => $this->timezone,
             'settings' => [

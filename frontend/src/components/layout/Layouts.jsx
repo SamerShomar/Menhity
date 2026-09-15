@@ -39,12 +39,24 @@ export function RequireAdmin() {
   return <Outlet />;
 }
 
-/** يمنع المستخدم المسجّل من فتح صفحات الدخول والتسجيل */
+/**
+ * يمنع المستخدم المسجّل من فتح صفحات الدخول والتسجيل.
+ *
+ * هذا الحارس هو مرجع الوجهة بعد نجاح المصادقة: يُعاد تقييمه فور ضبط
+ * المستخدم بينما الصفحة ما زالت صفحة مصادقة، فيسبق أي توجيه داخلها.
+ * لذا يحترم next ويميّز المشرف — وإلا هبط المشرف على لوحة الطالب.
+ */
 export function GuestOnly() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) return <FullPageLoader />;
-  if (isAuthenticated) return <Navigate to="/dashboard" replace />;
+
+  if (isAuthenticated) {
+    const next = new URLSearchParams(location.search).get("next");
+
+    return <Navigate to={next || (isAdmin ? "/admin" : "/dashboard")} replace />;
+  }
 
   return <Outlet />;
 }

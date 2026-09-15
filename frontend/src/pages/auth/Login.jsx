@@ -27,7 +27,15 @@ export default function LoginPage() {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const { ok, result } = await submit(form);
+    const { ok, result, error: failure } = await submit(form);
+
+    // حساب لم يؤكَّد بريده: الخادم أرسل رمزاً جديداً وننقله لشاشة التأكيد
+    if (!ok && failure?.status === 409) {
+      navigate("/verify-email", {
+        state: { email: form.email, notice: failure.message },
+      });
+      return;
+    }
 
     if (ok) {
       navigate(next || (result?.is_admin_level ? "/admin" : "/dashboard"), { replace: true });

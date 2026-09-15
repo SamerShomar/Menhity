@@ -26,6 +26,7 @@ import LoginPage from "@/pages/auth/Login";
 import RegisterPage from "@/pages/auth/Register";
 import ForgotPasswordPage from "@/pages/auth/ForgotPassword";
 import VerifyCodePage from "@/pages/auth/VerifyCode";
+import VerifyEmailPage from "@/pages/auth/VerifyEmail";
 import ResetPasswordPage from "@/pages/auth/ResetPassword";
 import ResetSuccessPage from "@/pages/auth/ResetSuccess";
 
@@ -69,6 +70,7 @@ export function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/verify-code" element={<VerifyCodePage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/reset-success" element={<ResetSuccessPage />} />
           </Route>

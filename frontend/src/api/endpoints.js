@@ -15,6 +15,8 @@ export const authApi = {
   login: (payload) => api.post("/auth/login", payload).then((r) => r.data),
   me: () => api.get("/auth/me").then((r) => r.data.data),
   logout: () => api.post("/auth/logout").then((r) => r.data),
+  verifyEmail: (payload) => api.post("/auth/verify-email", payload).then((r) => r.data),
+  resendVerification: (payload) => api.post("/auth/resend-verification", payload).then((r) => r.data),
   forgotPassword: (payload) => api.post("/auth/forgot-password", payload).then((r) => r.data),
   resendCode: (payload) => api.post("/auth/resend-code", payload).then((r) => r.data),
   verifyCode: (payload) => api.post("/auth/verify-code", payload).then((r) => r.data),

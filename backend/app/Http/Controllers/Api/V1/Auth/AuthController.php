@@ -9,7 +9,9 @@ use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
-use App\Services\DeviceService;
+use App\Models\VerificationCode;
+use App\Services\AccessTokenService;
+use App\Services\VerificationCodeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,9 +20,17 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly DeviceService $devices) {}
+    public function __construct(
+        private readonly AccessTokenService $tokens,
+        private readonly VerificationCodeService $codes,
+    ) {}
 
-    /** إنشاء حساب جديد وإرجاع توكن الوصول */
+    /**
+     * إنشاء حساب جديد وإرسال رمز تأكيد البريد.
+     *
+     * لا يُسلَّم توكن هنا — الجلسة تبدأ بعد تأكيد البريد، فلا يُستخدم
+     * الحساب ببريد لا يملكه صاحبه.
+     */
     public function register(RegisterRequest $request): JsonResponse
     {
         $user = DB::transaction(function () use ($request): User {
@@ -45,7 +55,13 @@ class AuthController extends Controller
             return $user;
         });
 
-        return $this->respondWithToken($request, $user, 201);
+        $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
+
+        return response()->json([
+            'message' => 'أنشأنا حسابك وأرسلنا رمز تأكيد إلى بريدك الإلكتروني.',
+            'email' => $user->email,
+            'requires_verification' => true,
+        ], 201);
     }
 
     /** تسجيل الدخول */
@@ -68,12 +84,29 @@ class AuthController extends Controller
             ]);
         }
 
+        /*
+         * بريد غير مؤكَّد: نرسل رمزاً جديداً ونعيد 409 مع علامة صريحة
+         * تقرأها الواجهة لتنقل المستخدم إلى شاشة التأكيد.
+         */
+        if (! $user->hasVerifiedEmail()) {
+            $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
+
+            return response()->json([
+                'message' => 'لم يتم تأكيد بريدك بعد. أرسلنا إليك رمز تأكيد جديد.',
+                'email' => $user->email,
+                'requires_verification' => true,
+            ], 409);
+        }
+
         // الحساب المعطّل مؤقتاً يُعاد تفعيله بمجرّد نجاح الدخول
         if ($user->status === UserStatus::Inactive) {
             $user->update(['status' => UserStatus::Active]);
         }
 
-        return $this->respondWithToken($request, $user);
+        return response()->json([
+            'token' => $this->tokens->issue($request, $user),
+            'user' => new UserResource($user->load('profile')),
+        ]);
     }
 
     /** المستخدم الحالي */
@@ -88,25 +121,5 @@ class AuthController extends Controller
         $request->user()->currentAccessToken()->delete();
 
         return response()->json(['message' => 'تم تسجيل الخروج بنجاح.']);
-    }
-
-    /** ينشئ توكناً يحمل بيانات الجهاز ويعيده مع بيانات المستخدم */
-    private function respondWithToken(Request $request, User $user, int $status = 200): JsonResponse
-    {
-        $device = $this->devices->fromRequest($request);
-
-        $token = $user->createToken(
-            name: $device['browser'].' · '.$device['os'],
-            expiresAt: now()->addDays(30),
-        );
-
-        $token->accessToken->forceFill($device)->save();
-
-        $user->update(['last_login_at' => now()]);
-
-        return response()->json([
-            'token' => $token->plainTextToken,
-            'user' => new UserResource($user->load('profile')),
-        ], $status);
     }
 }

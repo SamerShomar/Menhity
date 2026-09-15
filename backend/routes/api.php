@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Api\V1\AiToolController;
 use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\SessionController;
 use App\Http\Controllers\Api\V1\ContactController;
@@ -40,6 +41,8 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('auth')->group(function (): void {
         Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1');
         Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
+        Route::post('verify-email', [EmailVerificationController::class, 'verify'])->middleware('throttle:10,1');
+        Route::post('resend-verification', [EmailVerificationController::class, 'resend'])->middleware('throttle:4,1');
         Route::post('forgot-password', [PasswordResetController::class, 'forgot'])->middleware('throttle:6,1');
         Route::post('resend-code', [PasswordResetController::class, 'resend'])->middleware('throttle:6,1');
         Route::post('verify-code', [PasswordResetController::class, 'verify'])->middleware('throttle:10,1');
@@ -64,6 +67,8 @@ Route::prefix('v1')->group(function (): void {
         /* ---- الحساب والجلسات ---- */
         Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+        Route::get('auth/verification-status', [EmailVerificationController::class, 'status'])
+            ->name('auth.verification-status');
 
         Route::get('sessions', [SessionController::class, 'index'])->name('sessions.index');
         Route::delete('sessions/all', [SessionController::class, 'destroyAll'])->name('sessions.destroy-all');

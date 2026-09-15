@@ -11,7 +11,7 @@ class AuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_a_visitor_can_register_and_receives_a_token(): void
+    public function test_a_visitor_can_register_and_is_asked_to_verify_the_email(): void
     {
         $response = $this->postJson('/api/v1/auth/register', [
             'name' => 'سارة أحمد',
@@ -22,11 +22,14 @@ class AuthenticationTest extends TestCase
         ]);
 
         $response->assertCreated()
-            ->assertJsonStructure(['token', 'user' => ['id', 'name', 'email', 'role']]);
+            ->assertJsonPath('requires_verification', true)
+            ->assertJsonPath('email', 'sara@example.com')
+            ->assertJsonMissingPath('token');
 
         $user = User::where('email', 'sara@example.com')->first();
 
         $this->assertNotNull($user);
+        $this->assertNull($user->email_verified_at, 'الحساب الجديد يبدأ غير مؤكَّد');
         $this->assertNotNull($user->profile, 'يجب إنشاء ملف أكاديمي مع الحساب');
         $this->assertSame(1, $user->notifications()->count(), 'يجب إرسال إشعار ترحيبي');
     }

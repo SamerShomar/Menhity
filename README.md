@@ -40,7 +40,7 @@
 - صفحات: من نحن، الأسئلة الشائعة، مركز المساعدة، تواصل معنا، الشروط، الخصوصية، و404.
 
 ### للطالب
-- **مصادقة كاملة**: تسجيل، دخول، استعادة كلمة المرور برمز تحقق من ٦ أرقام، كلمة مرور جديدة.
+- **مصادقة كاملة**: تسجيل مع **تأكيد البريد الإلكتروني برمز من ٦ أرقام**، دخول، استعادة كلمة المرور بالرمز نفسه.
 - **الملف الأكاديمي**: معلومات شخصية، مؤهلات، خبرات، مهارات، لغات، شهادات، مشاريع، اهتمامات —
   مع حساب تلقائي لنسبة الاكتمال وتلميح لكل قسم ناقص.
 - **مطابقة ذكية**: خوارزمية تحسب نسبة توافق كل منحة مع الملف وتعرض **أسباب التوافق**.
@@ -229,6 +229,7 @@ docs/
 |---|---|
 | عام | `GET /meta` · `GET /stats` · `GET /ai-tools` · `POST /contact` |
 | المصادقة | `POST /auth/register` · `POST /auth/login` · `GET /auth/me` · `POST /auth/logout` |
+| تأكيد البريد | `POST /auth/verify-email` · `/auth/resend-verification` |
 | استعادة كلمة المرور | `POST /auth/forgot-password` · `/verify-code` · `/reset-password` |
 | المنح (مصادقة اختيارية) | `GET /scholarships` · `/featured` · `/facets` · `/{slug}` |
 | لوحة الطالب | `GET /dashboard` · `/profile` · `/documents` · `/notifications` · `/saved` |
@@ -276,6 +277,8 @@ docs/
 | `APP_URL` | ✅ | عنوان الخادم — يُبنى منه رابط المستندات |
 | `DB_CONNECTION` | ✅ | `pgsql` |
 | `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | ✅ | بيانات الاتصال بقاعدة البيانات |
+| `MAIL_MAILER` + `MAIL_HOST` + `MAIL_PORT` + `MAIL_USERNAME` + `MAIL_PASSWORD` | ✅ | إعداد SMTP — بدونه لا تصل رسائل تأكيد الحساب واستعادة كلمة المرور |
+| `MAIL_FROM_ADDRESS` | ✅ | بريد المُرسِل، على نطاق موثَّق لدى المزوّد |
 | `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` | ❌ | Cloudflare Workers AI — حصة يومية مجانية بلا بطاقة دفع (يلزم المتغيّران معاً) |
 | `CLOUDFLARE_MODEL` | ❌ | اسم نموذج Workers AI؛ الافتراضي `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
 | `GEMINI_API_KEY` | ❌ | مفتاح Google Gemini — طبقة مجانية بحدود يومية |
@@ -337,7 +340,7 @@ npm run lint      # فحص الكود
 
 | الميزة | الحالة | المطلوب |
 |---|---|---|
-| إرسال البريد الإلكتروني | رموز التحقق تُطبع في سجل الخادم أثناء التطوير | ربط مزوّد بريد (Resend / SES / SMTP) |
+| إرسال البريد الإلكتروني | يعمل عبر SMTP؛ بقيمة `MAIL_MAILER=log` تُكتب الرسالة في سجل الخادم بدل إرسالها | ضبط متغيّرات `MAIL_*` بمزوّد SMTP (Resend / Brevo / SES) |
 | تسجيل الدخول بـ Google / Apple | الأزرار موجودة وتعرض رسالة توضيحية | إضافة بيانات اعتماد OAuth |
 | توليد الذكاء الاصطناعي | يعمل بوضع المحاكاة | إضافة `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` أو `GEMINI_API_KEY` (كلاهما مجاني) أو `ANTHROPIC_API_KEY` |
 | تخزين الملفات | قرص `public` المحلي | نقله إلى تخزين سحابي (S3 / R2) عند النشر |
