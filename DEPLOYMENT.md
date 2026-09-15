@@ -145,7 +145,7 @@ php artisan key:generate --show
 |---|---|---|
 | **استعادة كلمة المرور** | لا مزوّد بريد — الرمز يُطبع في سجل Render | [Resend](https://resend.com) مجاناً حتى ٣٠٠٠ رسالة/شهر |
 | **المستندات المرفوعة** | قرص Render مؤقّت — تُمحى مع كل نشر | [Cloudflare R2](https://developers.cloudflare.com/r2/) مجاناً حتى ١٠GB |
-| **أدوات الذكاء الاصطناعي** | تعمل بوضع المحاكاة | أضف `ANTHROPIC_API_KEY` (مدفوع بالاستهلاك) |
+| **أدوات الذكاء الاصطناعي** | تعمل بوضع المحاكاة | أضف `GEMINI_API_KEY` من [aistudio.google.com](https://aistudio.google.com/apikey) — مجاني بحدود يومية |
 | **دخول Google / Apple** | لا بيانات اعتماد OAuth | مجاني — يحتاج إعداد في Google Cloud Console |
 
 > **الأهم بينها استعادة كلمة المرور.** إن كان الموقع سيُستخدم فعلاً، اربط البريد أولاً —
