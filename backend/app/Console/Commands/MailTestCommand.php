@@ -25,18 +25,25 @@ class MailTestCommand extends Command
         $to = $this->argument('email');
         $mailer = config('mail.default');
 
+        $rows = [['MAIL_MAILER', $mailer]];
+
+        // كل ناقل يقرأ مفاتيح مختلفة — نعرض ما يخصّ المضبوط فقط
+        $rows = array_merge($rows, $mailer === 'resend'
+            ? [['RESEND_API_KEY', $this->masked(config('mail.mailers.resend.key'))]]
+            : [
+                ['MAIL_HOST', config('mail.mailers.smtp.host') ?: '—'],
+                ['MAIL_PORT', config('mail.mailers.smtp.port') ?: '—'],
+                ['MAIL_SCHEME', config('mail.mailers.smtp.scheme') ?: '—'],
+                ['MAIL_USERNAME', config('mail.mailers.smtp.username') ?: '—'],
+                ['MAIL_PASSWORD', $this->masked(config('mail.mailers.smtp.password'))],
+            ]);
+
+        $rows[] = ['MAIL_FROM_ADDRESS', config('mail.from.address') ?: '—'];
+        $rows[] = ['MAIL_FROM_NAME', config('mail.from.name') ?: '—'];
+
         $this->newLine();
         $this->line('<comment>الإعداد الفعّال:</comment>');
-        $this->table(['المفتاح', 'القيمة'], [
-            ['MAIL_MAILER', $mailer],
-            ['MAIL_HOST', config('mail.mailers.smtp.host') ?: '—'],
-            ['MAIL_PORT', config('mail.mailers.smtp.port') ?: '—'],
-            ['MAIL_SCHEME', config('mail.mailers.smtp.scheme') ?: '—'],
-            ['MAIL_USERNAME', config('mail.mailers.smtp.username') ?: '—'],
-            ['MAIL_PASSWORD', $this->maskedPassword()],
-            ['MAIL_FROM_ADDRESS', config('mail.from.address') ?: '—'],
-            ['MAIL_FROM_NAME', config('mail.from.name') ?: '—'],
-        ]);
+        $this->table(['المفتاح', 'القيمة'], $rows);
 
         if ($mailer === 'log') {
             $this->warn('MAIL_MAILER=log — الرسالة تُكتب في storage/logs/laravel.log ولا تُرسَل فعلياً.');
@@ -65,18 +72,18 @@ class MailTestCommand extends Command
         return self::SUCCESS;
     }
 
-    /** يُظهر طول كلمة المرور ووجود مسافات دون كشف قيمتها */
-    private function maskedPassword(): string
+    /** يُظهر طول القيمة السرّية ووجود مسافات فيها دون كشفها */
+    private function masked(mixed $secret): string
     {
-        $password = (string) config('mail.mailers.smtp.password');
+        $secret = (string) $secret;
 
-        if ($password === '') {
+        if ($secret === '') {
             return '— (غير مضبوطة)';
         }
 
-        $note = str_contains($password, ' ') ? ' ⚠ تحتوي مسافات' : '';
+        $note = str_contains($secret, ' ') ? ' ⚠ تحتوي مسافات' : '';
 
-        return str_repeat('•', min(mb_strlen($password), 24)).' ('.mb_strlen($password).' محرفاً)'.$note;
+        return str_repeat('•', min(mb_strlen($secret), 24)).' ('.mb_strlen($secret).' محرفاً)'.$note;
     }
 
     /** ترجمة أشهر أخطاء SMTP إلى خطوة عملية */

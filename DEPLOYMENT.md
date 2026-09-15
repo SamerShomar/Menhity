@@ -268,16 +268,23 @@ Resend يرفض الإرسال من نطاق لا تملكه.
 
 | المتغيّر | القيمة |
 |---|---|
-| `MAIL_MAILER` | `smtp` |
-| `MAIL_HOST` | `smtp.resend.com` |
-| `MAIL_PORT` | `587` |
-| `MAIL_SCHEME` | `smtp` |
-| `MAIL_USERNAME` | `resend` |
-| `MAIL_PASSWORD` | مفتاح Resend من الخطوة ١ |
+| `MAIL_MAILER` | `resend` |
+| `RESEND_API_KEY` | مفتاح Resend من الخطوة ١ |
 | `MAIL_FROM_ADDRESS` | `no-reply@yourdomain.com` (أو `onboarding@resend.dev`) |
 | `MAIL_FROM_NAME` | `منحتي` |
 
 احفظ وانتظر إعادة النشر.
+
+> **لماذا لا SMTP؟** تحجب أغلب الاستضافات — Railway منها — المنافذ
+> الصادرة 25 و465 و587 لمنع السبام، فيفشل الإرسال بمهلة اتصال:
+> `Connection could not be established ... (Connection timed out)`.
+> الوضع `resend` يرسل عبر **HTTPS (المنفذ 443)** الذي لا يُحجب أبداً،
+> ويحتاج متغيّرين لا سبعة.
+>
+> إن أصررت على SMTP حيث لا يكون محجوباً: `MAIL_MAILER=smtp`،
+> `MAIL_HOST=smtp.resend.com`، `MAIL_PORT=587` (أو **2587** كبديل عند
+> الحجب)، `MAIL_SCHEME=smtp`، `MAIL_USERNAME=resend`،
+> `MAIL_PASSWORD=<المفتاح>`.
 
 ### ٤. تحقّق
 
@@ -430,6 +437,7 @@ php artisan menhity:mail-test your@email.com
 
 | الخطأ | السبب |
 |---|---|
+| `Connection could not be established ... timed out` | **الأشهر** — الاستضافة تحجب منفذ SMTP الصادر. انتقل إلى `MAIL_MAILER=resend` مع `RESEND_API_KEY` (عبر HTTPS)، أو جرّب المنفذ البديل `2587` |
 | `The "tls" scheme is not supported` | `MAIL_SCHEME=tls` — استخدم `smtp` (منفذ 587) أو `smtps` (منفذ 465) |
 | `535 Username and Password not accepted` | مع Gmail: كلمة مرور الحساب بدل App Password، أو لُصقت بمسافات |
 | `550` أو `domain is not verified` | `MAIL_FROM_ADDRESS` على نطاق غير موثَّق لدى المزوّد |
