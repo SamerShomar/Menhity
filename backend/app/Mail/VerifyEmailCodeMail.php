@@ -25,6 +25,7 @@ class VerifyEmailCodeMail extends Mailable
     {
         return new Content(
             view: 'emails.verification-code',
+            text: 'emails.verification-code-text',
             with: [
                 'name' => $this->user->firstName(),
                 'code' => $this->code,

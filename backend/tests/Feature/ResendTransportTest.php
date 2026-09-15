@@ -54,6 +54,23 @@ class ResendTransportTest extends TestCase
         });
     }
 
+    public function test_it_sends_a_plain_text_alternative_alongside_the_html(): void
+    {
+        $this->useResend();
+        Http::fake(['api.resend.com/*' => Http::response(['id' => 'msg_1'])]);
+
+        $this->send();
+
+        // غياب النسخة النصية إشارة تصنيف لدى مزوّدي البريد
+        Http::assertSent(function (Request $request) {
+            $body = $request->data();
+
+            return filled($body['text'] ?? null)
+                && str_contains($body['text'], '654321')
+                && ! str_contains($body['text'], '<');
+        });
+    }
+
     public function test_it_surfaces_an_api_error(): void
     {
         $this->useResend();
