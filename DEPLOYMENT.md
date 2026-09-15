@@ -153,6 +153,87 @@ php artisan key:generate --show
 
 ---
 
+## بديل: النشر على Railway
+
+Railway تستضيف **الخادم وقاعدة البيانات معاً** في مكان واحد، ولا ينام الخادم —
+فلا تنتظر ٤٠ ثانية كما في Render. المقابل أنها **ليست مجانية على المدى الطويل**:
+رصيد تجريبي عند التسجيل، ثم خطة Hobby بحدود ٥ دولارات شهرياً.
+تحقّق من أسعارهم الحالية لأنها تتغيّر.
+
+المشروع مهيّأ لها: `backend/railway.json` يحدّد البناء بـ Dockerfile وفحص الصحة على `/up`.
+
+### ١. أنشئ المشروع وقاعدة البيانات
+
+1. سجّل في [railway.app](https://railway.app) بحساب GitHub.
+2. **New Project** ← **Deploy from GitHub repo** ← اختر `Menhity`.
+3. داخل المشروع: **New** ← **Database** ← **Add PostgreSQL**.
+   تُنشأ خدمة باسم `Postgres` وتوفّر متغيّر `DATABASE_URL` تلقائياً.
+
+### ٢. اضبط خدمة الخادم
+
+من إعدادات خدمة `Menhity`:
+
+| الإعداد | القيمة |
+|---|---|
+| **Root Directory** | `backend` |
+| **Builder** | يُكتشف تلقائياً من `railway.json` (Dockerfile) |
+
+> إن لم تضبط **Root Directory** على `backend` فلن تجد Railway ملف `Dockerfile` وسيفشل البناء.
+
+### ٣. متغيّرات البيئة
+
+من تبويب **Variables** في خدمة الخادم:
+
+| المتغيّر | القيمة |
+|---|---|
+| `APP_NAME` | `منحتي` |
+| `APP_ENV` | `production` |
+| `APP_DEBUG` | `false` |
+| `APP_KEY` | ناتج `php artisan key:generate --show` |
+| `APP_URL` | رابط الخدمة بعد توليده (الخطوة ٤) |
+| `APP_LOCALE` | `ar` |
+| `LOG_CHANNEL` | `stderr` |
+| `DB_CONNECTION` | `pgsql` |
+| `DB_URL` | `${{Postgres.DATABASE_URL}}` ← **اكتبه هكذا حرفياً** |
+| `FRONTEND_URL` | رابط الواجهة (الخطوة ٥) |
+| `SESSION_DRIVER` | `database` |
+| `CACHE_STORE` | `database` |
+| `QUEUE_CONNECTION` | `database` |
+| `FILESYSTEM_DISK` | `public` |
+| `SEED_ON_DEPLOY` | `true` ← **عند أول نشر فقط** |
+
+> `${{Postgres.DATABASE_URL}}` ليست قيمة تنسخها بنفسك — هي **مرجع** تفهمه Railway
+> فتربط الخدمتين. لو غيّرت كلمة مرور قاعدة البيانات لاحقاً يتحدّث الرابط تلقائياً.
+
+### ٤. ولّد الرابط العام
+
+**Settings** ← **Networking** ← **Generate Domain**.
+ستحصل على رابط مثل `https://menhity-production.up.railway.app`.
+
+انسخه وضعه في `APP_URL`، ثم أعد النشر.
+
+تحقّق: افتح `<الرابط>/api/v1/stats` — لازم يظهر JSON بالأرقام.
+
+> بعد نجاح أول نشر، **غيّر `SEED_ON_DEPLOY` إلى `false`**.
+
+### ٥. الواجهة
+
+الأفضل إبقاؤها على **Cloudflare Pages** (الخطوة ٣ أعلاه) — مجانية وأسرع، ولا تستهلك
+رصيد Railway. اضبط فقط:
+
+- في Cloudflare: `VITE_API_URL` = `https://<رابط Railway>/api/v1`
+- في Railway: `FRONTEND_URL` = `https://menhity.pages.dev`
+
+ولو أردت وضعها على Railway أيضاً: **New** ← **GitHub Repo** ← نفس المستودع،
+Root Directory = `frontend`، وستكتشف Railway مشروع Vite وتبنيه تلقائياً.
+
+### النطاق الخاص على Railway
+
+**Settings** ← **Networking** ← **Custom Domain**. تعطيك Railway سجل `CNAME` تضيفه
+عند مسجّل نطاقك. النطاق نفسه تشتريه من جهة أخرى — Railway لا تبيع نطاقات.
+
+---
+
 ## أسئلة شائعة
 
 **لماذا لا أضع كل شيء على Render؟**
@@ -167,4 +248,13 @@ php artisan key:generate --show
 هذا نوم الخطة المجانية، لا خطأ في المشروع. راجع التنبيه في أول الصفحة.
 
 **كيف أحدّث الموقع بعد تعديل الكود؟**
-ادفع إلى `main` على GitHub — Render وCloudflare ينشران تلقائياً.
+ادفع إلى `main` على GitHub — Render وCloudflare وRailway تنشر تلقائياً.
+
+**Render أم Railway؟**
+
+| | Render (مجاني) | Railway (مدفوع) |
+|---|---|---|
+| التكلفة | صفر | ~$5/شهر بعد الرصيد التجريبي |
+| النوم بعد الخمول | ينام — أول طلب ٤٠–٦٠ ثانية | لا ينام |
+| قاعدة البيانات | خارجية (Neon) | مدمجة بضغطة |
+| الأنسب لـ | عرض مشروع، تجربة | موقع بزوّار فعليين |
