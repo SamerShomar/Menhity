@@ -270,6 +270,16 @@ Root Directory = `frontend`، وستكتشف Railway مشروع Vite وتبني�
 CORS يمنع الواجهة. تأكد أن `FRONTEND_URL` في Railway يطابق رابط الواجهة **تماماً**
 بلا شرطة مائلة في آخره، ثم أعد النشر.
 
+### خطأ 404 من Gemini يقول إن النموذج لم يعد متاحاً
+
+```
+Gemini (404): This model models/gemini-X is no longer available to new users.
+Please update your code to use models/gemini-Y
+```
+
+تسحب Google النماذج القديمة من المستخدمين الجدد دورياً. الرسالة تسمّي البديل —
+أضف متغيّر `GEMINI_MODEL` بقيمة الاسم الجديد وأعد النشر. لا حاجة لتعديل الكود.
+
 ### البيانات التجريبية تتكرّر مع كل نشر
 
 `SEED_ON_DEPLOY` ما زال `true`. غيّره إلى `false`.
