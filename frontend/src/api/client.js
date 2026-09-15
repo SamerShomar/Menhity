@@ -19,9 +19,16 @@ export function setToken(token) {
   }
 }
 
+/** مهلة عامة — بدونها يدور مؤشّر التحميل بلا نهاية إن لم يستجب الخادم */
+export const REQUEST_TIMEOUT = 30_000;
+
+/** توليد الذكاء الاصطناعي يستغرق دقيقة أو أكثر، فله مهلة خاصة */
+export const AI_TIMEOUT = 130_000;
+
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? "/api/v1",
   headers: { Accept: "application/json" },
+  timeout: REQUEST_TIMEOUT,
 });
 
 // إرفاق توكن الوصول مع كل طلب
@@ -57,8 +64,12 @@ export function parseApiError(error) {
   const response = error?.response;
 
   if (!response) {
+    const timedOut = error?.code === "ECONNABORTED" || error?.code === "ETIMEDOUT";
+
     return {
-      message: "تعذّر الاتصال بالخادم. تحقّق من اتصالك وحاول مجدداً.",
+      message: timedOut
+        ? "استغرق الخادم وقتاً أطول من المتوقّع ولم يردّ. حاول مجدداً بعد قليل."
+        : "تعذّر الاتصال بالخادم. تحقّق من اتصالك وحاول مجدداً.",
       errors: {},
     };
   }

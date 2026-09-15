@@ -1,4 +1,4 @@
-import { api } from "./client";
+import { AI_TIMEOUT, api } from "./client";
 
 /** كل نداءات الـ API في مكان واحد حتى لا تتناثر المسارات في المكوّنات */
 
@@ -82,7 +82,8 @@ export const settingsApi = {
 /* ---------------- أدوات الذكاء الاصطناعي ---------------- */
 export const aiApi = {
   tools: () => api.get("/ai-tools").then((r) => r.data),
-  run: (key, payload) => api.post(`/ai-tools/${key}/run`, payload).then((r) => r.data.data),
+  run: (key, payload) =>
+    api.post(`/ai-tools/${key}/run`, payload, { timeout: AI_TIMEOUT }).then((r) => r.data.data),
 };
 
 export const cvOrderApi = {
