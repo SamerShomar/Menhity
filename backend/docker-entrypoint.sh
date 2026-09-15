@@ -35,13 +35,31 @@ echo "→ انتظار قاعدة البيانات"
 attempt=1
 until php artisan db:show --quiet >/dev/null 2>&1; do
   if [ "$attempt" -ge 12 ]; then
+    last_error=$(php artisan db:show 2>&1 || true)
+
     echo ""
     echo "  تفاصيل آخر محاولة اتصال:"
-    php artisan db:show 2>&1 | grep -v '^\s*$' | head -12 || true
+    echo "$last_error" | grep -v '^[[:space:]]*$' | head -8
+
+    # الاتصال بالمضيف المحلي داخل حاوية يعني أن رابط قاعدة البيانات لم يصل
+    # أصلاً، فسقط Laravel إلى قيمه الافتراضية — وهذا عرَض مختلف تماماً
+    # عن قاعدة بعيدة لم تستجب، ويستحق إرشاداً مختلفاً.
+    if echo "$last_error" | grep -qE '127\.0\.0\.1|localhost'; then
+      fail "رابط قاعدة البيانات لم يصل إلى التطبيق.
+  المحاولة ذهبت إلى 127.0.0.1 وهي قيمة Laravel الافتراضية، أي أن DB_URL فارغ.
+
+  على Railway هذا يحدث غالباً لأن اسم خدمة قاعدة البيانات لا يطابق المرجع:
+  إن كتبت \${{Postgres.DATABASE_URL}} واسم الخدمة ليس Postgres بالضبط،
+  تترك Railway القيمة فارغة بصمت.
+
+  الحل المضمون: في حقل DB_URL اكتب \${{ فقط، فتفتح قائمة بالخدمات —
+  اختر خدمة قاعدة البيانات ثم DATABASE_URL. وتحقّق أن القيمة المُحلّلة
+  تظهر تحت الحقل وتبدأ بـ postgresql://"
+    fi
+
     fail "تعذّر الاتصال بقاعدة البيانات بعد 12 محاولة (60 ثانية).
-  على Railway: أضف خدمة PostgreSQL، ثم اكتب المتغيّر حرفياً هكذا:
-      DB_URL=\${{Postgres.DATABASE_URL}}
-  وتأكد أن DB_CONNECTION=pgsql"
+  الرابط يصل لكن الخادم لا يستجيب — تأكد أن خدمة قاعدة البيانات تعمل،
+  وأن DB_CONNECTION=pgsql"
   fi
   echo "   المحاولة ${attempt}/12 — إعادة المحاولة بعد 5 ثوانٍ"
   attempt=$((attempt + 1))
