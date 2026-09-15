@@ -315,8 +315,10 @@ npm run lint      # فحص الكود
 والواجهة على **Cloudflare Pages** — الخطوات كاملة بالعربية في
 [DEPLOYMENT.md](DEPLOYMENT.md).
 
-ملفات النشر الجاهزة: `backend/Dockerfile` · `backend/docker-entrypoint.sh` · `render.yaml`
-· `frontend/public/_redirects` · `frontend/vercel.json`
+يشرح الدليل أيضاً بديل **Railway** (الخادم وقاعدة البيانات معاً، بلا نوم، لكن مدفوع).
+
+ملفات النشر الجاهزة: `backend/Dockerfile` · `backend/docker-entrypoint.sh` ·
+`backend/railway.json` · `render.yaml` · `frontend/public/_redirects` · `frontend/vercel.json`
 
 ---
 
