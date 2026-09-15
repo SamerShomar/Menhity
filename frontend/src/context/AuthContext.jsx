@@ -43,11 +43,16 @@ export function AuthProvider({ children }) {
     return data.user;
   }, []);
 
-  const register = useCallback(async (payload) => {
-    const data = await authApi.register(payload);
-    setToken(data.token);
-    setUser(data.user);
-    return data.user;
+  /*
+   * التسجيل لا يفتح جلسة: الخادم يرسل رمز تأكيد إلى البريد ويعيد
+   * requires_verification، والجلسة تبدأ بعد نجاح التأكيد.
+   */
+  const register = useCallback(async (payload) => authApi.register(payload), []);
+
+  /** تبنّي جلسة سلّمها الخادم بعد تأكيد البريد */
+  const adoptSession = useCallback((token, nextUser) => {
+    setToken(token);
+    setUser(nextUser);
   }, []);
 
   const logout = useCallback(async () => {
@@ -77,12 +82,13 @@ export function AuthProvider({ children }) {
       isAdmin: Boolean(user?.is_admin_level),
       login,
       register,
+      adoptSession,
       logout,
       refresh,
       setUser,
       clearSession,
     }),
-    [user, loading, login, register, logout, refresh, clearSession],
+    [user, loading, login, register, adoptSession, logout, refresh, clearSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

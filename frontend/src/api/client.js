@@ -66,8 +66,9 @@ export function parseApiError(error) {
   const data = response.data ?? {};
   const errors = {};
 
+  // تُقرأ في المكوّنات بصيغة fieldErrors.field?.[0]، فنبقيها مصفوفات دائماً
   for (const [field, messages] of Object.entries(data.errors ?? {})) {
-    errors[field] = Array.isArray(messages) ? messages[0] : String(messages);
+    errors[field] = Array.isArray(messages) ? messages : [String(messages)];
   }
 
   return {

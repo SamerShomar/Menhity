@@ -43,9 +43,15 @@ export default function RegisterPage() {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const { ok } = await submit(form);
+    const { ok, result } = await submit(form);
 
-    if (ok) navigate("/dashboard", { replace: true });
+    // الجلسة تبدأ بعد تأكيد البريد، لا بعد إنشاء الحساب
+    if (ok) {
+      navigate("/verify-email", {
+        replace: true,
+        state: { email: result?.email ?? form.email, notice: result?.message },
+      });
+    }
   };
 
   const strengthTone = ["bg-ink-200", "bg-[color:var(--color-danger)]", "bg-gold-400", "bg-gold-500", "bg-[color:var(--color-success)]"][strength];
