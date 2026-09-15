@@ -49,11 +49,10 @@ class SettingsController extends Controller
                     ],
                     [
                         'key' => 'ai',
-                        'name' => 'مزوّد الذكاء الاصطناعي (Claude)',
+                        'name' => 'مزوّد الذكاء الاصطناعي',
                         'ok' => $this->ai->isConfigured(),
-                        'note' => $this->ai->isConfigured()
-                            ? 'المفتاح مضبوط'
-                            : 'وضع المحاكاة — المفتاح غير مضبوط',
+                        'note' => $this->ai->providerName()
+                            ?? 'وضع المحاكاة — لم يُضبط مفتاح أي مزوّد',
                     ],
                     [
                         'key' => 'mail',

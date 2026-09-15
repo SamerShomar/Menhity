@@ -189,7 +189,7 @@ class StudentDashboardApiTest extends TestCase
 
     public function test_an_ai_tool_runs_in_mock_mode_without_an_api_key(): void
     {
-        config(['menhity.ai.api_key' => null]);
+        config(['menhity.ai.gemini.api_key' => null, 'menhity.ai.anthropic.api_key' => null]);
 
         AiTool::create(['key' => 'profile-review', 'name_ar' => 'تقييم الملف الشخصي', 'sort_order' => 0]);
 

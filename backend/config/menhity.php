@@ -18,9 +18,27 @@ return [
     ],
 
     'ai' => [
-        'api_key' => env('ANTHROPIC_API_KEY'),
-        'model' => env('ANTHROPIC_MODEL', 'claude-opus-5'),
+        /*
+         * المزوّد المستخدم: gemini أو anthropic.
+         * بلا قيمة يُختار تلقائياً أول مزوّد مضبوط مفتاحه،
+         * وإن لم يُضبط أي مفتاح تعمل الأدوات بوضع المحاكاة.
+         */
+        'provider' => env('AI_PROVIDER'),
+
+        'gemini' => [
+            'api_key' => env('GEMINI_API_KEY'),
+            'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        ],
+
+        'anthropic' => [
+            'api_key' => env('ANTHROPIC_API_KEY'),
+            'model' => env('ANTHROPIC_MODEL', 'claude-opus-5'),
+        ],
+
         'max_tokens' => 8000,
+
+        /** مهلة الاتصال بالثواني — التوليد قد يستغرق دقيقة */
+        'timeout' => 120,
     ],
 
     'uploads' => [

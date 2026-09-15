@@ -2,21 +2,24 @@
 
 namespace App\Services;
 
-use Anthropic\Client;
-use Anthropic\Core\Exceptions\APIStatusException;
 use App\Enums\AiRunStatus;
 use App\Models\AiTool;
 use App\Models\AiToolRun;
 use App\Models\StudentProfile;
 use App\Models\User;
+use App\Services\Ai\AiProvider;
+use App\Services\Ai\ClaudeProvider;
+use App\Services\Ai\GeminiProvider;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 /**
  * طبقة أدوات الذكاء الاصطناعي.
  *
- * إذا كان ANTHROPIC_API_KEY مضبوطاً تُستخدم واجهة Claude الفعلية،
- * وإلا تعمل الأدوات بوضع المحاكاة حتى يبقى المشروع قابلاً للتشغيل دون مفتاح.
+ * تختار الخدمة المزوّد المضبوط مفتاحه (Gemini أو Claude)، وإن لم يُضبط أي
+ * مفتاح تعمل الأدوات بوضع المحاكاة حتى يبقى المشروع قابلاً للتشغيل والعرض
+ * فور استنساخه دون أي اشتراك.
  */
 class AiService
 {
@@ -36,7 +39,43 @@ class AiService
 
     public function isConfigured(): bool
     {
-        return filled(config('menhity.ai.api_key'));
+        return $this->provider() !== null;
+    }
+
+    /** اسم المزوّد الفعّال — يظهر في لوحة الإدارة */
+    public function providerName(): ?string
+    {
+        return $this->provider()?->name();
+    }
+
+    /**
+     * المزوّد الفعّال.
+     * مع ضبط AI_PROVIDER يُستخدم المطلوب صراحةً؛ وبدونه يُختار أول
+     * مزوّد مضبوط مفتاحه، فيكفي إضافة المفتاح دون إعداد إضافي.
+     */
+    private function provider(): ?AiProvider
+    {
+        $providers = [
+            'gemini' => fn () => new GeminiProvider,
+            'anthropic' => fn () => new ClaudeProvider,
+        ];
+
+        if ($requested = config('menhity.ai.provider')) {
+            $factory = $providers[$requested] ?? null;
+            $provider = $factory ? $factory() : null;
+
+            return $provider?->isConfigured() ? $provider : null;
+        }
+
+        foreach ($providers as $factory) {
+            $provider = $factory();
+
+            if ($provider->isConfigured()) {
+                return $provider;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -87,7 +126,7 @@ class AiService
 
         // --- الاتصال الفعلي بـ Claude ---
         try {
-            $output = $this->callClaude($toolKey, $profile, $userText, $target);
+            $output = $this->generate($toolKey, $profile, $userText, $target);
 
             $run?->update([
                 'status' => AiRunStatus::Success,
@@ -103,11 +142,13 @@ class AiService
                 'error' => null,
             ];
         } catch (Throwable $e) {
-            $message = $e instanceof APIStatusException
-                ? 'خطأ من مزوّد الذكاء الاصطناعي: '.($e->type?->value ?? $e->getMessage())
-                : $e->getMessage();
+            $message = $e->getMessage();
 
-            Log::warning('AI tool run failed', ['tool' => $toolKey, 'error' => $e->getMessage()]);
+            Log::warning('AI tool run failed', [
+                'tool' => $toolKey,
+                'provider' => $this->providerName(),
+                'error' => $message,
+            ]);
 
             $run?->update([
                 'status' => AiRunStatus::Failed,
@@ -130,13 +171,18 @@ class AiService
         return (int) round((microtime(true) - $startedAt) * 1000);
     }
 
-    private function callClaude(
+    /** يبني نص الطلب ويفوّض التوليد للمزوّد الفعّال */
+    private function generate(
         string $toolKey,
         StudentProfile $profile,
         ?string $userText,
         ?string $target,
     ): string {
-        $client = new Client(apiKey: config('menhity.ai.api_key'));
+        $provider = $this->provider();
+
+        if (! $provider) {
+            throw new RuntimeException('لا يوجد مزوّد ذكاء اصطناعي مضبوط.');
+        }
 
         $sections = ['بيانات الملف الأكاديمي:'.PHP_EOL.$this->summarizeProfile($profile)];
 
@@ -148,31 +194,10 @@ class AiService
             $sections[] = PHP_EOL.'النص المُقدَّم من المستخدم:'.PHP_EOL.$userText;
         }
 
-        $message = $client->messages->create(
-            model: config('menhity.ai.model'),
-            maxTokens: config('menhity.ai.max_tokens'),
-            system: [
-                ['type' => 'text', 'text' => $this->systemPrompt($toolKey)],
-            ],
-            thinking: ['type' => 'adaptive'],
-            messages: [
-                ['role' => 'user', 'content' => implode(PHP_EOL, $sections)],
-            ],
+        return $provider->generate(
+            $this->systemPrompt($toolKey),
+            implode(PHP_EOL, $sections),
         );
-
-        if ($message->stopReason === 'refusal') {
-            throw new \RuntimeException('تعذّر إنتاج المحتوى لهذا الطلب.');
-        }
-
-        $text = '';
-
-        foreach ($message->content as $block) {
-            if ($block->type === 'text') {
-                $text .= $block->text."\n";
-            }
-        }
-
-        return trim($text);
     }
 
     /* ------------------------------------------------------------
