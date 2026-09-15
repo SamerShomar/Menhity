@@ -271,7 +271,7 @@ Resend يرفض الإرسال من نطاق لا تملكه.
 | `MAIL_MAILER` | `smtp` |
 | `MAIL_HOST` | `smtp.resend.com` |
 | `MAIL_PORT` | `587` |
-| `MAIL_SCHEME` | `tls` |
+| `MAIL_SCHEME` | `smtp` |
 | `MAIL_USERNAME` | `resend` |
 | `MAIL_PASSWORD` | مفتاح Resend من الخطوة ١ |
 | `MAIL_FROM_ADDRESS` | `no-reply@yourdomain.com` (أو `onboarding@resend.dev`) |
@@ -283,6 +283,32 @@ Resend يرفض الإرسال من نطاق لا تملكه.
 
 أنشئ حساباً جديداً على الموقع. يجب أن تصل رسالة تحمل رمزاً من ستة أرقام
 خلال ثوانٍ. إن لم تجدها، راجع مجلد **Spam** ثم سجلّ **Logs** في Railway.
+
+> **`MAIL_SCHEME` يقبل `smtp` أو `smtps` فقط.** استخدم `smtp` مع المنفذ 587
+> و`smtps` مع المنفذ 465. القيمة `tls` **غير مقبولة** ويفشل كل إرسال معها.
+
+### بديل بلا دومين: Gmail
+
+Resend يرفض الإرسال من نطاق لا تملكه، فإن لم يكن لديك دومين بعد استخدم
+Gmail: مجاني، **٥٠٠ رسالة/يوم**، ولا يحتاج نطاقاً.
+
+1. فعّل **التحقق بخطوتين** في حساب Google.
+2. افتح [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords).
+3. اكتب أي اسم ← **Create** ← انسخ الـ **16 محرفاً**.
+
+| المتغيّر | القيمة |
+|---|---|
+| `MAIL_MAILER` | `smtp` |
+| `MAIL_HOST` | `smtp.gmail.com` |
+| `MAIL_PORT` | `587` |
+| `MAIL_SCHEME` | `smtp` |
+| `MAIL_USERNAME` | بريدك الكامل على Gmail |
+| `MAIL_PASSWORD` | الـ 16 محرفاً **بلا مسافات** |
+| `MAIL_FROM_ADDRESS` | نفس بريدك على Gmail |
+| `MAIL_FROM_NAME` | `منحتي` |
+
+> Google يعرض كلمة المرور مقسّمة (`abcd efgh ijkl mnop`) — **احذف المسافات**
+> عند لصقها، وإلا رُفضت المصادقة.
 
 > **مزوّدات بديلة** بالإعداد نفسه، يتغيّر `MAIL_HOST` و`MAIL_USERNAME` فقط:
 > [Brevo](https://brevo.com) (٣٠٠ رسالة/يوم)، [Mailgun](https://mailgun.com)،
@@ -393,14 +419,25 @@ Please update your code to use models/gemini-Y
 
 ### المستخدم يسجّل لكن لا تصله رسالة التأكيد
 
-راجع ثلاثة أشياء بالترتيب:
+افتح **Console** في Railway ونفّذ:
 
-1. `MAIL_MAILER` ما زال `log` — الرسالة تُكتب في السجل بدل إرسالها.
-2. `MAIL_FROM_ADDRESS` على نطاق غير موثَّق لدى المزوّد، فيرفض الإرسال.
-3. الرسالة في مجلد **Spam**.
+```
+php artisan menhity:mail-test your@email.com
+```
 
-سجلّ **Logs** في Railway يحمل سبب الرفض حرفياً — التطبيق يسجّل فشل الإرسال
-ولا يُسقط إنشاء الحساب، فالمستخدم يستطيع طلب رمز جديد بعد ضبط الإعداد.
+يطبع الأمر الإعداد الفعّال ثم يحاول إرسال رسالة حقيقية، ويعرض نص خطأ SMTP
+كاملاً مع الخطوة العملية المقابلة. أشهر الأسباب:
+
+| الخطأ | السبب |
+|---|---|
+| `The "tls" scheme is not supported` | `MAIL_SCHEME=tls` — استخدم `smtp` (منفذ 587) أو `smtps` (منفذ 465) |
+| `535 Username and Password not accepted` | مع Gmail: كلمة مرور الحساب بدل App Password، أو لُصقت بمسافات |
+| `550` أو `domain is not verified` | `MAIL_FROM_ADDRESS` على نطاق غير موثَّق لدى المزوّد |
+| `Connection could not be established` | `MAIL_HOST` أو `MAIL_PORT` خطأ |
+| لا خطأ لكن لا رسالة | `MAIL_MAILER` ما زال `log`، أو الرسالة في **Spam** |
+
+التطبيق يسجّل فشل الإرسال ولا يُسقط إنشاء الحساب، فالمستخدم يستطيع طلب رمز
+جديد بعد ضبط الإعداد.
 
 ### مستخدم قديم لا يستطيع الدخول بعد تحديث تأكيد البريد
 
