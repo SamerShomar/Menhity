@@ -65,8 +65,14 @@ return [
             // ],
         ],
 
+        /*
+         * Resend عبر HTTPS — لا يحتاج منفذ SMTP، فيعمل على الاستضافات
+         * التي تحجب المنافذ الصادرة 25 و465 و587.
+         */
         'resend' => [
             'transport' => 'resend',
+            'key' => env('RESEND_API_KEY'),
+            'timeout' => (int) env('MAIL_TIMEOUT', 15),
         ],
 
         'sendmail' => [

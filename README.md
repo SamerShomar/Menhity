@@ -277,7 +277,8 @@ docs/
 | `APP_URL` | ✅ | عنوان الخادم — يُبنى منه رابط المستندات |
 | `DB_CONNECTION` | ✅ | `pgsql` |
 | `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | ✅ | بيانات الاتصال بقاعدة البيانات |
-| `MAIL_MAILER` + `MAIL_HOST` + `MAIL_PORT` + `MAIL_USERNAME` + `MAIL_PASSWORD` | ✅ | إعداد SMTP — بدونه لا تصل رسائل تأكيد الحساب واستعادة كلمة المرور |
+| `MAIL_MAILER` | ✅ | `resend` (عبر HTTPS، موصى به) أو `smtp` — بدونه لا تصل رسائل تأكيد الحساب واستعادة كلمة المرور |
+| `RESEND_API_KEY` | ✅ | مع `MAIL_MAILER=resend`. الوضع `smtp` يحتاج `MAIL_HOST` و`MAIL_PORT` و`MAIL_USERNAME` و`MAIL_PASSWORD` بدلاً منه |
 | `MAIL_FROM_ADDRESS` | ✅ | بريد المُرسِل، على نطاق موثَّق لدى المزوّد |
 | `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` | ❌ | Cloudflare Workers AI — حصة يومية مجانية بلا بطاقة دفع (يلزم المتغيّران معاً) |
 | `CLOUDFLARE_MODEL` | ❌ | اسم نموذج Workers AI؛ الافتراضي `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
