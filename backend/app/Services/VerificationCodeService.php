@@ -50,6 +50,8 @@ class VerificationCodeService
             Log::error('تعذّر إرسال رمز التحقق بالبريد', [
                 'user_id' => $user->id,
                 'type' => $type,
+                // الناقل المستخدم فعلياً — يميّز خطأ الإعداد عن خطأ المزوّد
+                'mailer' => config('mail.default'),
                 'error' => $e->getMessage(),
             ]);
         }
