@@ -241,8 +241,10 @@ export default function AdminScholarshipsPage() {
 
       {/* تأكيد الحذف */}
       {confirming ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-navy-900/50 backdrop-blur-sm p-4">
-          <div className="glass-strong w-full max-w-md rounded-2xl p-6">
+        <div className="fixed inset-0 z-50 grid place-items-center p-4">
+          {/* التعتيم طبقة شقيقة لا حاضنة: عنصر مموّه يحرم ما بداخله من تمويه ما وراءه */}
+          <div className="absolute inset-0 bg-navy-900/50 backdrop-blur-sm" aria-hidden="true" />
+          <div className="glass-strong relative w-full max-w-md rounded-2xl p-6">
             <h2 className="font-display text-lg font-bold text-navy-800">حذف المنحة</h2>
             <p className="mt-2 text-[13.5px] leading-7 text-ink-600">
               سيُحذف «{confirming.title_ar}» نهائياً مع كل بياناتها المرتبطة. لا يمكن التراجع.
