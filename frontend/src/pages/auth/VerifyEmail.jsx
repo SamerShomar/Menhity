@@ -12,6 +12,9 @@ import { useSubmit } from "@/hooks/useApi";
 
 const RESEND_SECONDS = 60;
 
+/* حين يبلّغ الخادم أن الرسالة لم تغادره أصلاً، لا معنى لانتظار دقيقة كاملة */
+const RETRY_SECONDS = 15;
+
 /**
  * تأكيد البريد بعد إنشاء الحساب.
  *
@@ -25,9 +28,11 @@ export default function VerifyEmailPage() {
 
   const email = location.state?.email;
   const notice = location.state?.notice;
+  // false فقط حين أبلغ الخادم صراحةً أن رسالة الرمز لم تُرسَل (تعطّل مزوّد البريد)
+  const codeSent = location.state?.codeSent !== false;
 
   const [digits, setDigits] = useState(emptyCode);
-  const [seconds, setSeconds] = useState(RESEND_SECONDS);
+  const [seconds, setSeconds] = useState(codeSent ? RESEND_SECONDS : RETRY_SECONDS);
   const [resent, setResent] = useState(null);
   const codeInput = useRef(null);
 
@@ -80,7 +85,7 @@ export default function VerifyEmailPage() {
       title="أكّد بريدك الإلكتروني"
       description={
         <>
-          أرسلنا رمزاً من ستة أرقام إلى
+          {codeSent ? "أرسلنا رمزاً من ستة أرقام إلى" : "سنرسل رمزاً من ستة أرقام إلى"}
           <br />
           <span className="font-semibold text-navy-700" dir="ltr">
             {email}
@@ -88,9 +93,14 @@ export default function VerifyEmailPage() {
         </>
       }
     >
-      {notice ? (
-        <Alert tone="success" className="mb-5">
+      {notice && !resent ? (
+        <Alert tone={codeSent ? "success" : "warning"} className="mb-5">
           {notice}
+          {!codeSent ? (
+            <span className="mt-1 block">
+              المشكلة في إرسال البريد من جهتنا لا في بريدك. إن تكرّرت بعد إعادة الإرسال، تواصل مع الدعم.
+            </span>
+          ) : null}
         </Alert>
       ) : null}
 

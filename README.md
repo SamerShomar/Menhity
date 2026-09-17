@@ -92,7 +92,7 @@
 | طلبات HTTP | Axios مع اعتراض 401 وتوحيد رسائل الخطأ |
 | الأيقونات | lucide-react عبر سجل أيقونات صريح |
 | الذكاء الاصطناعي | Cloudflare Workers AI أو Google Gemini (كلاهما مجاني) أو Anthropic Claude — اختياري، يعمل بوضع محاكاة بدونها |
-| الاختبارات | PHPUnit (39 اختباراً · 129 تأكيداً) |
+| الاختبارات | PHPUnit (92 اختباراً · 267 تأكيداً) |
 | تنسيق الكود | Laravel Pint · oxlint |
 
 الخطوط: **Tajawal** للنصوص و**Cairo** للعناوين.
@@ -192,7 +192,7 @@ npm run dev                  # http://127.0.0.1:5173
 │   │   ├── migrations/            # 8 ترحيلات للمجال + ترحيلات Laravel
 │   │   └── seeders/               # بيانات تجريبية كاملة
 │   ├── routes/api.php             # 66 مساراً تحت /api/v1
-│   └── tests/Feature/             # 39 اختباراً
+│   └── tests/                     # 92 اختباراً (Feature + Unit)
 │
 └── frontend/                      # React — الواجهة
     ├── src/
@@ -277,9 +277,11 @@ docs/
 | `APP_URL` | ✅ | عنوان الخادم — يُبنى منه رابط المستندات |
 | `DB_CONNECTION` | ✅ | `pgsql` |
 | `DB_DATABASE` / `DB_USERNAME` / `DB_PASSWORD` | ✅ | بيانات الاتصال بقاعدة البيانات |
-| `MAIL_MAILER` | ✅ | `resend` (عبر HTTPS، موصى به) أو `smtp` — بدونه لا تصل رسائل تأكيد الحساب واستعادة كلمة المرور |
-| `RESEND_API_KEY` | ✅ | مع `MAIL_MAILER=resend`. الوضع `smtp` يحتاج `MAIL_HOST` و`MAIL_PORT` و`MAIL_USERNAME` و`MAIL_PASSWORD` بدلاً منه |
-| `MAIL_FROM_ADDRESS` | ✅ | بريد المُرسِل، على نطاق موثَّق لدى المزوّد |
+| `MAIL_MAILER` | ✅ | `resend` أو `gmail` (كلاهما عبر HTTPS فيعملان حيث تحجب الاستضافة SMTP) أو `smtp` — بدونه لا تصل رسائل تأكيد الحساب واستعادة كلمة المرور |
+| `RESEND_API_KEY` | ✅ | مع `MAIL_MAILER=resend` — يحتاج نطاقاً موثَّقاً لدى Resend |
+| `GMAIL_CLIENT_ID` + `GMAIL_CLIENT_SECRET` + `GMAIL_REFRESH_TOKEN` | ✅ | مع `MAIL_MAILER=gmail` — الإرسال من حساب Gmail بلا نطاق؛ يطبعها `php artisan menhity:gmail-auth` |
+| `MAIL_HOST` و`MAIL_PORT` و`MAIL_USERNAME` و`MAIL_PASSWORD` | ✅ | مع `MAIL_MAILER=smtp` فقط، حيث لا تُحجب المنافذ 587/465 |
+| `MAIL_FROM_ADDRESS` | ✅ | بريد المُرسِل: على نطاق موثَّق لدى المزوّد، أو بريد حساب Gmail المُخوَّل |
 | `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` | ❌ | Cloudflare Workers AI — حصة يومية مجانية بلا بطاقة دفع (يلزم المتغيّران معاً) |
 | `CLOUDFLARE_MODEL` | ❌ | اسم نموذج Workers AI؛ الافتراضي `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |
 | `GEMINI_API_KEY` | ❌ | مفتاح Google Gemini — طبقة مجانية بحدود يومية |
@@ -306,6 +308,8 @@ php artisan migrate:fresh --seed  # إعادة بناء قاعدة البيان�
 php artisan route:list --path=api # عرض كل مسارات الـ API
 php artisan test --compact        # تشغيل الاختبارات
 vendor/bin/pint                   # تنسيق كود PHP
+php artisan menhity:mail-test x@y # يفحص إعداد البريد ويرسل رسالة تجريبية
+php artisan menhity:gmail-auth    # يربط حساب Gmail مرة واحدة ويطبع متغيّرات MAIL_MAILER=gmail
 ```
 
 ### الواجهة
@@ -341,7 +345,7 @@ npm run lint      # فحص الكود
 
 | الميزة | الحالة | المطلوب |
 |---|---|---|
-| إرسال البريد الإلكتروني | يعمل عبر SMTP؛ بقيمة `MAIL_MAILER=log` تُكتب الرسالة في سجل الخادم بدل إرسالها | ضبط متغيّرات `MAIL_*` بمزوّد SMTP (Resend / Brevo / SES) |
+| إرسال البريد الإلكتروني | بقيمة `MAIL_MAILER=log` تُكتب الرسالة في سجل الخادم بدل إرسالها | ناقل عبر HTTPS: `resend` لنطاقك أو `gmail` لحساب Gmail (SMTP يُحجب على الاستضافة المجانية) |
 | تسجيل الدخول بـ Google / Apple | الأزرار موجودة وتعرض رسالة توضيحية | إضافة بيانات اعتماد OAuth |
 | توليد الذكاء الاصطناعي | يعمل بوضع المحاكاة | إضافة `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` أو `GEMINI_API_KEY` (كلاهما مجاني) أو `ANTHROPIC_API_KEY` |
 | تخزين الملفات | قرص `public` المحلي | نقله إلى تخزين سحابي (S3 / R2) عند النشر |

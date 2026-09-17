@@ -32,7 +32,7 @@ export default function LoginPage() {
     // حساب لم يؤكَّد بريده: الخادم أرسل رمزاً جديداً وننقله لشاشة التأكيد
     if (!ok && failure?.status === 409) {
       navigate("/verify-email", {
-        state: { email: form.email, notice: failure.message },
+        state: { email: form.email, notice: failure.message, codeSent: failure.data?.code_sent },
       });
       return;
     }
