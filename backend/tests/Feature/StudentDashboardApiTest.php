@@ -217,7 +217,7 @@ class StudentDashboardApiTest extends TestCase
     {
         $user = $this->student();
 
-        $this->actingAs($user)->postJson('/api/v1/cv-orders')
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])
             ->assertUnprocessable()
             ->assertJsonPath('message', 'أكمل «المعلومات الشخصية والنبذة» قبل إرسال الطلب.');
     }
@@ -228,7 +228,7 @@ class StudentDashboardApiTest extends TestCase
         $user = $this->student();
         $this->completeProfile($user);
 
-        $response = $this->actingAs($user)->postJson('/api/v1/cv-orders')->assertCreated();
+        $response = $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->assertCreated();
 
         $this->assertNotNull($response->json('data.order_number'));
         $this->assertSame(CvOrderStatus::InExpertReview->value, $response->json('data.status'));
@@ -244,14 +244,32 @@ class StudentDashboardApiTest extends TestCase
         );
     }
 
-    public function test_a_second_cv_order_is_blocked_while_one_is_active(): void
+    public function test_a_second_order_of_the_same_kind_is_blocked_while_one_is_active(): void
     {
         User::factory()->expert()->create();
         $user = $this->student();
         $this->completeProfile($user);
 
-        $this->actingAs($user)->postJson('/api/v1/cv-orders')->assertCreated();
-        $this->actingAs($user)->postJson('/api/v1/cv-orders')->assertStatus(409);
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->assertCreated();
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->assertStatus(409);
+    }
+
+    public function test_a_different_service_is_allowed_alongside_an_active_order(): void
+    {
+        Storage::fake('local');
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->assertCreated();
+
+        // مساران مستقلان — الأول لا يحجب الثاني
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', [
+            'kind' => 'letter_improve',
+            'file' => UploadedFile::fake()->create('letter.pdf', 40, 'application/pdf'),
+        ])->assertCreated();
+
+        $this->assertSame(2, $user->cvOrders()->count());
     }
 
     public function test_a_user_can_send_a_note_to_their_expert(): void
@@ -260,7 +278,7 @@ class StudentDashboardApiTest extends TestCase
         $user = $this->student();
         $this->completeProfile($user);
 
-        $orderId = $this->actingAs($user)->postJson('/api/v1/cv-orders')->json('data.id');
+        $orderId = $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->json('data.id');
 
         $this->actingAs($user)->postJson("/api/v1/cv-orders/{$orderId}/notes", [
             'body' => 'أرجو التركيز على خبرتي البحثية ومشروع التخرّج.',
@@ -272,10 +290,74 @@ class StudentDashboardApiTest extends TestCase
         User::factory()->expert()->create();
         $owner = $this->student();
         $this->completeProfile($owner);
-        $orderId = $this->actingAs($owner)->postJson('/api/v1/cv-orders')->json('data.id');
+        $orderId = $this->actingAs($owner)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->json('data.id');
 
         $intruder = $this->student();
         $this->actingAs($intruder)->getJson("/api/v1/cv-orders/{$orderId}")->assertForbidden();
+    }
+
+    public function test_an_improvement_request_requires_the_student_to_attach_a_file(): void
+    {
+        $user = $this->student();
+
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_improve'])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'أرفق ملفك الحالي ليتمكّن الفريق من تحسينه.');
+    }
+
+    public function test_an_improvement_request_stores_the_file_privately(): void
+    {
+        Storage::fake('local');
+        User::factory()->expert()->create();
+        $user = $this->student();
+
+        // التحسين يبدأ من ملف المستخدم، فلا يشترط اكتمال الملف الأكاديمي
+        $response = $this->actingAs($user)->postJson('/api/v1/cv-orders', [
+            'kind' => 'cv_improve',
+            'file' => UploadedFile::fake()->create('سيرتي.pdf', 120, 'application/pdf'),
+            'note' => 'أرجو إبراز خبرتي البحثية.',
+        ])->assertCreated();
+
+        $this->assertSame('cv_improve', $response->json('data.kind'));
+        $this->assertSame('سيرتي.pdf', $response->json('data.source_file_name'));
+
+        $order = $user->cvOrders()->first();
+        Storage::disk('local')->assertExists($order->source_file_path);
+        $this->assertStringStartsWith('cv-orders/source/', $order->source_file_path);
+    }
+
+    public function test_the_student_downloads_the_delivered_file_and_outsiders_cannot(): void
+    {
+        Storage::fake('local');
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+        $orderId = $this->actingAs($user)
+            ->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->json('data.id');
+
+        // قبل التسليم لا يوجد ما يُحمَّل
+        $this->actingAs($user)->get("/api/v1/cv-orders/{$orderId}/file")->assertNotFound();
+
+        $admin = User::factory()->admin()->create();
+        $this->actingAs($admin)->post("/api/v1/admin/orders/{$orderId}/deliver", [
+            'file' => UploadedFile::fake()->create('النهائية.pdf', 90, 'application/pdf'),
+        ])->assertOk();
+
+        $download = $this->actingAs($user)->get("/api/v1/cv-orders/{$orderId}/file")
+            ->assertOk()
+            ->assertDownload();
+
+        /*
+         * يكتب Laravel اسماً لاتينياً في filename للتوافق القديم، والاسم العربي
+         * في filename* وفق RFC 5987 — وهو ما تقرأه المتصفحات فعلياً.
+         */
+        $this->assertStringContainsString(
+            "filename*=utf-8''".rawurlencode('النهائية.pdf'),
+            $download->headers->get('content-disposition'),
+        );
+
+        $intruder = $this->student();
+        $this->actingAs($intruder)->get("/api/v1/cv-orders/{$orderId}/file")->assertForbidden();
     }
 
     public function test_settings_password_change_revokes_other_devices(): void

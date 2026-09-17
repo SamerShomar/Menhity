@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\CvOrderKind;
 use App\Enums\CvOrderStatus;
 use App\Enums\NotificationType;
 use App\Enums\TimelineStatus;
@@ -10,7 +11,9 @@ use App\Enums\UserStatus;
 use App\Models\CvOrder;
 use App\Models\StudentProfile;
 use App\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 /** إنشاء طلبات صياغة السيرة الذاتية وتحريك مراحلها */
@@ -63,13 +66,29 @@ class CvOrderService
     }
 
     /** إنشاء الطلب وإسناده لأقلّ الخبراء انشغالاً */
-    public function submit(User $user, StudentProfile $profile): CvOrder
-    {
-        foreach ($this->readiness($profile) as $requirement) {
-            if ($requirement['required'] && ! $requirement['done']) {
-                throw new RuntimeException("أكمل «{$requirement['label']}» قبل إرسال الطلب.");
+    public function submit(
+        User $user,
+        StudentProfile $profile,
+        CvOrderKind $kind = CvOrderKind::CvBuild,
+        ?UploadedFile $sourceFile = null,
+        ?string $note = null,
+    ): CvOrder {
+        /*
+         * اكتمال الملف الأكاديمي شرط للكتابة من الصفر وحدها — فهي تُبنى منه.
+         * أما التحسين فيبدأ من ملف يرفعه الطالب، فالشرط عليه أن يرفعه.
+         */
+        if ($kind === CvOrderKind::CvBuild) {
+            foreach ($this->readiness($profile) as $requirement) {
+                if ($requirement['required'] && ! $requirement['done']) {
+                    throw new RuntimeException("أكمل «{$requirement['label']}» قبل إرسال الطلب.");
+                }
             }
+        } elseif (! $sourceFile) {
+            throw new RuntimeException('أرفق ملفك الحالي ليتمكّن الفريق من تحسينه.');
         }
+
+        // قرص خاص لا عام: هذه مستندات شخصية لا يجوز الوصول إليها برابط مباشر
+        $sourcePath = $sourceFile?->store('cv-orders/source', 'local');
 
         $expert = User::where('role', UserRole::Expert)
             ->where('status', UserStatus::Active)
@@ -79,10 +98,14 @@ class CvOrderService
 
         $report = $this->ats->build($profile);
 
-        return DB::transaction(function () use ($user, $profile, $expert, $report): CvOrder {
+        return DB::transaction(function () use ($user, $profile, $expert, $report, $kind, $sourceFile, $sourcePath, $note): CvOrder {
             $order = CvOrder::create([
                 'order_number' => CvOrder::generateOrderNumber(),
                 'user_id' => $user->id,
+                'kind' => $kind,
+                'source_file_path' => $sourcePath,
+                'source_file_name' => $sourceFile?->getClientOriginalName(),
+                'request_note' => $note,
                 'expert_id' => $expert?->id,
                 'status' => CvOrderStatus::InExpertReview,
                 'current_step' => 5,
@@ -125,8 +148,8 @@ class CvOrderService
 
             $user->notifications()->create([
                 'type' => NotificationType::OrderUpdate,
-                'title' => 'تم استلام طلب صياغة سيرتك الذاتية',
-                'body' => "رقم الطلب {$order->order_number}. سيتواصل معك الخبير الأكاديمي خلال 24–48 ساعة عمل.",
+                'title' => 'تم استلام طلبك: '.$kind->label(),
+                'body' => "رقم الطلب {$order->order_number}. سيعمل الفريق على ملفك ويسلّمك النسخة النهائية خلال 24–48 ساعة عمل.",
                 'badge_label' => 'قيد المراجعة',
                 'action_label' => 'متابعة الطلب',
                 'action_url' => "/tools/cv-builder/orders/{$order->id}",
@@ -137,6 +160,42 @@ class CvOrderService
     }
 
     /** تحريك الطلب إلى مرحلة جديدة ومواءمة التايملاين معها */
+    /**
+     * تسليم الملف النهائي الذي أعدّه الفريق يدوياً.
+     * يستبدل أي ملف سُلّم سابقاً حتى لا تتراكم نسخ مهجورة على القرص.
+     */
+    public function deliver(CvOrder $order, UploadedFile $file): CvOrder
+    {
+        $previous = $order->final_file_path;
+        $path = $file->store('cv-orders/final', 'local');
+
+        DB::transaction(function () use ($order, $file, $path): void {
+            $order->update([
+                'final_file_path' => $path,
+                'final_file_name' => $file->getClientOriginalName(),
+                'status' => CvOrderStatus::Delivered,
+                'delivered_at' => now(),
+            ]);
+
+            $order->timeline()->update(['status' => TimelineStatus::Done, 'occurred_at' => now()]);
+
+            $order->user->notifications()->create([
+                'type' => NotificationType::OrderUpdate,
+                'title' => 'ملفك جاهز للتحميل',
+                'body' => "أنهى الفريق العمل على طلبك {$order->order_number}. حمّل النسخة النهائية الآن.",
+                'badge_label' => 'تم التسليم',
+                'action_label' => 'تحميل الملف',
+                'action_url' => "/tools/cv-builder/{$order->id}",
+            ]);
+        });
+
+        if ($previous) {
+            Storage::disk('local')->delete($previous);
+        }
+
+        return $order->refresh();
+    }
+
     public function advance(CvOrder $order, CvOrderStatus $status): CvOrder
     {
         $target = $status->timelineIndex();

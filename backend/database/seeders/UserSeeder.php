@@ -17,8 +17,13 @@ class UserSeeder extends Seeder
     {
         $password = 'Menhity@2026';
 
+        /*
+         * حسابات التشغيل تحمل اسم الدور لا اسماً شخصياً: هي حسابات نظام
+         * يتشاركها الفريق، فاسم شخص عليها يضلّل من يقرأ سجلّ الإجراءات.
+         */
+
         User::create([
-            'name' => 'أحمد محمد',
+            'name' => 'Admin',
             'email' => 'admin@menhity.com',
             'password' => $password,
             'role' => UserRole::Admin,
@@ -27,7 +32,7 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'عمر السعيد',
+            'name' => 'Moderator',
             'email' => 'moderator@menhity.com',
             'password' => $password,
             'role' => UserRole::Moderator,
@@ -36,7 +41,7 @@ class UserSeeder extends Seeder
         ]);
 
         $expert = User::create([
-            'name' => 'عبد الرحمن النجار',
+            'name' => 'Expert',
             'email' => 'expert@menhity.com',
             'password' => $password,
             'role' => UserRole::Expert,
@@ -53,7 +58,7 @@ class UserSeeder extends Seeder
         /* ---------- الطالب صاحب الملف المكتمل ---------- */
 
         $student = User::create([
-            'name' => 'أحمد عبدالله',
+            'name' => 'Student',
             'email' => 'student@menhity.com',
             'password' => $password,
             'role' => UserRole::Student,

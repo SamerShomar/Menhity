@@ -120,6 +120,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('cv-orders', [CvOrderController::class, 'store'])->name('cv-orders.store');
         Route::get('cv-orders/{cvOrder}', [CvOrderController::class, 'show'])->name('cv-orders.show');
         Route::post('cv-orders/{cvOrder}/notes', [CvOrderController::class, 'addNote'])->name('cv-orders.notes');
+        Route::get('cv-orders/{cvOrder}/file', [CvOrderController::class, 'downloadFinal'])->name('cv-orders.file');
 
         /* ================= لوحة الإدارة ================= */
 
@@ -145,6 +146,8 @@ Route::prefix('v1')->group(function (): void {
 
                 Route::get('orders', [Admin\OrderController::class, 'index'])->name('admin.orders.index');
                 Route::patch('orders/{cvOrder}/advance', [Admin\OrderController::class, 'advance'])->name('admin.orders.advance');
+                Route::get('orders/{cvOrder}/source', [Admin\OrderController::class, 'downloadSource'])->name('admin.orders.source');
+                Route::post('orders/{cvOrder}/deliver', [Admin\OrderController::class, 'deliver'])->name('admin.orders.deliver');
 
                 Route::get('notifications', [Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
                 Route::post('notifications/broadcast', [Admin\NotificationController::class, 'broadcast'])->name('admin.notifications.broadcast');

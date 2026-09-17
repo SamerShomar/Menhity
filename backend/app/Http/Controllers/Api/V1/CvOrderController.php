@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Enums\CvOrderKind;
 use App\Enums\CvOrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CvOrderResource;
@@ -9,7 +10,10 @@ use App\Models\CvOrder;
 use App\Services\CvOrderService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use RuntimeException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CvOrderController extends Controller
 {
@@ -56,17 +60,42 @@ class CvOrderController extends Controller
     {
         $user = $request->user();
 
-        $existing = $user->cvOrders()->active()->latest()->first();
+        $validated = $request->validate([
+            'kind' => ['required', Rule::enum(CvOrderKind::class)],
+            'file' => [
+                'nullable',
+                'file',
+                'mimes:pdf,doc,docx',
+                'max:'.(config('menhity.uploads.max_bytes') / 1024),
+            ],
+            'note' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'file.mimes' => 'الملف يجب أن يكون PDF أو Word.',
+        ]);
+
+        $kind = CvOrderKind::from($validated['kind']);
+
+        /*
+         * المنع لكل خدمة على حدة: طلب تحسين خطاب قائم لا يمنع طلب سيرة،
+         * فهما مساران مستقلان يعمل عليهما الفريق بالتوازي.
+         */
+        $existing = $user->cvOrders()->active()->where('kind', $kind)->latest()->first();
 
         if ($existing) {
             return response()->json([
-                'message' => 'لديك طلب قيد المعالجة بالفعل.',
+                'message' => "لديك طلب «{$kind->label()}» قيد المعالجة بالفعل.",
                 'data' => (new CvOrderResource($existing->load(self::RELATIONS)))->resolve(),
             ], 409);
         }
 
         try {
-            $order = $this->orders->submit($user, $this->profiles->profileFor($user));
+            $order = $this->orders->submit(
+                $user,
+                $this->profiles->profileFor($user),
+                $kind,
+                $request->file('file'),
+                $validated['note'] ?? null,
+            );
         } catch (RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
         }
@@ -75,6 +104,21 @@ class CvOrderController extends Controller
             'message' => 'تم استلام طلبك بنجاح.',
             'data' => (new CvOrderResource($order->load(self::RELATIONS)))->resolve(),
         ], 201);
+    }
+
+    /** تحميل الملف النهائي — يُخدَّم من قرص خاص بعد التحقق من الملكية */
+    public function downloadFinal(Request $request, CvOrder $cvOrder): StreamedResponse
+    {
+        abort_unless(
+            $cvOrder->user_id === $request->user()->id || $request->user()->isAdminLevel(),
+            403,
+        );
+        abort_unless($cvOrder->final_file_path, 404, 'لم يُسلَّم ملف لهذا الطلب بعد.');
+
+        return Storage::disk('local')->download(
+            $cvOrder->final_file_path,
+            $cvOrder->final_file_name ?? "منحتي-{$cvOrder->order_number}.pdf",
+        );
     }
 
     /** إرسال ملاحظة خاصة إلى الخبير */

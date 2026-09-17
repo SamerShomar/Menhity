@@ -39,10 +39,20 @@ const TIMELINE_ICON = {
 };
 
 export default function CvOrderTrackingPage() {
+  const [downloading, setDownloading] = useState(false);
   const { id } = useParams();
   const [note, setNote] = useState("");
 
   const { data: order, loading, error, reload } = useApi(() => cvOrderApi.show(id), [id]);
+
+  const onDownload = async () => {
+    setDownloading(true);
+    try {
+      await cvOrderApi.downloadFinal(order.id, order.final_file_name);
+    } finally {
+      setDownloading(false);
+    }
+  };
   const addNote = useSubmit((body) => cvOrderApi.addNote(id, body));
 
   if (loading) return <LoadingBlock className="py-24" />;
@@ -280,18 +290,21 @@ export default function CvOrderTrackingPage() {
               </Card>
             ) : null}
 
-            {order.final_file_url ? (
+            {order.has_final_file ? (
               <div className="rounded-2xl bg-[color:var(--color-success)]/12 backdrop-blur-md p-5 text-center">
                 <CircleCheck className="mx-auto size-8 text-[color:var(--color-success)]" />
-                <p className="mt-2 font-bold text-[#14532d]">سيرتك الذاتية جاهزة</p>
-                <ButtonLink to={order.final_file_url} external className="mt-4 w-full">
+                <p className="mt-2 font-bold text-[#14532d]">ملفك جاهز</p>
+                {order.final_file_name ? (
+                  <p className="mt-1 truncate text-[12px] text-ink-600">{order.final_file_name}</p>
+                ) : null}
+                <Button className="mt-4 w-full" onClick={onDownload} loading={downloading} loadingText="جارٍ التحميل…">
                   <Download className="size-4" />
                   تحميل الملف
-                </ButtonLink>
+                </Button>
               </div>
             ) : (
               <Alert tone="info" title="ما الخطوة التالية؟">
-                سيصلك إشعار فور انتهاء الخبير من الصياغة، وسيظهر زر التحميل هنا مباشرة.
+                سيصلك إشعار فور انتهاء الفريق من العمل على ملفك، وسيظهر زر التحميل هنا مباشرة.
               </Alert>
             )}
           </aside>
