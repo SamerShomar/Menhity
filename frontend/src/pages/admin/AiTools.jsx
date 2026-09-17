@@ -64,7 +64,7 @@ export default function AdminAiToolsPage() {
       {error ? <Alert tone="danger">{error}</Alert> : null}
       {toggle.error ? <Alert tone="danger">{toggle.error}</Alert> : null}
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="إجمالي التشغيلات" value={meta.total_runs ?? 0} icon={<Sparkles className="size-5" />} />
         <StatCard label="تشغيلات هذا الشهر" value={meta.month_runs ?? 0} tone="info" />
         <StatCard label="المستفيدون" value={meta.beneficiaries ?? 0} icon={<Users className="size-5" />} tone="gold" />

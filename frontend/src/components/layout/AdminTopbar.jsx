@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronLeft, Search } from "lucide-react";
+import { ChevronLeft, Menu, Search } from "lucide-react";
 
 import { ADMIN_NAV } from "@/lib/constants";
 
 /** شريط علوي بمسار التنقّل وبحث سريع (Cmd/Ctrl + K) */
-export function AdminTopbar() {
+export function AdminTopbar({ onOpenNav }) {
   const location = useLocation();
   const inputRef = useRef(null);
   const [query, setQuery] = useState("");
@@ -29,15 +29,24 @@ export function AdminTopbar() {
   const matches = query.trim() ? ADMIN_NAV.filter((item) => item.label.includes(query.trim())) : [];
 
   return (
-    <header className="glass-header sticky top-0 z-30 flex h-16 items-center justify-between gap-4 rounded-none border-x-0 border-t-0 px-6">
-      <nav aria-label="مسار التنقّل" className="flex items-center gap-1.5 text-[12.5px] text-ink-500">
-        <Link to="/admin" className="hover:text-navy-700">
+    <header className="glass-header sticky top-0 z-30 flex h-16 items-center justify-between gap-3 rounded-none border-x-0 border-t-0 px-4 sm:px-6">
+      <button
+        type="button"
+        onClick={onOpenNav}
+        aria-label="فتح قائمة الإدارة"
+        className="-ms-1 grid size-10 shrink-0 place-items-center rounded-lg text-ink-800 transition-colors hover:bg-white/60 lg:hidden"
+      >
+        <Menu className="size-5" />
+      </button>
+
+      <nav aria-label="مسار التنقّل" className="flex min-w-0 flex-1 items-center gap-1.5 text-[12.5px] text-ink-500">
+        <Link to="/admin" className="shrink-0 hover:text-navy-700">
           لوحة التحكم
         </Link>
         {current && current.to !== "/admin" && (
           <>
-            <ChevronLeft className="size-3.5" />
-            <span className="font-semibold text-ink-800">{current.label}</span>
+            <ChevronLeft className="size-3.5 shrink-0" />
+            <span className="truncate font-semibold text-ink-800">{current.label}</span>
           </>
         )}
       </nav>

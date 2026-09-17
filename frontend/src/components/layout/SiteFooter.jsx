@@ -78,10 +78,13 @@ function FooterColumn({ title, links }) {
   return (
     <div>
       <h3 className="mb-4 text-sm font-bold text-white">{title}</h3>
-      <ul className="space-y-2.5">
+      <ul className="-my-1.5">
         {links.map((link) => (
           <li key={link.to + link.label}>
-            <Link to={link.to} className="text-[13px] text-navy-200 transition-colors hover:text-gold-400">
+            <Link
+              to={link.to}
+              className="inline-flex min-h-10 items-center text-[13px] text-navy-200 transition-colors hover:text-gold-400"
+            >
               {link.label}
             </Link>
           </li>
@@ -96,7 +99,7 @@ function SocialLink({ label, children }) {
     <a
       href="#"
       aria-label={label}
-      className="flex size-8 items-center justify-center rounded-lg bg-white/12 backdrop-blur-sm text-white transition-colors hover:bg-gold-400 hover:text-navy-900"
+      className="flex size-10 items-center justify-center rounded-lg bg-white/12 backdrop-blur-sm text-white transition-colors hover:bg-gold-400 hover:text-navy-900"
     >
       {children}
     </a>

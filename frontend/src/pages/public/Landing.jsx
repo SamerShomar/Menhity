@@ -110,7 +110,8 @@ export default function LandingPage() {
               </Button>
             </form>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            {/* على الهاتف يمتدّ الزرّان بعرض الشاشة بدل صفٍّ متعرّج */}
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               {!isAuthenticated ? (
                 <ButtonLink to="/register" size="lg" className="bg-white text-navy-700 hover:bg-navy-500/10">
                   أنشئ حسابك مجاناً
@@ -120,11 +121,7 @@ export default function LandingPage() {
                   اذهب للوحة التحكم
                 </ButtonLink>
               )}
-              <ButtonLink
-                to="/scholarships"
-                size="lg"
-                variant="onDark"
-              >
+              <ButtonLink to="/scholarships" size="lg" variant="onDark">
                 تصفّح كل المنح
                 <ArrowLeft className="size-4" />
               </ButtonLink>

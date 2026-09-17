@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -102,18 +103,21 @@ export function DashboardLayout() {
 }
 
 export function AdminLayout() {
+  // القائمة درجٌ على الهاتف، وعمود ثابت من lg فصاعداً
+  const [navOpen, setNavOpen] = useState(false);
+
   return (
     <div className="flex min-h-dvh">
-      <AdminSidebar />
+      <AdminSidebar open={navOpen} onClose={() => setNavOpen(false)} />
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <AdminTopbar />
+        <AdminTopbar onOpenNav={() => setNavOpen(true)} />
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 sm:p-6">
           <Outlet />
         </main>
 
-        <footer className="glass-soft rounded-none border-x-0 border-b-0 px-6 py-4">
+        <footer className="glass-soft rounded-none border-x-0 border-b-0 px-4 py-4 sm:px-6">
           <p className="text-[11.5px] text-ink-400">
             منصة منحتي — لوحة الإدارة الأكاديمية
           </p>

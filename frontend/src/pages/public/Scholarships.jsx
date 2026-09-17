@@ -176,7 +176,9 @@ export default function ScholarshipsPage() {
                 </Button>
 
                 <label className="flex items-center gap-2 text-[13px] text-ink-500">
-                  ترتيب حسب
+                  {/* التسمية تُطوى على الهاتف: تُزاحم الفلاتر وتُلَفّ على سطرين */}
+                  <span className="hidden sm:inline">ترتيب حسب</span>
+                  <span className="sr-only sm:hidden">ترتيب حسب</span>
                   <select
                     value={filters.sort}
                     onChange={(event) => write({ ...filters, sort: event.target.value })}
