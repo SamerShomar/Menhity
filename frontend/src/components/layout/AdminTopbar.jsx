@@ -29,7 +29,7 @@ export function AdminTopbar() {
   const matches = query.trim() ? ADMIN_NAV.filter((item) => item.label.includes(query.trim())) : [];
 
   return (
-    <header className="glass-strong sticky top-0 z-30 flex h-16 items-center justify-between gap-4 rounded-none border-x-0 border-t-0 px-6 shadow-none">
+    <header className="glass-header sticky top-0 z-30 flex h-16 items-center justify-between gap-4 rounded-none border-x-0 border-t-0 px-6">
       <nav aria-label="مسار التنقّل" className="flex items-center gap-1.5 text-[12.5px] text-ink-500">
         <Link to="/admin" className="hover:text-navy-700">
           لوحة التحكم
