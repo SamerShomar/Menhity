@@ -75,6 +75,19 @@ return [
             'timeout' => (int) env('MAIL_TIMEOUT', 15),
         ],
 
+        /*
+         * Gmail عبر واجهته على HTTPS — لمن يرسل من حساب Gmail بلا نطاق خاص.
+         * الاعتماد بـ OAuth 2.0: رمز التحديث يُصدَر مرة واحدة بأمر
+         * php artisan menhity:gmail-auth، ولا حاجة لكلمة مرور تطبيق.
+         */
+        'gmail' => [
+            'transport' => 'gmail',
+            'client_id' => env('GMAIL_CLIENT_ID'),
+            'client_secret' => env('GMAIL_CLIENT_SECRET'),
+            'refresh_token' => env('GMAIL_REFRESH_TOKEN'),
+            'timeout' => (int) env('MAIL_TIMEOUT', 15),
+        ],
+
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),

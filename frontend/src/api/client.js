@@ -86,5 +86,7 @@ export function parseApiError(error) {
     message: data.message ?? "حدث خطأ غير متوقّع. حاول مجدداً.",
     errors,
     status: response.status,
+    // جسم الاستجابة كما هو — لحقول إضافية تحملها بعض الأخطاء (مثل code_sent مع 409 لبريد غير مؤكَّد)
+    data,
   };
 }

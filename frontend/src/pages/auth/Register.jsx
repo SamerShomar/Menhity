@@ -49,7 +49,11 @@ export default function RegisterPage() {
     if (ok) {
       navigate("/verify-email", {
         replace: true,
-        state: { email: result?.email ?? form.email, notice: result?.message },
+        state: {
+          email: result?.email ?? form.email,
+          notice: result?.message,
+          codeSent: result?.code_sent,
+        },
       });
     }
   };

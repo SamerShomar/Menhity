@@ -40,7 +40,9 @@ class EmailVerificationTest extends TestCase
             'password' => self::PASSWORD,
             'password_confirmation' => self::PASSWORD,
             'accept_terms' => true,
-        ])->assertCreated();
+        ])
+            ->assertCreated()
+            ->assertJsonPath('code_sent', true);
 
         Mail::assertSent(
             VerifyEmailCodeMail::class,

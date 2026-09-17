@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Mail\MailFailureHint;
 use App\Mail\PasswordResetCodeMail;
 use App\Mail\VerifyEmailCodeMail;
 use App\Models\User;
@@ -29,8 +30,10 @@ class VerificationCodeService
      *
      * فشل الإرسال لا يُسقط العملية المستدعية — الحساب يبقى قائماً
      * ويستطيع المستخدم طلب رمز جديد، والخطأ يُسجَّل للمشرف.
+     *
+     * @return bool هل سُلِّمت الرسالة إلى الناقل — false يعني أن الرمز لن يصل
      */
-    public function send(User $user, string $type): void
+    public function send(User $user, string $type): bool
     {
         $code = $this->issue($user, $type);
 
@@ -41,7 +44,7 @@ class VerificationCodeService
         };
 
         if (! $mailable) {
-            return;
+            return false;
         }
 
         try {
@@ -53,8 +56,14 @@ class VerificationCodeService
                 // الناقل المستخدم فعلياً — يميّز خطأ الإعداد عن خطأ المزوّد
                 'mailer' => config('mail.default'),
                 'error' => $e->getMessage(),
+                // الخطوة العملية المقابلة للخطأ، فتُقرأ من السجل مباشرة
+                'hint' => MailFailureHint::for($e->getMessage()),
             ]);
+
+            return false;
         }
+
+        return true;
     }
 
     /** ينشئ رمزاً جديداً ويلغي الرموز السابقة من النوع نفسه */

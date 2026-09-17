@@ -55,12 +55,16 @@ class AuthController extends Controller
             return $user;
         });
 
-        $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
+        $sent = $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
 
         return response()->json([
-            'message' => 'أنشأنا حسابك وأرسلنا رمز تأكيد إلى بريدك الإلكتروني.',
+            'message' => $sent
+                ? 'أنشأنا حسابك وأرسلنا رمز تأكيد إلى بريدك الإلكتروني.'
+                : 'أنشأنا حسابك، لكن تعذّر إرسال رمز التأكيد الآن. جرّب «إعادة الإرسال» بعد قليل.',
             'email' => $user->email,
             'requires_verification' => true,
+            // false تعني أن الرسالة لم تغادر الخادم أصلاً — فتنبّه الواجهة بدل انتظار بريد لن يصل
+            'code_sent' => $sent,
         ], 201);
     }
 
@@ -89,12 +93,15 @@ class AuthController extends Controller
          * تقرأها الواجهة لتنقل المستخدم إلى شاشة التأكيد.
          */
         if (! $user->hasVerifiedEmail()) {
-            $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
+            $sent = $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
 
             return response()->json([
-                'message' => 'لم يتم تأكيد بريدك بعد. أرسلنا إليك رمز تأكيد جديد.',
+                'message' => $sent
+                    ? 'لم يتم تأكيد بريدك بعد. أرسلنا إليك رمز تأكيد جديد.'
+                    : 'لم يتم تأكيد بريدك بعد، وتعذّر إرسال رمز جديد الآن. جرّب «إعادة الإرسال» بعد قليل.',
                 'email' => $user->email,
                 'requires_verification' => true,
+                'code_sent' => $sent,
             ], 409);
         }
 
