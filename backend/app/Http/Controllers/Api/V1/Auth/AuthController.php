@@ -26,9 +26,9 @@ class AuthController extends Controller
     ) {}
 
     /**
-     * إنشاء حساب جديد وإرسال رمز تأكيد البريد.
+     * إنشاء حساب جديد وإرسال رابط التفعيل.
      *
-     * لا يُسلَّم توكن هنا — الجلسة تبدأ بعد تأكيد البريد، فلا يُستخدم
+     * لا يُسلَّم توكن هنا — الجلسة تبدأ بعد ضغط الرابط، فلا يُستخدم
      * الحساب ببريد لا يملكه صاحبه.
      */
     public function register(RegisterRequest $request): JsonResponse
@@ -59,12 +59,12 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => $sent
-                ? 'أنشأنا حسابك وأرسلنا رمز تأكيد إلى بريدك الإلكتروني.'
-                : 'أنشأنا حسابك، لكن تعذّر إرسال رمز التأكيد الآن. جرّب «إعادة الإرسال» بعد قليل.',
+                ? 'أنشأنا حسابك وأرسلنا رابط التفعيل إلى بريدك الإلكتروني.'
+                : 'أنشأنا حسابك، لكن تعذّر إرسال رابط التفعيل الآن. جرّب «إعادة الإرسال» بعد قليل.',
             'email' => $user->email,
             'requires_verification' => true,
             // false تعني أن الرسالة لم تغادر الخادم أصلاً — فتنبّه الواجهة بدل انتظار بريد لن يصل
-            'code_sent' => $sent,
+            'link_sent' => $sent,
         ], 201);
     }
 
@@ -89,8 +89,8 @@ class AuthController extends Controller
         }
 
         /*
-         * بريد غير مؤكَّد: نرسل رمزاً جديداً ونعيد 409 مع علامة صريحة
-         * تقرأها الواجهة لتنقل المستخدم إلى شاشة التأكيد.
+         * حساب غير مفعَّل: نرسل رابطاً جديداً ونعيد 409 مع علامة صريحة
+         * تقرأها الواجهة لتنقل المستخدم إلى شاشة التفعيل.
          */
         if (! $user->hasVerifiedEmail()) {
             $sent = $this->codes->send($user, VerificationCode::TYPE_EMAIL_VERIFY);
@@ -101,7 +101,7 @@ class AuthController extends Controller
                     : 'لم يتم تأكيد بريدك بعد، وتعذّر إرسال رمز جديد الآن. جرّب «إعادة الإرسال» بعد قليل.',
                 'email' => $user->email,
                 'requires_verification' => true,
-                'code_sent' => $sent,
+                'link_sent' => $sent,
             ], 409);
         }
 

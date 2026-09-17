@@ -10,6 +10,7 @@ use App\Models\VerificationCode;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -23,6 +24,9 @@ class VerificationCodeService
 {
     public const TTL_MINUTES = 15;
 
+    /** رابط التفعيل يُفتح من صندوق البريد، وقد لا يُفتح فوراً */
+    public const ACTIVATION_TTL_HOURS = 48;
+
     public const MAX_ATTEMPTS = 5;
 
     /**
@@ -35,11 +39,15 @@ class VerificationCodeService
      */
     public function send(User $user, string $type): bool
     {
-        $code = $this->issue($user, $type);
-
         $mailable = match ($type) {
-            VerificationCode::TYPE_EMAIL_VERIFY => new VerifyEmailCodeMail($user, $code),
-            VerificationCode::TYPE_PASSWORD_RESET => new PasswordResetCodeMail($user, $code),
+            VerificationCode::TYPE_EMAIL_VERIFY => new VerifyEmailCodeMail(
+                $user,
+                $this->activationUrl($user, $this->issueActivationToken($user)),
+            ),
+            VerificationCode::TYPE_PASSWORD_RESET => new PasswordResetCodeMail(
+                $user,
+                $this->issue($user, VerificationCode::TYPE_PASSWORD_RESET),
+            ),
             default => null,
         };
 
@@ -67,6 +75,37 @@ class VerificationCodeService
     }
 
     /** ينشئ رمزاً جديداً ويلغي الرموز السابقة من النوع نفسه */
+    /**
+     * رمز تفعيل طويل يُمرَّر في رابط، لا رقم يُكتب بالي.
+     * طوله يجعل تخمينه غير عملي، فلا حاجة لعدّاد محاولات عليه.
+     */
+    public function issueActivationToken(User $user): string
+    {
+        $token = Str::random(64);
+
+        $user->verificationCodes()
+            ->where('type', VerificationCode::TYPE_EMAIL_VERIFY)
+            ->whereNull('used_at')
+            ->update(['used_at' => now()]);
+
+        $user->verificationCodes()->create([
+            'type' => VerificationCode::TYPE_EMAIL_VERIFY,
+            'code_hash' => Hash::make($token),
+            'expires_at' => now()->addHours(self::ACTIVATION_TTL_HOURS),
+        ]);
+
+        return $token;
+    }
+
+    /** الرابط الذي يضغطه المستخدم في رسالة التفعيل */
+    public function activationUrl(User $user, string $token): string
+    {
+        return rtrim(config('menhity.frontend_url'), '/').'/verify-email?'.http_build_query([
+            'token' => $token,
+            'email' => $user->email,
+        ]);
+    }
+
     public function issue(User $user, string $type): string
     {
         $code = (string) random_int(100000, 999999);
@@ -90,6 +129,30 @@ class VerificationCodeService
      *
      * @throws ValidationException
      */
+    /**
+     * يتحقّق من رمز التفعيل المُمرَّر في الرابط.
+     *
+     * @throws ValidationException
+     */
+    public function verifyActivationToken(User $user, string $token): VerificationCode
+    {
+        $record = $user->verificationCodes()
+            ->where('type', VerificationCode::TYPE_EMAIL_VERIFY)
+            ->whereNull('used_at')
+            ->latest()
+            ->first();
+
+        $invalid = fn () => ValidationException::withMessages([
+            'token' => 'رابط التفعيل غير صالح أو انتهت صلاحيته. اطلب رابطاً جديداً.',
+        ]);
+
+        if (! $record || $record->isExpired() || ! Hash::check($token, $record->code_hash)) {
+            throw $invalid();
+        }
+
+        return $record;
+    }
+
     public function verify(User $user, string $type, string $code): VerificationCode
     {
         $record = $user->verificationCodes()
@@ -116,8 +179,10 @@ class VerificationCodeService
     }
 
     /** رسالة موحّدة حتى لا يُستدلّ منها على وجود الحساب */
-    public function invalid(string $message = 'الرمز غير صحيح أو منتهي الصلاحية.'): ValidationException
-    {
-        return ValidationException::withMessages(['code' => $message]);
+    public function invalid(
+        string $message = 'الرمز غير صحيح أو منتهي الصلاحية.',
+        string $key = 'code',
+    ): ValidationException {
+        return ValidationException::withMessages([$key => $message]);
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\ActivateAccountRequest;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
-use App\Http\Requests\Auth\VerifyCodeRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use App\Models\VerificationCode;
@@ -15,9 +15,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 /**
- * تأكيد البريد الإلكتروني برمز من ستة أرقام يُرسَل بعد التسجيل.
+ * تفعيل الحساب برابط يُضغط من رسالة البريد.
  *
- * لا تُسلَّم أي جلسة قبل التأكيد، فالحساب غير المؤكَّد لا يستطيع الدخول.
+ * لا تُسلَّم أي جلسة قبل التفعيل، فالحساب غير المفعَّل لا يستطيع الدخول.
  */
 class EmailVerificationController extends Controller
 {
@@ -26,24 +26,28 @@ class EmailVerificationController extends Controller
         private readonly AccessTokenService $tokens,
     ) {}
 
-    /** تأكيد البريد وتسليم توكن الدخول مباشرة */
-    public function verify(VerifyCodeRequest $request): JsonResponse
+    /** تفعيل الحساب من الرابط وتسليم توكن الدخول مباشرة */
+    public function verify(ActivateAccountRequest $request): JsonResponse
     {
         $user = User::where('email', $request->string('email')->value())->first();
 
         if (! $user) {
-            throw $this->codes->invalid();
+            // رسالة موحّدة: لا تكشف ما إذا كان البريد مسجّلاً
+            throw $this->codes->invalid(
+                'رابط التفعيل غير صالح أو انتهت صلاحيته. اطلب رابطاً جديداً.',
+                'token',
+            );
         }
 
         // حساب مؤكَّد سابقاً: لا نكشف ذلك برسالة خطأ، بل نوجّهه للدخول
         if ($user->hasVerifiedEmail()) {
             return response()->json([
-                'message' => 'بريدك مؤكَّد بالفعل. سجّل الدخول للمتابعة.',
+                'message' => 'حسابك مفعَّل بالفعل. سجّل الدخول للمتابعة.',
                 'already_verified' => true,
             ], 200);
         }
 
-        $record = $this->codes->verify($user, VerificationCode::TYPE_EMAIL_VERIFY, $request->string('code')->value());
+        $record = $this->codes->verifyActivationToken($user, $request->string('token')->value());
 
         DB::transaction(function () use ($user, $record): void {
             $user->forceFill(['email_verified_at' => now()])->save();
@@ -67,7 +71,7 @@ class EmailVerificationController extends Controller
 
         // رسالة موحّدة سواء وُجد الحساب أم لا
         return response()->json([
-            'message' => 'إن كان هذا البريد بانتظار التأكيد فقد أرسلنا إليه رمزاً جديداً.',
+            'message' => 'إن كان هذا البريد بانتظار التفعيل فقد أرسلنا إليه رابطاً جديداً.',
         ]);
     }
 
