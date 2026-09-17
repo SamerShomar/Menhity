@@ -56,7 +56,7 @@
   /* --- الزجاج: أسطح شبه شفّافة فوق خلفية متدرّجة --- */
   --glass-tint: 255 255 255;
   --glass-blur: 30px;
-  --glass-blur-strong: 40px;
+  --glass-blur-strong: 64px;
   --glass-blur-header: 72px;
 
   /*
@@ -181,13 +181,17 @@
   box-shadow: var(--glass-lip), var(--glass-shadow);
 }
 
-/* لما يطفو فوق المحتوى: الترويسة، القوائم المنسدلة، النوافذ */
+/*
+ * ما يطفو فوق المحتوى: القوائم المنسدلة، الأدراج، النوافذ.
+ * تعتيم منخفض وتمويه عالٍ — بشرط أن يكون العنصر خارج أي سلف مموّه،
+ * وإلا مات تمويهه وصار التعتيم المنخفض طبقة شاحبة فوق نصّ حادّ.
+ */
 @utility glass-strong {
-  background-color: rgb(var(--glass-tint) / 0.58);
+  background-color: rgb(var(--glass-tint) / 0.44);
   background-image: var(--glass-sheen);
   backdrop-filter: blur(var(--glass-blur-strong)) saturate(200%) brightness(1.10);
   -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(200%) brightness(1.10);
-  border: 1px solid rgb(255 255 255 / 0.68);
+  border: 1px solid rgb(255 255 255 / 0.55);
   box-shadow: var(--glass-lip), var(--glass-shadow-lg);
 }
 
