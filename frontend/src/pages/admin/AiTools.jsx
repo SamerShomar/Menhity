@@ -82,10 +82,10 @@ export default function AdminAiToolsPage() {
           title="الأدوات"
           subtitle={`${meta.active_tools ?? 0} من ${meta.total_tools ?? 0} أداة مفعّلة. إيقاف أداة يخفيها عن الطلاب فوراً.`}
         />
-        <CardBody className="divide-y divide-ink-200 py-1">
+        <CardBody className="divide-y divide-ink-900/10 py-1">
           {tools.map((tool) => (
             <div key={tool.key} className="flex items-start gap-4 py-1">
-              <span className="mt-3.5 grid size-10 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-600">
+              <span className="mt-3.5 grid size-10 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-600">
                 <Icon name={tool.icon} className="size-5" />
               </span>
 

@@ -233,7 +233,7 @@ export default function AdminScholarshipFormPage() {
                     className={`cursor-pointer rounded-lg px-3 py-2 text-[13px] font-semibold transition ${
                       values.levels.includes(level.value)
                         ? "bg-navy-700 text-white"
-                        : "bg-ink-100 text-ink-600 hover:bg-ink-200"
+                        : "bg-white/55 backdrop-blur-md text-ink-700 hover:bg-white/80"
                     }`}
                   >
                     <input
@@ -334,7 +334,7 @@ function StringList({ label, items, onChange, placeholder, multiline }) {
       {items.length > 0 ? (
         <ul className="mb-3 space-y-2">
           {items.map((item, index) => (
-            <li key={`${item}-${index}`} className="flex items-start gap-2 rounded-lg bg-ink-50 px-3 py-2">
+            <li key={`${item}-${index}`} className="flex items-start gap-2 glass-soft rounded-lg px-3 py-2">
               <span className="min-w-0 flex-1 text-[13px] leading-6 text-ink-700">{item}</span>
               <button
                 type="button"
@@ -357,7 +357,7 @@ function StringList({ label, items, onChange, placeholder, multiline }) {
             onChange={(event) => setDraft(event.target.value)}
             placeholder={placeholder}
             aria-label={label}
-            className="min-w-0 flex-1 rounded-lg border border-ink-300 bg-white px-3 py-2 text-[13px] focus:border-navy-500 focus:outline-none"
+            className="min-w-0 flex-1 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-3 py-2 text-[13px] focus:border-navy-500 focus:outline-none"
           />
         ) : (
           <input
@@ -365,7 +365,7 @@ function StringList({ label, items, onChange, placeholder, multiline }) {
             onChange={(event) => setDraft(event.target.value)}
             placeholder={placeholder}
             aria-label={label}
-            className="h-10 min-w-0 flex-1 rounded-lg border border-ink-300 bg-white px-3 text-[13px] focus:border-navy-500 focus:outline-none"
+            className="h-10 min-w-0 flex-1 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-3 text-[13px] focus:border-navy-500 focus:outline-none"
           />
         )}
         <Button type="button" variant="soft" size="sm" onClick={add}>
@@ -393,11 +393,11 @@ function ObjectList({ label, items, onChange, blank, fields }) {
       </div>
 
       {items.length === 0 ? (
-        <p className="rounded-lg bg-ink-50 px-3 py-3 text-[12.5px] text-ink-500">لم تُضف أي عنصر بعد.</p>
+        <p className="glass-soft rounded-lg px-3 py-3 text-[12.5px] text-ink-500">لم تُضف أي عنصر بعد.</p>
       ) : (
         <ul className="space-y-3">
           {items.map((item, index) => (
-            <li key={index} className="flex items-end gap-2 rounded-lg bg-ink-50 p-3">
+            <li key={index} className="flex items-end gap-2 glass-soft rounded-lg p-3">
               {fields.map((field) => (
                 <Input
                   key={field.key}
@@ -411,7 +411,7 @@ function ObjectList({ label, items, onChange, blank, fields }) {
                 type="button"
                 onClick={() => onChange(items.filter((_, position) => position !== index))}
                 aria-label="حذف العنصر"
-                className="mb-1 grid size-10 shrink-0 place-items-center rounded-lg text-ink-400 hover:bg-danger-soft hover:text-[color:var(--color-danger)]"
+                className="mb-1 grid size-10 shrink-0 place-items-center rounded-lg text-ink-400 hover:bg-[color:var(--color-danger)]/12 hover:text-[color:var(--color-danger)]"
               >
                 <X className="size-4" />
               </button>

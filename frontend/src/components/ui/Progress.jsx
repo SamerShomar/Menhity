@@ -1,10 +1,11 @@
 import { clamp, cn } from "@/lib/utils";
 
+/* تدرّج خفيف بدل لون مصمت — يخفّف حدّة الشريط فوق الأسطح الزجاجية */
 const FILLS = {
-  navy: "bg-navy-600",
-  gold: "bg-gold-400",
-  success: "bg-[color:var(--color-success)]",
-  danger: "bg-[color:var(--color-danger)]",
+  navy: "bg-gradient-to-l from-navy-600 to-navy-400",
+  gold: "bg-gradient-to-l from-gold-500 to-gold-300",
+  success: "bg-gradient-to-l from-[#15803d] to-[#34d399]",
+  danger: "bg-gradient-to-l from-[#b91c1c] to-[#f87171]",
 };
 
 export function Progress({ value, tone = "navy", height = 8, className }) {
@@ -16,7 +17,7 @@ export function Progress({ value, tone = "navy", height = 8, className }) {
       aria-valuenow={percent}
       aria-valuemin={0}
       aria-valuemax={100}
-      className={cn("w-full overflow-hidden rounded-full bg-ink-200", className)}
+      className={cn("w-full overflow-hidden rounded-full bg-ink-900/10 backdrop-blur-sm", className)}
       style={{ height }}
     >
       <div

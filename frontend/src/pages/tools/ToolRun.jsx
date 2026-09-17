@@ -60,7 +60,7 @@ export default function ToolRunPage() {
   }
 
   return (
-    <div className="bg-ink-100 py-10">
+    <div className="py-10">
       <div className="container-page max-w-5xl">
         <PageHeader
           title={tool.name_ar}
@@ -154,7 +154,7 @@ export default function ToolRunPage() {
                     </Alert>
                   ) : null}
 
-                  <pre className="max-h-[520px] overflow-auto rounded-xl bg-ink-50 p-4 text-[13px] leading-8 whitespace-pre-wrap text-ink-800 scrollbar-slim">
+                  <pre className="max-h-[520px] overflow-auto glass-soft rounded-xl p-4 text-[13px] leading-8 whitespace-pre-wrap text-ink-800 scrollbar-slim">
                     {result.output}
                   </pre>
                 </>

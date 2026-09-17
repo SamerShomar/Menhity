@@ -33,8 +33,8 @@ export function WizardSteps({ steps, current, onSelect }) {
               className={cn(
                 "relative z-10 grid size-10 place-items-center rounded-full border-2 text-sm font-bold transition",
                 done && "border-navy-600 bg-navy-600 text-white",
-                active && "border-navy-600 bg-white text-navy-700 ring-4 ring-navy-100",
-                !done && !active && "border-ink-300 bg-white text-ink-400",
+                active && "border-navy-600 bg-white/85 backdrop-blur-md text-navy-700 ring-4 ring-navy-500/15",
+                !done && !active && "border-ink-900/15 bg-white/50 backdrop-blur-md text-ink-400",
                 onSelect && step.n <= current && "cursor-pointer hover:border-navy-500",
               )}
             >

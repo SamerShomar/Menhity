@@ -73,7 +73,7 @@ export default function CvWizardPage() {
   }
 
   return (
-    <div className="bg-ink-100 py-10">
+    <div className="py-10">
       <div className="container-page max-w-4xl">
         <PageHeader
           title="صياغة السيرة الذاتية"
@@ -86,7 +86,7 @@ export default function CvWizardPage() {
           }
         />
 
-        <div className="rounded-2xl bg-white p-5 ring-1 ring-ink-200">
+        <div className="glass rounded-2xl p-5">
           <WizardSteps steps={CV_STEPS} current={step} onSelect={setStep} />
         </div>
 

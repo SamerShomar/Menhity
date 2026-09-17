@@ -75,7 +75,7 @@ export function AuthCardHeader({ title, description, icon }) {
   return (
     <div className="mb-6 text-center">
       {icon ? (
-        <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-navy-50 text-navy-700">
+        <div className="glass-soft mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl text-navy-700">
           {icon}
         </div>
       ) : null}
@@ -91,9 +91,9 @@ export function AuthCardHeader({ title, description, icon }) {
  */
 export function AuthSplit({ title, description, badge, children, aside }) {
   return (
-    <div className="min-h-dvh bg-ink-100 lg:grid lg:grid-cols-[1fr_minmax(0,520px)]">
+    <div className="min-h-dvh lg:grid lg:grid-cols-[1fr_minmax(0,520px)]">
       {/* اللوحة الكحلية — تظهر على اليمين في RTL */}
-      <aside className="relative hidden overflow-hidden bg-navy-800 lg:block">
+      <aside className="relative hidden overflow-hidden bg-navy-800/92 backdrop-blur-xl lg:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(246,196,69,0.16),transparent_58%)]" />
 
         <div className="relative flex h-full flex-col p-10 text-white">
@@ -133,7 +133,7 @@ export function AuthSplit({ title, description, badge, children, aside }) {
           <div className="mb-8 flex justify-center lg:hidden">
             <Logo />
           </div>
-          <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-ink-200 sm:p-8">
+          <div className="glass-strong rounded-3xl p-6 sm:p-8">
             <AuthCardHeader title={title} description={description} />
             {children}
           </div>

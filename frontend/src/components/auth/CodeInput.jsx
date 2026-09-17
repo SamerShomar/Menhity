@@ -72,7 +72,7 @@ export const CodeInput = forwardRef(function CodeInput({ digits, onChange, disab
           onChange={handleChange(index)}
           onKeyDown={handleKeyDown(index)}
           autoFocus={index === 0}
-          className="h-14 w-12 rounded-xl border border-ink-300 bg-white text-center text-2xl font-bold text-navy-800 transition focus:border-navy-500 focus:ring-2 focus:ring-navy-100 focus:outline-none disabled:bg-ink-100"
+          className="h-14 w-12 rounded-xl border border-ink-900/12 bg-white/60 backdrop-blur-md text-center text-2xl font-bold text-navy-800 transition focus:border-navy-500 focus:ring-2 focus:ring-navy-100 focus:outline-none disabled:bg-ink-100"
         />
       ))}
     </div>

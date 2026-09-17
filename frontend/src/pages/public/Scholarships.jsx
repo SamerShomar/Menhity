@@ -90,10 +90,10 @@ export default function ScholarshipsPage() {
   const activeChips = LIST_KEYS.flatMap((key) => filters[key].map((value) => ({ key, value })));
 
   return (
-    <div className="bg-ink-100 py-8">
+    <div className="py-8">
       <div className="container-page">
         {/* العنوان والبحث */}
-        <header className="rounded-2xl bg-navy-700 p-6 text-white sm:p-8">
+        <header className="glass-dark rounded-2xl p-6 text-white sm:p-8">
           <h1 className="font-display text-2xl sm:text-3xl">اكتشف المنح الدراسية</h1>
           <p className="mt-2 text-sm text-navy-100 sm:text-base">
             ابحث بين المنح المتاحة وصفِّها حسب مرحلتك وتخصصك والدولة التي تريد الدراسة فيها.
@@ -107,14 +107,14 @@ export default function ScholarshipsPage() {
             className="mt-5 flex flex-col gap-3 sm:flex-row"
           >
             <div className="relative flex-1">
-              <Search className="pointer-events-none absolute top-1/2 start-3.5 size-5 -translate-y-1/2 text-ink-400" />
+              <Search className="pointer-events-none absolute top-1/2 start-3.5 size-5 -translate-y-1/2 text-white/60" />
               <input
                 type="search"
                 value={term}
                 onChange={(event) => setTerm(event.target.value)}
                 placeholder="ابحث باسم المنحة أو الجهة المانحة أو التخصص…"
                 aria-label="البحث في المنح"
-                className="h-12 w-full rounded-xl border-0 bg-white ps-11 pe-4 text-sm text-ink-800 placeholder:text-ink-400 focus:ring-2 focus:ring-gold-400 focus:outline-none"
+                className="h-12 w-full rounded-xl border border-white/25 bg-white/15 backdrop-blur-lg text-white placeholder:text-white/65 focus:bg-white/22 focus:ring-2 focus:ring-gold-400/70 focus:outline-none ps-11 pe-4 text-sm"
               />
             </div>
             <Button type="submit" variant="gold" size="lg">
@@ -153,7 +153,7 @@ export default function ScholarshipsPage() {
 
           <div>
             {/* شريط الأدوات */}
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-white px-4 py-3 ring-1 ring-ink-200">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 glass rounded-xl px-4 py-3">
               <p className="text-sm text-ink-600">
                 {loading ? (
                   "جارٍ البحث…"
@@ -180,7 +180,7 @@ export default function ScholarshipsPage() {
                   <select
                     value={filters.sort}
                     onChange={(event) => write({ ...filters, sort: event.target.value })}
-                    className="h-9 rounded-lg border border-ink-300 bg-white px-2.5 text-[13px] font-semibold text-ink-800 focus:border-navy-500 focus:outline-none"
+                    className="h-9 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-2.5 text-[13px] font-semibold text-ink-800 focus:border-navy-500 focus:outline-none"
                   >
                     {SORT_OPTIONS.map((option) => (
                       <option key={option.value} value={option.value}>
@@ -200,7 +200,7 @@ export default function ScholarshipsPage() {
                     key={`${chip.key}-${chip.value}`}
                     type="button"
                     onClick={() => onToggleFilter(chip.key, chip.value)}
-                    className="flex items-center gap-1.5 rounded-full bg-navy-50 px-3 py-1.5 text-xs font-semibold text-navy-700 hover:bg-navy-100"
+                    className="flex items-center gap-1.5 rounded-full bg-navy-500/10 px-3 py-1.5 text-xs font-semibold text-navy-700 hover:bg-navy-100"
                   >
                     {chip.value}
                     <X className="size-3.5" />
@@ -266,7 +266,7 @@ export default function ScholarshipsPage() {
       {drawerOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="absolute inset-0 bg-navy-900/50"
+            className="absolute inset-0 bg-navy-900/50 backdrop-blur-sm"
             onClick={() => setDrawerOpen(false)}
             aria-hidden="true"
           />
@@ -276,7 +276,7 @@ export default function ScholarshipsPage() {
                 type="button"
                 onClick={() => setDrawerOpen(false)}
                 aria-label="إغلاق الفلاتر"
-                className="grid size-9 place-items-center rounded-lg bg-white text-ink-500 ring-1 ring-ink-200"
+                className="grid size-9 place-items-center rounded-lg glass text-ink-500"
               >
                 <X className="size-4" />
               </button>

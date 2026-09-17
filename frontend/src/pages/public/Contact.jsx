@@ -38,7 +38,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="bg-ink-100 py-12">
+    <div className="py-12">
       <div className="container-page">
         <header className="text-center">
           <h1 className="font-display text-3xl text-navy-800">تواصل معنا</h1>
@@ -48,7 +48,7 @@ export default function ContactPage() {
         </header>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_360px]">
-          <div className="rounded-2xl bg-white p-6 ring-1 ring-ink-200 sm:p-8">
+          <div className="glass rounded-2xl p-6 sm:p-8">
             {success ? (
               <Alert tone="success" className="mb-6" title="وصلتنا رسالتك">
                 شكراً لتواصلك معنا. سيرد عليك فريق منحتي على بريدك الإلكتروني قريباً.
@@ -109,7 +109,7 @@ export default function ContactPage() {
           </div>
 
           <aside className="space-y-4">
-            <div className="rounded-2xl bg-navy-700 p-6 text-white">
+            <div className="glass-dark rounded-2xl p-6 text-white">
               <h2 className="font-display text-lg font-bold">معلومات التواصل</h2>
 
               <ul className="mt-5 space-y-4">

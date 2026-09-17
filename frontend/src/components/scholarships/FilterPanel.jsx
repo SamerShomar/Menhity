@@ -8,7 +8,7 @@ function FilterGroup({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-ink-200 py-4 last:border-b-0">
+    <div className="border-b border-ink-900/10 py-4 last:border-b-0">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
@@ -60,7 +60,7 @@ export function FilterPanel({ filters, facets, onToggle, onReset, className }) {
   );
 
   return (
-    <div className={cn("rounded-2xl bg-white p-5 ring-1 ring-ink-200", className)}>
+    <div className={cn("glass rounded-2xl p-5", className)}>
       <div className="flex items-center justify-between pb-2">
         <h2 className="font-display text-base font-bold text-navy-800">
           تصفية النتائج

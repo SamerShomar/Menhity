@@ -47,7 +47,7 @@ export function UserMenu() {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex items-center gap-2 rounded-full py-1 ps-1 pe-2 transition-colors hover:bg-ink-100"
+        className="flex items-center gap-2 rounded-full py-1 ps-1 pe-2 transition-colors hover:bg-white/60"
       >
         <Avatar name={user.name} src={user.avatar_url} size={34} />
         <span className="hidden text-[13px] font-semibold text-ink-700 sm:inline">{user.first_name}</span>
@@ -57,9 +57,9 @@ export function UserMenu() {
       {open && (
         <div
           role="menu"
-          className="absolute end-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl border border-ink-200 bg-white py-1.5 shadow-[0_16px_40px_-16px_rgb(15_23_42/0.25)]"
+          className="glass-strong absolute end-0 top-full z-50 mt-2 w-56 overflow-hidden rounded-xl py-1.5"
         >
-          <div className="border-b border-ink-100 px-3.5 pb-2.5 pt-1">
+          <div className="border-b border-ink-900/8 px-3.5 pb-2.5 pt-1">
             <p className="truncate text-[13px] font-bold text-ink-900">{user.name}</p>
           </div>
 
@@ -81,7 +81,7 @@ export function UserMenu() {
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-1 flex w-full items-center gap-2.5 border-t border-ink-100 px-3.5 py-2 pt-2.5 text-start text-[13px] font-semibold text-[color:var(--color-danger)] transition-colors hover:bg-danger-soft"
+            className="mt-1 flex w-full items-center gap-2.5 border-t border-ink-900/8 px-3.5 py-2 pt-2.5 text-start text-[13px] font-semibold text-[color:var(--color-danger)] transition-colors hover:bg-[color:var(--color-danger)]/12"
           >
             <LogOut className="size-4" />
             تسجيل الخروج
@@ -98,7 +98,7 @@ function MenuLink({ to, icon, onClick, children }) {
       to={to}
       role="menuitem"
       onClick={onClick}
-      className="flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-ink-700 transition-colors hover:bg-ink-100"
+      className="flex items-center gap-2.5 px-3.5 py-2 text-[13px] font-medium text-ink-700 transition-colors hover:bg-white/60"
     >
       <span className="text-ink-400">{icon}</span>
       {children}

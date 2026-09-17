@@ -21,8 +21,8 @@ export function DashboardSidebar({ completionPercent }) {
 
   return (
     <aside className="lg:sticky lg:top-20 lg:h-fit">
-      <div className="rounded-2xl border border-ink-200 bg-white p-5 shadow-[0_1px_2px_rgb(15_23_42/0.04)]">
-        <div className="flex flex-col items-center border-b border-ink-100 pb-5 text-center">
+      <div className="glass rounded-2xl p-5">
+        <div className="flex flex-col items-center border-b border-ink-900/8 pb-5 text-center">
           <Avatar name={user?.name} src={user?.avatar_url} size={72} />
           <p className="mt-3 text-[15px] font-bold text-ink-900">{user?.name}</p>
           <p className="mt-0.5 text-[12px] text-ink-500">
@@ -45,7 +45,7 @@ export function DashboardSidebar({ completionPercent }) {
               className={({ isActive }) =>
                 cn(
                   LINK_BASE,
-                  isActive ? "bg-gold-400 text-navy-900" : "text-ink-600 hover:bg-ink-100 hover:text-ink-900",
+                  isActive ? "glass-gold text-navy-900" : "text-ink-600 hover:bg-white/60 hover:text-ink-900",
                 )
               }
             >
@@ -55,10 +55,10 @@ export function DashboardSidebar({ completionPercent }) {
           ))}
         </nav>
 
-        <div className="mt-5 flex flex-col gap-0.5 border-t border-ink-100 pt-4">
+        <div className="mt-5 flex flex-col gap-0.5 border-t border-ink-900/8 pt-4">
           <NavLink
             to="/help"
-            className={cn(LINK_BASE, "font-medium text-ink-500 hover:bg-ink-100 hover:text-ink-800")}
+            className={cn(LINK_BASE, "font-medium text-ink-500 hover:bg-white/60 hover:text-ink-800")}
           >
             <CircleHelp className="size-4" />
             مركز المساعدة
@@ -69,7 +69,7 @@ export function DashboardSidebar({ completionPercent }) {
             onClick={handleLogout}
             className={cn(
               LINK_BASE,
-              "w-full text-start font-medium text-[color:var(--color-danger)] hover:bg-danger-soft",
+              "w-full text-start font-medium text-[color:var(--color-danger)] hover:bg-[color:var(--color-danger)]/12",
             )}
           >
             <LogOut className="size-4" />

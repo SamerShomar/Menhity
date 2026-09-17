@@ -4,7 +4,7 @@ import { ButtonLink } from "@/components/ui/Button";
 
 export default function NotFoundPage() {
   return (
-    <div className="flex min-h-[70vh] items-center justify-center bg-ink-100 px-4 py-16">
+    <div className="flex min-h-[70vh] items-center justify-center px-4 py-16">
       <div className="text-center">
         <svg viewBox="0 0 320 170" className="mx-auto w-full max-w-sm" role="presentation" aria-hidden="true">
           <text

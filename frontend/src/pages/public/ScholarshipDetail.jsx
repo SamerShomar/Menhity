@@ -85,7 +85,7 @@ export default function ScholarshipDetailPage() {
   ];
 
   return (
-    <div className="bg-ink-100 pb-12">
+    <div className="pb-12">
       {/* الترويسة */}
       <div className="bg-navy-700 text-white">
         <div className="container-page py-8">
@@ -110,10 +110,10 @@ export default function ScholarshipDetailPage() {
                   </span>
                   {scholarship.country_name_ar}
                 </span>
-                <Badge tone={URGENCY_TONE[scholarship.deadline_urgency] ?? "neutral"} dot>
+                <Badge tone={URGENCY_TONE[scholarship.deadline_urgency] ?? "neutral"} onDark dot>
                   {deadlineLabel(scholarship.days_until_deadline)}
                 </Badge>
-                {scholarship.is_featured ? <Badge tone="gold">منحة مميزة</Badge> : null}
+                {scholarship.is_featured ? <Badge tone="gold" onDark>منحة مميزة</Badge> : null}
               </div>
 
               <h1 className="font-display text-2xl leading-relaxed sm:text-3xl">{scholarship.title_ar}</h1>
@@ -143,12 +143,12 @@ export default function ScholarshipDetailPage() {
                 </ButtonLink>
               ) : null}
 
-              <Button variant="outline" size="lg" onClick={() => toggle(scholarship)}>
+              <Button variant="onDark" size="lg" onClick={() => toggle(scholarship)}>
                 {saved ? <BookmarkCheck className="size-4" /> : <Bookmark className="size-4" />}
                 {saved ? "محفوظة" : "حفظ"}
               </Button>
 
-              <Button variant="outline" size="lg" onClick={share} aria-label="مشاركة المنحة">
+              <Button variant="onDark" size="lg" onClick={share} aria-label="مشاركة المنحة">
                 <Share2 className="size-4" />
               </Button>
             </div>
@@ -173,7 +173,7 @@ export default function ScholarshipDetailPage() {
               <CardBody>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {scholarship.benefits.map((benefit) => (
-                    <div key={benefit.id} className="flex gap-3 rounded-xl bg-ink-50 p-4">
+                    <div key={benefit.id} className="flex gap-3 glass-soft rounded-xl p-4">
                       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-gold-100 text-gold-700">
                         <Icon name={benefit.icon} className="size-5" />
                       </span>
@@ -208,7 +208,7 @@ export default function ScholarshipDetailPage() {
             <Card>
               <CardHeader title="المستندات المطلوبة" icon={<FileText className="size-4" />} />
               <CardBody>
-                <ul className="divide-y divide-ink-200">
+                <ul className="divide-y divide-ink-900/10">
                   {scholarship.documents.map((document) => (
                     <li key={document.id} className="flex items-center justify-between gap-4 py-3">
                       <span className="flex items-center gap-2.5 text-[15px] text-ink-700">
@@ -297,7 +297,7 @@ export default function ScholarshipDetailPage() {
           ) : null}
 
           {!isAuthenticated ? (
-            <div className="rounded-2xl bg-navy-700 p-5 text-white">
+            <div className="glass-dark rounded-2xl p-5 text-white">
               <p className="font-display text-lg font-bold">هل هذه المنحة مناسبة لك؟</p>
               <p className="mt-2 text-[13px] leading-7 text-navy-100">
                 أنشئ ملفك الأكاديمي مجاناً لتعرف نسبة مطابقتك مع هذه المنحة وتصلك تنبيهات قبل إغلاق التقديم.

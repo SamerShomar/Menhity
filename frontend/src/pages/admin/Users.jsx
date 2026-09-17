@@ -128,7 +128,7 @@ export default function AdminUsersPage() {
           disabled={row.id === currentUser?.id || setRole.submitting}
           onChange={(event) => onRoleChange(row, event.target.value)}
           aria-label={`دور ${row.name}`}
-          className="h-8 rounded-lg border border-ink-300 bg-white px-2 text-[12px] font-semibold text-ink-800 disabled:opacity-60 focus:border-navy-500 focus:outline-none"
+          className="h-8 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-2 text-[12px] font-semibold text-ink-800 disabled:opacity-60 focus:border-navy-500 focus:outline-none"
         >
           {roles.map((item) => (
             <option key={item.value} value={item.value}>
@@ -151,7 +151,7 @@ export default function AdminUsersPage() {
             disabled={row.id === currentUser?.id || setStatus.submitting}
             onChange={(event) => onStatusChange(row, event.target.value)}
             aria-label={`حالة ${row.name}`}
-            className="h-8 rounded-lg border border-ink-300 bg-white px-2 text-[12px] disabled:opacity-60 focus:border-navy-500 focus:outline-none"
+            className="h-8 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-2 text-[12px] disabled:opacity-60 focus:border-navy-500 focus:outline-none"
           >
             {statuses.map((item) => (
               <option key={item.value} value={item.value}>
@@ -209,7 +209,7 @@ export default function AdminUsersPage() {
               onChange={(event) => setTerm(event.target.value)}
               placeholder="ابحث بالاسم أو البريد…"
               aria-label="بحث في المستخدمين"
-              className="h-10 w-full rounded-lg border border-ink-300 bg-white ps-10 pe-3 text-[13px] focus:border-navy-500 focus:outline-none"
+              className="h-10 w-full rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md ps-10 pe-3 text-[13px] focus:border-navy-500 focus:outline-none"
             />
           </form>
 
@@ -217,7 +217,7 @@ export default function AdminUsersPage() {
             value={role}
             onChange={(event) => write({ q, role: event.target.value, status, page: 1 })}
             aria-label="تصفية حسب الدور"
-            className="h-10 rounded-lg border border-ink-300 bg-white px-3 text-[13px] focus:border-navy-500 focus:outline-none"
+            className="h-10 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-3 text-[13px] focus:border-navy-500 focus:outline-none"
           >
             <option value="">كل الأدوار</option>
             {roles.map((item) => (
@@ -233,7 +233,7 @@ export default function AdminUsersPage() {
               onClick={() => write({ q, role, page: 1 })}
               className={cn(
                 "rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition",
-                !status ? "bg-navy-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                !status ? "bg-navy-700 text-white" : "bg-white/55 backdrop-blur-md text-ink-700 hover:bg-white/80",
               )}
             >
               الكل
@@ -245,7 +245,7 @@ export default function AdminUsersPage() {
                 onClick={() => write({ q, role, status: item.value, page: 1 })}
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition",
-                  status === item.value ? "bg-navy-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                  status === item.value ? "bg-navy-700 text-white" : "bg-white/55 backdrop-blur-md text-ink-700 hover:bg-white/80",
                 )}
               >
                 {item.label}
@@ -275,8 +275,8 @@ export default function AdminUsersPage() {
 
       {/* سبب الإيقاف */}
       {suspending ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-navy-900/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-navy-900/50 backdrop-blur-sm p-4">
+          <div className="glass-strong w-full max-w-md rounded-2xl p-6">
             <h2 className="flex items-center gap-2 font-display text-lg font-bold text-navy-800">
               <ShieldCheck className="size-5" />
               إيقاف حساب {suspending.name}

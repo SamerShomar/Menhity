@@ -19,7 +19,9 @@ function pageList(current, total) {
 }
 
 const ITEM =
-  "inline-flex size-9 items-center justify-center rounded-lg border border-ink-200 bg-white text-[13px] font-semibold text-ink-600 transition-colors hover:border-navy-300 hover:text-navy-700";
+  "inline-flex size-9 items-center justify-center rounded-lg border border-ink-900/10 " +
+  "bg-white/55 backdrop-blur-md text-[13px] font-semibold text-ink-700 transition-all " +
+  "hover:bg-white/80 hover:border-navy-500/30 hover:text-navy-700";
 
 export function Pagination({ page, totalPages, onChange, className }) {
   if (!totalPages || totalPages <= 1) return null;

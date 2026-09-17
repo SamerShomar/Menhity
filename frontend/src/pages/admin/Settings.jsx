@@ -65,7 +65,7 @@ export default function AdminSettingsPage() {
               ["الهاتف", site.phone],
               ["العنوان", site.address],
             ].map(([label, value]) => (
-              <div key={label} className="flex items-start justify-between gap-4 rounded-lg bg-ink-50 px-4 py-3">
+              <div key={label} className="flex items-start justify-between gap-4 glass-soft rounded-lg px-4 py-3">
                 <dt className="text-[12.5px] font-semibold text-ink-500">{label}</dt>
                 <dd className="text-end text-[13px] font-bold text-navy-800">{value || "—"}</dd>
               </div>
@@ -73,7 +73,7 @@ export default function AdminSettingsPage() {
           </dl>
 
           {site.description ? (
-            <p className="mt-4 rounded-lg bg-ink-50 px-4 py-3 text-[13px] leading-7 text-ink-600">
+            <p className="mt-4 glass-soft rounded-lg px-4 py-3 text-[13px] leading-7 text-ink-600">
               {site.description}
             </p>
           ) : null}
@@ -84,13 +84,13 @@ export default function AdminSettingsPage() {
       <Card>
         <CardHeader title="حالة التكاملات" icon={<Server className="size-4" />} />
         <CardBody>
-          <ul className="divide-y divide-ink-200">
+          <ul className="divide-y divide-ink-900/10">
             {(data?.integrations ?? []).map((integration) => {
               const IntegrationIcon = INTEGRATION_ICON[integration.key] ?? Server;
 
               return (
                 <li key={integration.key} className="flex items-center gap-4 py-3.5 first:pt-0 last:pb-0">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-600">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-600">
                     <IntegrationIcon className="size-5" />
                   </span>
 
@@ -124,7 +124,7 @@ export default function AdminSettingsPage() {
           {(data?.audit_log ?? []).length === 0 ? (
             <p className="py-6 text-center text-[13px] text-ink-500">لا توجد عمليات مسجّلة بعد.</p>
           ) : (
-            <ul className="divide-y divide-ink-200">
+            <ul className="divide-y divide-ink-900/10">
               {data.audit_log.map((entry) => (
                 <li key={entry.id} className="flex items-start justify-between gap-4 py-3">
                   <div className="min-w-0">

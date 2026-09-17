@@ -95,14 +95,14 @@ export default function LandingPage() {
 
             <form onSubmit={onSearch} className="mt-7 flex flex-col gap-3 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="pointer-events-none absolute top-1/2 start-4 size-5 -translate-y-1/2 text-ink-400" />
+                <Search className="pointer-events-none absolute top-1/2 start-4 size-5 -translate-y-1/2 text-white/60" />
                 <input
                   type="search"
                   value={term}
                   onChange={(event) => setTerm(event.target.value)}
                   placeholder="ابحث عن منحة، دولة، أو تخصص…"
                   aria-label="ابحث عن منحة"
-                  className="h-13 w-full rounded-xl border-0 bg-white py-3.5 ps-12 pe-4 text-sm text-ink-800 placeholder:text-ink-400 focus:ring-2 focus:ring-gold-400 focus:outline-none"
+                  className="h-13 w-full rounded-xl border border-white/25 bg-white/15 backdrop-blur-lg text-white placeholder:text-white/65 focus:bg-white/22 focus:ring-2 focus:ring-gold-400/70 focus:outline-none py-3.5 ps-12 pe-4 text-sm"
                 />
               </div>
               <Button type="submit" variant="gold" size="lg">
@@ -112,19 +112,18 @@ export default function LandingPage() {
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               {!isAuthenticated ? (
-                <ButtonLink to="/register" size="lg" className="bg-white text-navy-700 hover:bg-navy-50">
+                <ButtonLink to="/register" size="lg" className="bg-white text-navy-700 hover:bg-navy-500/10">
                   أنشئ حسابك مجاناً
                 </ButtonLink>
               ) : (
-                <ButtonLink to="/dashboard" size="lg" className="bg-white text-navy-700 hover:bg-navy-50">
+                <ButtonLink to="/dashboard" size="lg" className="bg-white text-navy-700 hover:bg-navy-500/10">
                   اذهب للوحة التحكم
                 </ButtonLink>
               )}
               <ButtonLink
                 to="/scholarships"
                 size="lg"
-                variant="outline"
-                className="border-white/40 bg-transparent text-white hover:border-white hover:bg-white/10 hover:text-white"
+                variant="onDark"
               >
                 تصفّح كل المنح
                 <ArrowLeft className="size-4" />
@@ -139,11 +138,11 @@ export default function LandingPage() {
       </section>
 
       {/* ============ الأرقام ============ */}
-      <section className="border-b border-ink-200 bg-white py-10">
+      <section className="border-b border-ink-900/8 py-10">
         <div className="container-page grid grid-cols-2 gap-6 lg:grid-cols-4">
           {STAT_LABELS.map((stat) => (
             <div key={stat.key} className="flex items-center gap-3.5">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-700">
+              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-700">
                 <stat.icon className="size-6" />
               </span>
               <div className="min-w-0">
@@ -159,7 +158,7 @@ export default function LandingPage() {
       </section>
 
       {/* ============ المنح المميزة ============ */}
-      <section className="bg-ink-100 py-14">
+      <section className="py-14">
         <div className="container-page">
           <SectionHeading
             eyebrow="فرص مختارة"
@@ -190,7 +189,7 @@ export default function LandingPage() {
       </section>
 
       {/* ============ كيف تعمل المنصة ============ */}
-      <section className="bg-white py-14">
+      <section className="py-14">
         <div className="container-page">
           <SectionHeading
             eyebrow="كيف تعمل منحتي؟"
@@ -200,11 +199,11 @@ export default function LandingPage() {
 
           <ol className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step, index) => (
-              <li key={step.title} className="relative rounded-2xl bg-ink-50 p-6 ring-1 ring-ink-200">
+              <li key={step.title} className="relative glass-soft rounded-2xl p-6">
                 <span className="num absolute -top-3 start-6 grid size-8 place-items-center rounded-full bg-navy-700 text-sm font-bold text-white">
                   {index + 1}
                 </span>
-                <span className="mt-3 inline-grid size-12 place-items-center rounded-xl bg-gold-100 text-gold-700">
+                <span className="mt-3 inline-grid size-12 place-items-center rounded-xl bg-gold-400/25 text-gold-700">
                   <step.icon className="size-6" />
                 </span>
                 <h3 className="mt-4 font-display text-lg font-bold text-navy-800">{step.title}</h3>
@@ -216,7 +215,7 @@ export default function LandingPage() {
       </section>
 
       {/* ============ أدوات الذكاء الاصطناعي ============ */}
-      <section className="bg-ink-100 py-14">
+      <section className="py-14">
         <div className="container-page">
           <SectionHeading
             eyebrow="أدوات مجانية"
@@ -229,9 +228,9 @@ export default function LandingPage() {
               <Link
                 key={tool.key}
                 to={TOOL_ROUTES[tool.key] ?? "/tools"}
-                className="group rounded-2xl bg-white p-5 ring-1 ring-ink-200 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200"
+                className="group glass rounded-2xl p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200"
               >
-                <span className="grid size-12 place-items-center rounded-xl bg-navy-50 text-navy-700 transition group-hover:bg-navy-700 group-hover:text-white">
+                <span className="grid size-12 place-items-center rounded-xl bg-navy-500/10 text-navy-700 transition group-hover:bg-navy-700 group-hover:text-white">
                   <Icon name={tool.icon} className="size-6" />
                 </span>
                 <h3 className="mt-4 font-display text-base font-bold text-navy-800">{tool.name_ar}</h3>

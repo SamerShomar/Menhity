@@ -3,11 +3,15 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
+/*
+ * الحقول أعلى تعتيماً من اللوح الذي تجلس عليه: الكتابة تحتاج سطحاً هادئاً،
+ * ويزداد التعتيم عند التركيز ليُفرز الحقل النشط عمّا حوله.
+ */
 const FIELD_BASE =
-  "w-full rounded-[10px] border border-ink-300 bg-white px-3.5 text-sm text-ink-900 " +
-  "placeholder:text-ink-400 transition-colors " +
-  "focus:border-navy-500 focus:outline-none focus:ring-2 focus:ring-navy-500/15 " +
-  "disabled:bg-ink-100 disabled:text-ink-500 aria-[invalid=true]:border-[color:var(--color-danger)]";
+  "w-full rounded-[10px] border border-ink-900/12 bg-white/60 backdrop-blur-md px-3.5 text-sm text-ink-900 " +
+  "placeholder:text-ink-400 transition-all " +
+  "focus:border-navy-500/60 focus:bg-white/85 focus:outline-none focus:ring-2 focus:ring-navy-500/15 " +
+  "disabled:bg-ink-100/60 disabled:text-ink-500 aria-[invalid=true]:border-[color:var(--color-danger)]";
 
 export function Label({ htmlFor, required, hint, children }) {
   return (
@@ -201,7 +205,7 @@ export function Switch({ checked, onChange, label, description, disabled }) {
       >
         <span
           className={cn(
-            "absolute top-0.5 size-5 rounded-full bg-white shadow transition-all",
+            "absolute top-0.5 size-5 rounded-full bg-white shadow-md transition-all",
             checked ? "start-5.5" : "start-0.5",
           )}
         />

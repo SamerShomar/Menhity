@@ -4,7 +4,7 @@ export function Card({ as: Tag = "div", className, children }) {
   return (
     <Tag
       className={cn(
-        "rounded-2xl border border-ink-200 bg-white shadow-[0_1px_2px_rgb(15_23_42/0.04),0_8px_24px_-12px_rgb(15_23_42/0.12)]",
+        "glass rounded-2xl",
         className,
       )}
     >

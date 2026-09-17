@@ -54,7 +54,7 @@ export default function RegisterPage() {
     }
   };
 
-  const strengthTone = ["bg-ink-200", "bg-[color:var(--color-danger)]", "bg-gold-400", "bg-gold-500", "bg-[color:var(--color-success)]"][strength];
+  const strengthTone = ["bg-ink-200", "bg-[color:var(--color-danger)]", "bg-gold-400", "bg-gold-400/400", "bg-[color:var(--color-success)]"][strength];
 
   return (
     <AuthSplit

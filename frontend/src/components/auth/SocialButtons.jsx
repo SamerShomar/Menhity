@@ -38,7 +38,7 @@ export function SocialButtons({ label = "أو تابع باستخدام" }) {
   const [notice, setNotice] = useState(false);
 
   const buttonClass =
-    "flex flex-1 items-center justify-center gap-2 rounded-xl border border-ink-200 bg-white px-4 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-navy-300 hover:bg-ink-50";
+    "flex flex-1 items-center justify-center gap-2 rounded-xl border border-ink-900/12 bg-white/55 backdrop-blur-md px-4 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-navy-300 hover:bg-white/55";
 
   return (
     <div className="mt-6">
@@ -60,7 +60,7 @@ export function SocialButtons({ label = "أو تابع باستخدام" }) {
       </div>
 
       {notice ? (
-        <p className="mt-3 rounded-xl bg-gold-50 px-3 py-2 text-center text-xs leading-6 text-gold-800">
+        <p className="mt-3 rounded-xl bg-gold-400/18 backdrop-blur-md px-3 py-2 text-center text-xs leading-6 text-gold-800">
           الدخول عبر جوجل وآبل غير مُفعّل بعد في هذه النسخة. استخدم البريد الإلكتروني وكلمة المرور.
         </p>
       ) : null}

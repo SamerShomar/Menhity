@@ -25,7 +25,7 @@ export function BarList({ items, valueLabel = "", color = CHART_COLORS[0], class
             </span>
           </div>
 
-          <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-ink-100">
+          <div className="mt-1.5 h-2 w-full overflow-hidden rounded-full bg-ink-900/8">
             <div
               className="h-full rounded-full"
               style={{ width: `${(item.value / highest) * 100}%`, backgroundColor: item.color ?? color }}

@@ -40,10 +40,10 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-white py-14">
+      <section className="py-14">
         <div className="container-page grid items-center gap-10 lg:grid-cols-2">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-navy-50 px-4 py-1.5 text-sm font-semibold text-navy-700">
+            <span className="inline-flex items-center gap-2 rounded-full bg-navy-500/10 px-4 py-1.5 text-sm font-semibold text-navy-700">
               <Target className="size-4" />
               رسالتنا
             </span>
@@ -54,7 +54,7 @@ export default function AboutPage() {
               تجهّز ملفك للتقديم.
             </p>
 
-            <div className="mt-6 flex items-start gap-3 rounded-2xl bg-gold-50 p-5">
+            <div className="mt-6 flex items-start gap-3 glass-soft rounded-2xl p-5">
               <Eye className="mt-0.5 size-5 shrink-0 text-gold-700" />
               <div>
                 <p className="font-bold text-navy-800">رؤيتنا</p>
@@ -70,14 +70,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-ink-100 py-14">
+      <section className="py-14">
         <div className="container-page">
           <SectionHeading eyebrow="قيمنا" title="على ماذا نبني منحتي" />
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((value) => (
-              <div key={value.title} className="rounded-2xl bg-white p-6 ring-1 ring-ink-200">
-                <span className="grid size-12 place-items-center rounded-xl bg-navy-50 text-navy-700">
+              <div key={value.title} className="glass rounded-2xl p-6">
+                <span className="grid size-12 place-items-center rounded-xl bg-navy-500/10 text-navy-700">
                   <value.icon className="size-6" />
                 </span>
                 <h3 className="mt-4 font-display text-base font-bold text-navy-800">{value.title}</h3>
@@ -88,7 +88,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="bg-white py-14">
+      <section className="py-14">
         <div className="container-page rounded-3xl bg-navy-700 px-6 py-12 text-center text-white">
           <h2 className="font-display text-2xl">لديك سؤال أو اقتراح؟</h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-8 text-navy-100">

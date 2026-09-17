@@ -16,7 +16,7 @@ export function DataTable({ columns, rows, loading, empty = "لا توجد بي�
     <div className="overflow-x-auto scrollbar-slim">
       <table className="w-full min-w-[720px] border-collapse text-start">
         <thead>
-          <tr className="border-b border-ink-200 bg-ink-50">
+          <tr className="border-b border-ink-900/10 bg-white/45">
             {columns.map((column) => (
               <th
                 key={column.key}
@@ -32,9 +32,9 @@ export function DataTable({ columns, rows, loading, empty = "لا توجد بي�
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-ink-200">
+        <tbody className="divide-y divide-ink-900/10">
           {rows.map((row) => (
-            <tr key={rowKey(row)} className="transition hover:bg-ink-50/60">
+            <tr key={rowKey(row)} className="transition hover:bg-white/50">
               {columns.map((column) => (
                 <td key={column.key} className={cn("px-4 py-3.5 align-middle text-[13px]", column.className)}>
                   {column.cell(row)}

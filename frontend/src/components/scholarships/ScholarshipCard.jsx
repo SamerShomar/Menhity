@@ -32,12 +32,12 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
   return (
     <article
       className={cn(
-        "group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white ring-1 ring-ink-200 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200",
+        "group relative flex h-full flex-col overflow-hidden glass rounded-2xl transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200",
         className,
       )}
     >
       {/* شريط العلم والدولة */}
-      <div className="flex items-center justify-between gap-3 bg-navy-50 px-4 py-3">
+      <div className="flex items-center justify-between gap-3 bg-navy-500/10 px-4 py-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <span className="text-2xl leading-none" aria-hidden="true">
             {countryFlag(countryCode)}
@@ -58,7 +58,7 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
               onClick={() => onToggleSave(scholarship)}
               aria-label={saved ? "إزالة من المحفوظات" : "حفظ المنحة"}
               aria-pressed={Boolean(saved)}
-              className="relative z-10 grid size-8 place-items-center rounded-lg bg-white text-ink-400 ring-1 ring-ink-200 transition hover:text-navy-700"
+              className="relative z-10 grid size-8 place-items-center rounded-lg glass text-ink-400 transition hover:text-navy-700"
             >
               {saved ? <BookmarkCheck className="size-4 text-navy-700" /> : <Bookmark className="size-4" />}
             </button>
@@ -109,14 +109,14 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
 /** هيكل تحميل بنفس أبعاد البطاقة */
 export function ScholarshipCardSkeleton() {
   return (
-    <div className="h-[260px] animate-pulse overflow-hidden rounded-2xl bg-white ring-1 ring-ink-200">
-      <div className="h-12 bg-ink-100" />
+    <div className="h-[260px] animate-pulse overflow-hidden glass rounded-2xl">
+      <div className="h-12 bg-ink-900/8" />
       <div className="space-y-3 p-4">
-        <div className="h-4 w-3/4 rounded bg-ink-100" />
-        <div className="h-3 w-1/2 rounded bg-ink-100" />
+        <div className="h-4 w-3/4 rounded bg-ink-900/8" />
+        <div className="h-3 w-1/2 rounded bg-ink-900/8" />
         <div className="flex gap-2 pt-2">
-          <div className="h-6 w-20 rounded-full bg-ink-100" />
-          <div className="h-6 w-24 rounded-full bg-ink-100" />
+          <div className="h-6 w-20 rounded-full bg-ink-900/8" />
+          <div className="h-6 w-24 rounded-full bg-ink-900/8" />
         </div>
       </div>
     </div>
