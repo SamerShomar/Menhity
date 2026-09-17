@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\User;
 use App\Services\VerificationCodeService;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
@@ -18,7 +19,18 @@ class VerifyEmailCodeMail extends Mailable
 
     public function envelope(): Envelope
     {
-        return new Envelope(subject: "رمز تأكيد بريدك في منحتي: {$this->code}");
+        return new Envelope(
+            subject: "رمز تأكيد بريدك في منحتي: {$this->code}",
+            replyTo: array_filter([$this->replyToAddress()]),
+        );
+    }
+
+    /** عنوان الردّ إن ضُبط — يسمح بالردّ على بريد حقيقي رغم قيود المُرسِل */
+    private function replyToAddress(): ?Address
+    {
+        $address = config('mail.reply_to.address');
+
+        return filled($address) ? new Address($address, config('mail.reply_to.name')) : null;
     }
 
     public function content(): Content

@@ -71,6 +71,28 @@ class ResendTransportTest extends TestCase
         });
     }
 
+    public function test_it_attaches_a_reply_to_when_configured(): void
+    {
+        $this->useResend();
+        config(['mail.reply_to.address' => 'nebal@example.com', 'mail.reply_to.name' => 'منحتي']);
+        Http::fake(['api.resend.com/*' => Http::response(['id' => 'msg_1'])]);
+
+        $this->send();
+
+        Http::assertSent(fn (Request $r) => str_contains($r->data()['reply_to'][0] ?? '', 'nebal@example.com'));
+    }
+
+    public function test_it_omits_reply_to_when_not_configured(): void
+    {
+        $this->useResend();
+        config(['mail.reply_to.address' => null]);
+        Http::fake(['api.resend.com/*' => Http::response(['id' => 'msg_1'])]);
+
+        $this->send();
+
+        Http::assertSent(fn (Request $r) => ! array_key_exists('reply_to', $r->data()));
+    }
+
     public function test_it_surfaces_an_api_error(): void
     {
         $this->useResend();
