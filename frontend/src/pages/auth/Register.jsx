@@ -45,15 +45,13 @@ export default function RegisterPage() {
     event.preventDefault();
     const { ok, result } = await submit(form);
 
-    // الجلسة تبدأ بعد تأكيد البريد، لا بعد إنشاء الحساب
+    // الجلسة تبدأ بعد ضغط رابط التفعيل، لا بعد إنشاء الحساب.
+    // البريد يُحمل في الرابط لا في حالة التوجيه، فتعمل الصفحة عند فتحها من جهاز آخر.
     if (ok) {
-      navigate("/verify-email", {
+      const email = result?.email ?? form.email;
+      navigate(`/verify-email?email=${encodeURIComponent(email)}`, {
         replace: true,
-        state: {
-          email: result?.email ?? form.email,
-          notice: result?.message,
-          codeSent: result?.code_sent,
-        },
+        state: { notice: result?.message, linkSent: result?.link_sent },
       });
     }
   };

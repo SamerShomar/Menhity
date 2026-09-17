@@ -9,18 +9,18 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
-/** رسالة تأكيد البريد الإلكتروني بعد إنشاء الحساب. */
+/** رسالة تفعيل الحساب — زرّ واحد يكمل التسجيل. */
 class VerifyEmailCodeMail extends Mailable
 {
     public function __construct(
         public readonly User $user,
-        public readonly string $code,
+        public readonly string $activationUrl,
     ) {}
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "رمز تأكيد بريدك في منحتي: {$this->code}",
+            subject: 'فعّل حسابك في منحتي',
             replyTo: array_filter([$this->replyToAddress()]),
         );
     }
@@ -36,15 +36,12 @@ class VerifyEmailCodeMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.verification-code',
-            text: 'emails.verification-code-text',
+            view: 'emails.activate-account',
+            text: 'emails.activate-account-text',
             with: [
                 'name' => $this->user->firstName(),
-                'code' => $this->code,
-                'heading' => 'أكّد بريدك الإلكتروني',
-                'intro' => 'أهلاً بك في منحتي. استخدم الرمز التالي لتأكيد بريدك وتفعيل حسابك.',
-                'minutes' => VerificationCodeService::TTL_MINUTES,
-                'disclaimer' => 'إن لم تكن أنت من أنشأ هذا الحساب، تجاهل هذه الرسالة ولن يُفعَّل الحساب.',
+                'url' => $this->activationUrl,
+                'hours' => VerificationCodeService::ACTIVATION_TTL_HOURS,
             ],
         );
     }

@@ -165,7 +165,7 @@ class GmailTransportTest extends TestCase
         $this->send();
     }
 
-    public function test_registration_reports_when_the_code_could_not_be_sent(): void
+    public function test_registration_reports_when_the_link_could_not_be_sent(): void
     {
         $this->useGmail();
         $this->fakeGoogle([
@@ -182,7 +182,7 @@ class GmailTransportTest extends TestCase
         ])
             ->assertCreated()
             ->assertJsonPath('requires_verification', true)
-            ->assertJsonPath('code_sent', false);
+            ->assertJsonPath('link_sent', false);
 
         $this->assertDatabaseHas('users', ['email' => 'new@example.com']);
     }

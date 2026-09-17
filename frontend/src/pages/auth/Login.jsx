@@ -29,10 +29,10 @@ export default function LoginPage() {
     event.preventDefault();
     const { ok, result, error: failure } = await submit(form);
 
-    // حساب لم يؤكَّد بريده: الخادم أرسل رمزاً جديداً وننقله لشاشة التأكيد
+    // حساب غير مفعَّل: الخادم أرسل رابطاً جديداً وننقله لشاشة التفعيل
     if (!ok && failure?.status === 409) {
-      navigate("/verify-email", {
-        state: { email: form.email, notice: failure.message, codeSent: failure.data?.code_sent },
+      navigate(`/verify-email?email=${encodeURIComponent(form.email)}`, {
+        state: { notice: failure.message, linkSent: failure.data?.link_sent },
       });
       return;
     }

@@ -40,7 +40,7 @@
 - صفحات: من نحن، الأسئلة الشائعة، مركز المساعدة، تواصل معنا، الشروط، الخصوصية، و404.
 
 ### للطالب
-- **مصادقة كاملة**: تسجيل مع **تأكيد البريد الإلكتروني برمز من ٦ أرقام**، دخول، استعادة كلمة المرور بالرمز نفسه.
+- **مصادقة كاملة**: تسجيل مع **تفعيل الحساب برابط يُضغط من البريد**، دخول، واستعادة كلمة المرور برمز من ٦ أرقام.
 - **الملف الأكاديمي**: معلومات شخصية، مؤهلات، خبرات، مهارات، لغات، شهادات، مشاريع، اهتمامات —
   مع حساب تلقائي لنسبة الاكتمال وتلميح لكل قسم ناقص.
 - **مطابقة ذكية**: خوارزمية تحسب نسبة توافق كل منحة مع الملف وتعرض **أسباب التوافق**.
@@ -229,7 +229,7 @@ docs/
 |---|---|
 | عام | `GET /meta` · `GET /stats` · `GET /ai-tools` · `POST /contact` |
 | المصادقة | `POST /auth/register` · `POST /auth/login` · `GET /auth/me` · `POST /auth/logout` |
-| تأكيد البريد | `POST /auth/verify-email` · `/auth/resend-verification` |
+| تفعيل الحساب | `POST /auth/verify-email` (بالرمز من الرابط) · `/auth/resend-verification` |
 | استعادة كلمة المرور | `POST /auth/forgot-password` · `/verify-code` · `/reset-password` |
 | المنح (مصادقة اختيارية) | `GET /scholarships` · `/featured` · `/facets` · `/{slug}` |
 | لوحة الطالب | `GET /dashboard` · `/profile` · `/documents` · `/notifications` · `/saved` |
@@ -281,6 +281,7 @@ docs/
 | `RESEND_API_KEY` | ✅ | مع `MAIL_MAILER=resend` — يحتاج نطاقاً موثَّقاً لدى Resend |
 | `GMAIL_CLIENT_ID` + `GMAIL_CLIENT_SECRET` + `GMAIL_REFRESH_TOKEN` | ✅ | مع `MAIL_MAILER=gmail` — الإرسال من حساب Gmail بلا نطاق؛ يطبعها `php artisan menhity:gmail-auth` |
 | `MAIL_HOST` و`MAIL_PORT` و`MAIL_USERNAME` و`MAIL_PASSWORD` | ✅ | مع `MAIL_MAILER=smtp` فقط، حيث لا تُحجب المنافذ 587/465 |
+| `FRONTEND_URL` | ✅ | أصل الواجهة — يُبنى منه رابط تفعيل الحساب في الرسائل |
 | `MAIL_FROM_ADDRESS` | ✅ | بريد المُرسِل: على نطاق موثَّق لدى المزوّد، أو بريد حساب Gmail المُخوَّل |
 | `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` | ❌ | Cloudflare Workers AI — حصة يومية مجانية بلا بطاقة دفع (يلزم المتغيّران معاً) |
 | `CLOUDFLARE_MODEL` | ❌ | اسم نموذج Workers AI؛ الافتراضي `@cf/meta/llama-3.3-70b-instruct-fp8-fast` |

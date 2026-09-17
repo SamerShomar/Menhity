@@ -32,7 +32,10 @@ class ResendTransportTest extends TestCase
     {
         $user = new User(['name' => 'سارة علي', 'email' => 'sara@example.com']);
 
-        Mail::to('sara@example.com')->send(new VerifyEmailCodeMail($user, '654321'));
+        Mail::to('sara@example.com')->send(new VerifyEmailCodeMail(
+            $user,
+            'https://menhity.test/verify-email?token='.str_repeat('a', 64).'&email=sara%40example.com',
+        ));
     }
 
     public function test_it_posts_the_message_to_the_resend_api(): void
@@ -49,8 +52,9 @@ class ResendTransportTest extends TestCase
                 && $request->hasHeader('Authorization', 'Bearer test-key')
                 && $body['to'] === ['sara@example.com']
                 && str_contains($body['from'], 'no-reply@menhity.com')
-                && str_contains($body['subject'], '654321')
-                && str_contains($body['html'], '654321');
+                && str_contains($body['subject'], 'فعّل حسابك')
+                && str_contains($body['html'], 'تفعيل الحساب')
+                && str_contains($body['html'], '/verify-email?token=');
         });
     }
 
@@ -66,7 +70,7 @@ class ResendTransportTest extends TestCase
             $body = $request->data();
 
             return filled($body['text'] ?? null)
-                && str_contains($body['text'], '654321')
+                && str_contains($body['text'], '/verify-email?token=')
                 && ! str_contains($body['text'], '<');
         });
     }

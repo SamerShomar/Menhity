@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 /**
- * يغطّي دورة تأكيد البريد كاملة: الإرسال عند التسجيل، حجب الدخول
- * قبل التأكيد، التحقق من الرمز، وحدود المحاولات والصلاحية.
+ * يغطّي دورة تفعيل الحساب كاملة: إرسال الرابط عند التسجيل، حجب الدخول
+ * قبل التفعيل، صحّة الرمز في الرابط، وانتهاء صلاحيته.
  */
 class EmailVerificationTest extends TestCase
 {
@@ -21,16 +21,16 @@ class EmailVerificationTest extends TestCase
 
     private const PASSWORD = 'Menhity@2026';
 
-    /** @return array{0: User, 1: string} المستخدم والرمز الصريح */
-    private function unverifiedUserWithCode(): array
+    /** @return array{0: User, 1: string} المستخدم ورمز التفعيل الصريح */
+    private function unverifiedUserWithToken(): array
     {
         $user = User::factory()->unverified()->create(['password' => self::PASSWORD]);
-        $code = app(VerificationCodeService::class)->issue($user, VerificationCode::TYPE_EMAIL_VERIFY);
+        $token = app(VerificationCodeService::class)->issueActivationToken($user);
 
-        return [$user, $code];
+        return [$user, $token];
     }
 
-    public function test_registration_sends_a_verification_email(): void
+    public function test_registration_sends_an_activation_link(): void
     {
         Mail::fake();
 
@@ -42,12 +42,14 @@ class EmailVerificationTest extends TestCase
             'accept_terms' => true,
         ])
             ->assertCreated()
-            ->assertJsonPath('code_sent', true);
+            ->assertJsonPath('link_sent', true);
 
         Mail::assertSent(
             VerifyEmailCodeMail::class,
             fn (VerifyEmailCodeMail $mail) => $mail->hasTo('sara@example.com')
-                && preg_match('/^\d{6}$/', $mail->code) === 1,
+                && str_contains($mail->activationUrl, '/verify-email?')
+                && str_contains($mail->activationUrl, 'token=')
+                && str_contains($mail->activationUrl, rawurlencode('sara@example.com')),
         );
 
         $user = User::where('email', 'sara@example.com')->first();
@@ -58,20 +60,21 @@ class EmailVerificationTest extends TestCase
         );
     }
 
-    public function test_the_stored_code_is_hashed_and_not_readable(): void
+    public function test_the_stored_token_is_hashed_and_not_readable(): void
     {
-        [$user, $code] = $this->unverifiedUserWithCode();
+        [$user, $token] = $this->unverifiedUserWithToken();
 
         $record = $user->verificationCodes()->latest()->first();
 
-        $this->assertNotSame($code, $record->code_hash);
-        $this->assertStringNotContainsString($code, $record->code_hash);
+        $this->assertSame(64, mb_strlen($token), 'طول الرمز يجعل تخمينه غير عملي');
+        $this->assertNotSame($token, $record->code_hash);
+        $this->assertStringNotContainsString($token, $record->code_hash);
     }
 
     public function test_an_unverified_user_cannot_log_in_and_gets_a_fresh_code(): void
     {
         Mail::fake();
-        [$user] = $this->unverifiedUserWithCode();
+        [$user] = $this->unverifiedUserWithToken();
 
         $this->postJson('/api/v1/auth/login', [
             'email' => $user->email,
@@ -100,11 +103,11 @@ class EmailVerificationTest extends TestCase
 
     public function test_the_correct_code_verifies_the_email_and_returns_a_token(): void
     {
-        [$user, $code] = $this->unverifiedUserWithCode();
+        [$user, $token] = $this->unverifiedUserWithToken();
 
         $this->postJson('/api/v1/auth/verify-email', [
             'email' => $user->email,
-            'code' => $code,
+            'token' => $token,
         ])->assertOk()->assertJsonStructure(['token', 'user' => ['id', 'email']]);
 
         $this->assertNotNull($user->fresh()->email_verified_at);
@@ -113,65 +116,59 @@ class EmailVerificationTest extends TestCase
 
     public function test_a_used_code_cannot_be_replayed(): void
     {
-        [$user, $code] = $this->unverifiedUserWithCode();
+        [$user, $token] = $this->unverifiedUserWithToken();
 
-        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'code' => $code])->assertOk();
+        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'token' => $token])->assertOk();
 
         // الحساب صار مؤكَّداً، فلا يُسلَّم توكن ثانٍ من الرمز نفسه
-        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'code' => $code])
+        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'token' => $token])
             ->assertOk()
             ->assertJsonPath('already_verified', true)
             ->assertJsonMissingPath('token');
     }
 
-    public function test_a_wrong_code_is_rejected_and_counts_an_attempt(): void
+    public function test_a_wrong_token_is_rejected(): void
     {
-        [$user, $code] = $this->unverifiedUserWithCode();
-        $wrong = $code === '000000' ? '111111' : '000000';
+        [$user] = $this->unverifiedUserWithToken();
 
-        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'code' => $wrong])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('code');
-
-        $this->assertSame(1, $user->verificationCodes()->latest()->first()->attempts);
-        $this->assertNull($user->fresh()->email_verified_at);
-    }
-
-    public function test_the_code_is_locked_after_too_many_wrong_attempts(): void
-    {
-        [$user, $code] = $this->unverifiedUserWithCode();
-        $user->verificationCodes()->latest()->first()->update([
-            'attempts' => VerificationCodeService::MAX_ATTEMPTS,
-        ]);
-
-        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'code' => $code])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('code');
+        $this->postJson('/api/v1/auth/verify-email', [
+            'email' => $user->email,
+            'token' => str_repeat('z', 64),
+        ])->assertUnprocessable()->assertJsonValidationErrors('token');
 
         $this->assertNull($user->fresh()->email_verified_at);
     }
 
-    public function test_an_expired_code_is_rejected(): void
+    public function test_a_malformed_token_is_rejected_before_any_lookup(): void
     {
-        [$user, $code] = $this->unverifiedUserWithCode();
+        [$user] = $this->unverifiedUserWithToken();
+
+        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'token' => 'short'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('token');
+    }
+
+    public function test_an_expired_link_is_rejected(): void
+    {
+        [$user, $token] = $this->unverifiedUserWithToken();
         $user->verificationCodes()->latest()->first()->update(['expires_at' => now()->subMinute()]);
 
-        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'code' => $code])
+        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'token' => $token])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('code');
+            ->assertJsonValidationErrors('token');
     }
 
     public function test_resending_issues_a_new_code_and_cancels_the_previous_one(): void
     {
         Mail::fake();
-        [$user, $first] = $this->unverifiedUserWithCode();
+        [$user, $first] = $this->unverifiedUserWithToken();
 
         $this->postJson('/api/v1/auth/resend-verification', ['email' => $user->email])->assertOk();
 
         Mail::assertSent(VerifyEmailCodeMail::class);
 
         // الرمز القديم بطل مفعوله فوراً
-        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'code' => $first])
+        $this->postJson('/api/v1/auth/verify-email', ['email' => $user->email, 'token' => $first])
             ->assertUnprocessable();
     }
 
@@ -188,9 +185,9 @@ class EmailVerificationTest extends TestCase
 
     public function test_verifying_an_unknown_email_reveals_nothing(): void
     {
-        $this->postJson('/api/v1/auth/verify-email', ['email' => 'nobody@example.com', 'code' => '123456'])
+        $this->postJson('/api/v1/auth/verify-email', ['email' => 'nobody@example.com', 'token' => str_repeat('a', 64)])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('code');
+            ->assertJsonValidationErrors('token');
     }
 
     public function test_password_reset_sends_a_real_email(): void
@@ -208,7 +205,7 @@ class EmailVerificationTest extends TestCase
 
     public function test_resetting_the_password_also_marks_the_email_verified(): void
     {
-        [$user, $_] = $this->unverifiedUserWithCode();
+        [$user] = $this->unverifiedUserWithToken();
         $code = app(VerificationCodeService::class)->issue($user, VerificationCode::TYPE_PASSWORD_RESET);
 
         $this->postJson('/api/v1/auth/reset-password', [

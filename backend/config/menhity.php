@@ -6,6 +6,10 @@
  * على الـ API والواجهة الأمامية معاً.
  */
 return [
+
+    /** أصل الواجهة — تُبنى منه روابط الرسائل مثل رابط تفعيل الحساب */
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
     'site' => [
         'name' => 'منحتي',
         'name_en' => 'Minhati',
