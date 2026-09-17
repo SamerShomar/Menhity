@@ -40,7 +40,7 @@ export function SiteHeader() {
   }, [isAuthenticated, location.pathname]);
 
   return (
-    <header className="glass-strong sticky top-0 z-40 rounded-none border-x-0 border-t-0 shadow-none">
+    <header className="glass-header sticky top-0 z-40 rounded-none border-x-0 border-t-0">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
           <Logo />
@@ -54,7 +54,7 @@ export function SiteHeader() {
                 className={({ isActive }) =>
                   cn(
                     "relative rounded-lg px-3 py-2 text-[13.5px] font-semibold transition-colors",
-                    isActive ? "text-navy-700" : "text-ink-500 hover:text-ink-900",
+                    isActive ? "text-navy-900" : "text-ink-800 hover:text-navy-900",
                   )
                 }
               >
@@ -62,7 +62,7 @@ export function SiteHeader() {
                   <>
                     {item.label}
                     {isActive && (
-                      <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-navy-700" />
+                      <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-navy-900" />
                     )}
                   </>
                 )}
@@ -77,19 +77,24 @@ export function SiteHeader() {
               <Link
                 to="/dashboard/notifications"
                 aria-label={`الإشعارات${unread ? ` (${unread} غير مقروء)` : ""}`}
-                className="relative rounded-full p-2 text-ink-500 transition-colors hover:bg-white/60 hover:text-ink-800"
+                className="relative rounded-full p-2 text-ink-700 transition-colors hover:bg-white/60 hover:text-navy-900"
               >
                 <Bell className="size-5" />
                 {unread > 0 && (
                   <span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-[color:var(--color-danger)] ring-2 ring-white" />
                 )}
               </Link>
-              <span className="hidden h-7 w-px bg-ink-900/10 sm:block" />
+              <span className="hidden h-7 w-px bg-ink-900/20 sm:block" />
               <UserMenu />
             </>
           ) : (
             <>
-              <ButtonLink to="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
+              <ButtonLink
+                to="/login"
+                variant="ghost"
+                size="sm"
+                className="hidden text-ink-800 sm:inline-flex"
+              >
                 تسجيل الدخول
               </ButtonLink>
               <ButtonLink to="/register" size="sm">
@@ -102,7 +107,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="فتح القائمة"
-            className="rounded-lg p-2 text-ink-600 transition-colors hover:bg-white/60 md:hidden"
+            className="rounded-lg p-2 text-ink-800 transition-colors hover:bg-white/60 md:hidden"
           >
             <Menu className="size-5" />
           </button>

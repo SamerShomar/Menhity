@@ -13,18 +13,18 @@ export function StatCard({ label, value, icon, hint, tone = "navy", className })
   return (
     <div
       className={cn(
-        "glass flex items-center gap-3.5 rounded-2xl p-4",
+        "glass flex min-w-0 items-center gap-3 rounded-2xl p-3.5 sm:gap-3.5 sm:p-4",
         className,
       )}
     >
       {icon && (
-        <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", TONES[tone])}>
+        <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-xl sm:size-10", TONES[tone])}>
           {icon}
         </span>
       )}
       <div className="min-w-0">
         <p className="num text-xl font-extrabold leading-tight text-ink-900">{value}</p>
-        <p className="mt-0.5 truncate text-[12px] font-medium text-ink-500">{label}</p>
+        <p className="mt-0.5 line-clamp-2 text-[12px] font-medium text-ink-500">{label}</p>
         {hint && <p className="mt-0.5 text-[11px] text-ink-400">{hint}</p>}
       </div>
     </div>

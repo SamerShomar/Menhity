@@ -189,7 +189,7 @@ export default function AdminOrdersPage() {
         className="hidden"
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="إجمالي الطلبات" value={meta.total ?? 0} icon={<ClipboardList className="size-5" />} />
         <StatCard label="قيد التنفيذ" value={meta.in_progress ?? 0} tone="gold" />
         <StatCard label="مُسلّمة" value={meta.delivered ?? 0} tone="success" />

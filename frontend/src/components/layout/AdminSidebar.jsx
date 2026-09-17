@@ -1,5 +1,6 @@
-import { NavLink, useNavigate } from "react-router-dom";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { useEffect } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { LogOut, ShieldCheck, X } from "lucide-react";
 
 import { Icon } from "@/components/ui/Icon";
 import { Logo } from "@/components/ui/Logo";
@@ -7,17 +8,42 @@ import { useAuth } from "@/context/AuthContext";
 import { ADMIN_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export function AdminSidebar() {
+/**
+ * قائمة لوحة الإدارة.
+ *
+ * تظهر عموداً ثابتاً على الشاشات الكبيرة، ودرجاً منزلقاً على الهاتف —
+ * وإلا بقيت اللوحة على الهاتف بلا أي وسيلة تنقّل أو خروج.
+ */
+export function AdminSidebar({ open = false, onClose }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // فتح صفحة من الدرج يغلقه — المسار وحده هو المُشغِّل هنا
+  useEffect(() => {
+    if (open) onClose?.();
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Esc يغلق الدرج
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const onKey = (event) => {
+      if (event.key === "Escape") onClose?.();
+    };
+
+    window.addEventListener("keydown", onKey);
+
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
   async function handleLogout() {
     await logout();
     navigate("/login");
   }
 
-  return (
-    <aside className="glass hidden w-64 shrink-0 flex-col rounded-none border-y-0 border-s-0 lg:flex">
+  const body = (
+    <>
       <div className="border-b border-ink-900/8 p-5">
         <Logo to="/admin" />
 
@@ -69,13 +95,42 @@ export function AdminSidebar() {
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-lg bg-white/70 px-3 py-2 text-[12.5px] font-semibold text-[color:var(--color-danger)] transition-colors hover:bg-[color:var(--color-danger)]/12"
+            className="mt-2.5 flex min-h-10 w-full items-center justify-center gap-2 rounded-lg bg-white/70 px-3 text-[12.5px] font-semibold text-[color:var(--color-danger)] transition-colors hover:bg-[color:var(--color-danger)]/12"
           >
             <LogOut className="size-3.5" />
             تسجيل الخروج
           </button>
         </div>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      <aside className="glass hidden w-64 shrink-0 flex-col rounded-none border-y-0 border-s-0 lg:flex">
+        {body}
+      </aside>
+
+      {open && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <div
+            className="absolute inset-0 bg-navy-900/45 backdrop-blur-sm"
+            onClick={onClose}
+            aria-hidden="true"
+          />
+          <div className="glass-strong absolute inset-y-0 start-0 flex w-72 max-w-[85vw] flex-col rounded-none border-y-0 border-s-0">
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="إغلاق القائمة"
+              className="absolute end-3 top-3 z-10 grid size-9 place-items-center rounded-lg text-ink-600 hover:bg-white/60"
+            >
+              <X className="size-5" />
+            </button>
+            {body}
+          </div>
+        </div>
+      )}
+    </>
   );
 }

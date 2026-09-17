@@ -64,7 +64,7 @@ export default function AdminNotificationsPage() {
     <div className="space-y-6">
       <PageHeader title="الإشعارات" description="أرسل إشعاراً جماعياً للطلاب وتابع آخر الإشعارات المرسلة." />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="إجمالي الإشعارات" value={meta.total ?? 0} icon={<Bell className="size-5" />} />
         <StatCard label="غير مقروءة" value={meta.unread ?? 0} tone="gold" />
         <StatCard label="نسبة القراءة" value={`${meta.read_rate ?? 0}%`} tone="success" />

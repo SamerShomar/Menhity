@@ -63,7 +63,7 @@ export default function NotificationsPage() {
             type="button"
             onClick={() => setTab(item.key)}
             className={cn(
-              "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold transition",
+              "flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-[13px] font-semibold transition",
               tab === item.key ? "bg-navy-700 text-white" : "glass text-ink-600 hover:bg-white/55",
             )}
           >
@@ -142,7 +142,7 @@ export default function NotificationsPage() {
                         <button
                           type="button"
                           onClick={() => onOpen(notification)}
-                          className="text-[12px] font-semibold text-ink-500 hover:text-navy-700 hover:underline"
+                          className="inline-flex min-h-9 items-center text-[12px] font-semibold text-ink-500 hover:text-navy-700 hover:underline"
                         >
                           تعليم كمقروء
                         </button>
