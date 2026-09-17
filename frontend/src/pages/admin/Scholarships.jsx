@@ -108,7 +108,7 @@ export default function AdminScholarshipsPage() {
           onChange={(event) => onStatusChange(row, event.target.value)}
           disabled={setStatus.submitting}
           aria-label={`حالة ${row.title_ar}`}
-          className="h-8 rounded-lg border border-ink-300 bg-white px-2 text-[12px] font-semibold text-ink-800 focus:border-navy-500 focus:outline-none"
+          className="h-8 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-2 text-[12px] font-semibold text-ink-800 focus:border-navy-500 focus:outline-none"
         >
           {statuses.map((item) => (
             <option key={item.value} value={item.value}>
@@ -136,7 +136,7 @@ export default function AdminScholarshipsPage() {
           <Link
             to={`/admin/scholarships/${row.slug}`}
             aria-label={`تعديل ${row.title_ar}`}
-            className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-navy-50 hover:text-navy-700"
+            className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-navy-500/10 hover:text-navy-700"
           >
             <Pencil className="size-4" />
           </Link>
@@ -144,7 +144,7 @@ export default function AdminScholarshipsPage() {
             type="button"
             onClick={() => setConfirming(row)}
             aria-label={`حذف ${row.title_ar}`}
-            className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-danger-soft hover:text-[color:var(--color-danger)]"
+            className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-[color:var(--color-danger)]/12 hover:text-[color:var(--color-danger)]"
           >
             <Trash2 className="size-4" />
           </button>
@@ -189,7 +189,7 @@ export default function AdminScholarshipsPage() {
               onChange={(event) => setTerm(event.target.value)}
               placeholder="ابحث باسم المنحة أو الجهة…"
               aria-label="بحث في المنح"
-              className="h-10 w-full rounded-lg border border-ink-300 bg-white ps-10 pe-3 text-[13px] focus:border-navy-500 focus:outline-none"
+              className="h-10 w-full rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md ps-10 pe-3 text-[13px] focus:border-navy-500 focus:outline-none"
             />
           </form>
 
@@ -199,7 +199,7 @@ export default function AdminScholarshipsPage() {
               onClick={() => write({ q, page: 1 })}
               className={cn(
                 "rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition",
-                !status ? "bg-navy-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                !status ? "bg-navy-700 text-white" : "bg-white/55 backdrop-blur-md text-ink-700 hover:bg-white/80",
               )}
             >
               الكل
@@ -211,7 +211,7 @@ export default function AdminScholarshipsPage() {
                 onClick={() => write({ status: item.value, q, page: 1 })}
                 className={cn(
                   "rounded-lg px-3 py-1.5 text-[12.5px] font-semibold transition",
-                  status === item.value ? "bg-navy-700 text-white" : "bg-ink-100 text-ink-600 hover:bg-ink-200",
+                  status === item.value ? "bg-navy-700 text-white" : "bg-white/55 backdrop-blur-md text-ink-700 hover:bg-white/80",
                 )}
               >
                 {item.label}
@@ -241,8 +241,8 @@ export default function AdminScholarshipsPage() {
 
       {/* تأكيد الحذف */}
       {confirming ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-navy-900/50 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-6">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-navy-900/50 backdrop-blur-sm p-4">
+          <div className="glass-strong w-full max-w-md rounded-2xl p-6">
             <h2 className="font-display text-lg font-bold text-navy-800">حذف المنحة</h2>
             <p className="mt-2 text-[13.5px] leading-7 text-ink-600">
               سيُحذف «{confirming.title_ar}» نهائياً مع كل بياناتها المرتبطة. لا يمكن التراجع.

@@ -19,7 +19,7 @@ export default function ToolsHubPage() {
   const aiConfigured = data?.meta?.ai_configured;
 
   return (
-    <div className="bg-ink-100 py-12">
+    <div className="py-12">
       <div className="container-page">
         <SectionHeading
           as="h1"
@@ -47,9 +47,9 @@ export default function ToolsHubPage() {
               <Link
                 key={tool.key}
                 to={TOOL_ROUTES[tool.key] ?? "/tools"}
-                className="group flex flex-col rounded-2xl bg-white p-6 ring-1 ring-ink-200 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200"
+                className="group flex flex-col glass rounded-2xl p-6 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200"
               >
-                <span className="grid size-12 place-items-center rounded-xl bg-navy-50 text-navy-700 transition group-hover:bg-navy-700 group-hover:text-white">
+                <span className="grid size-12 place-items-center rounded-xl bg-navy-500/10 text-navy-700 transition group-hover:bg-navy-700 group-hover:text-white">
                   <Icon name={tool.icon} className="size-6" />
                 </span>
 

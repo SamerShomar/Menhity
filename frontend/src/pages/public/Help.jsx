@@ -48,10 +48,10 @@ export default function HelpPage() {
   const { site } = useMeta();
 
   return (
-    <div className="bg-ink-100 py-12">
+    <div className="py-12">
       <div className="container-page max-w-5xl">
         <header className="text-center">
-          <span className="inline-grid size-14 place-items-center rounded-2xl bg-navy-50 text-navy-700">
+          <span className="inline-grid size-14 place-items-center rounded-2xl bg-navy-500/10 text-navy-700">
             <LifeBuoy className="size-7" />
           </span>
           <h1 className="mt-4 font-display text-3xl text-navy-800">مركز المساعدة</h1>
@@ -62,8 +62,8 @@ export default function HelpPage() {
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           {GUIDES.map((guide) => (
-            <div key={guide.title} className="rounded-2xl bg-white p-6 ring-1 ring-ink-200">
-              <span className="grid size-12 place-items-center rounded-xl bg-navy-50 text-navy-700">
+            <div key={guide.title} className="glass rounded-2xl p-6">
+              <span className="grid size-12 place-items-center rounded-xl bg-navy-500/10 text-navy-700">
                 <guide.icon className="size-6" />
               </span>
               <h2 className="mt-4 font-display text-lg font-bold text-navy-800">{guide.title}</h2>
@@ -80,8 +80,8 @@ export default function HelpPage() {
         </div>
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <div className="flex items-start gap-4 rounded-2xl bg-white p-6 ring-1 ring-ink-200">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gold-100 text-gold-700">
+          <div className="flex items-start gap-4 glass rounded-2xl p-6">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gold-400/25 text-gold-700">
               <BookOpenCheck className="size-5" />
             </span>
             <div>
@@ -95,8 +95,8 @@ export default function HelpPage() {
             </div>
           </div>
 
-          <div className="flex items-start gap-4 rounded-2xl bg-white p-6 ring-1 ring-ink-200">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-700">
+          <div className="flex items-start gap-4 glass rounded-2xl p-6">
+            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-700">
               <Mail className="size-5" />
             </span>
             <div>

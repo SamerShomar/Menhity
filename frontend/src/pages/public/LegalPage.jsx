@@ -5,10 +5,10 @@ import { useMeta } from "@/context/MetaContext";
 /** صفحة نصية موحّدة للشروط وسياسة الخصوصية */
 export function LegalPage({ title, updatedAt, intro, sections }) {
   return (
-    <div className="bg-ink-100 py-12">
+    <div className="py-12">
       <div className="container-page max-w-3xl">
-        <article className="rounded-2xl bg-white p-6 ring-1 ring-ink-200 sm:p-10">
-          <header className="border-b border-ink-200 pb-6">
+        <article className="glass rounded-2xl p-6 sm:p-10">
+          <header className="border-b border-ink-900/10 pb-6">
             <h1 className="font-display text-2xl text-navy-800 sm:text-3xl">{title}</h1>
             <p className="mt-2 text-[13px] text-ink-500">
               آخر تحديث: <span className="num">{updatedAt}</span>
@@ -41,7 +41,7 @@ export function LegalPage({ title, updatedAt, intro, sections }) {
             ))}
           </div>
 
-          <footer className="mt-10 rounded-xl bg-ink-50 p-5 text-[14px] leading-8 text-ink-600">
+          <footer className="mt-10 glass-soft rounded-xl p-5 text-[14px] leading-8 text-ink-600">
             لأي استفسار حول هذه الصفحة، تواصل معنا عبر{" "}
             <Link to="/contact" className="font-bold text-navy-700 hover:underline">
               نموذج التواصل

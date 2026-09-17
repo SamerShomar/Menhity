@@ -79,7 +79,7 @@ function FaqItem({ item }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="overflow-hidden rounded-xl bg-white ring-1 ring-ink-200">
+    <div className="glass overflow-hidden rounded-xl">
       <button
         type="button"
         onClick={() => setOpen((value) => !value)}
@@ -90,17 +90,17 @@ function FaqItem({ item }) {
         <ChevronDown className={cn("size-5 shrink-0 text-ink-400 transition-transform", open && "rotate-180")} />
       </button>
 
-      {open ? <p className="border-t border-ink-200 px-5 py-4 text-[14px] leading-8 text-ink-600">{item.a}</p> : null}
+      {open ? <p className="border-t border-ink-900/10 px-5 py-4 text-[14px] leading-8 text-ink-600">{item.a}</p> : null}
     </div>
   );
 }
 
 export default function FaqPage() {
   return (
-    <div className="bg-ink-100 py-12">
+    <div className="py-12">
       <div className="container-page max-w-4xl">
         <header className="text-center">
-          <span className="inline-grid size-14 place-items-center rounded-2xl bg-navy-50 text-navy-700">
+          <span className="inline-grid size-14 place-items-center rounded-2xl bg-navy-500/10 text-navy-700">
             <MessageCircleQuestion className="size-7" />
           </span>
           <h1 className="mt-4 font-display text-3xl text-navy-800">الأسئلة الشائعة</h1>
@@ -122,7 +122,7 @@ export default function FaqPage() {
           ))}
         </div>
 
-        <div className="mt-10 rounded-2xl bg-navy-700 px-6 py-10 text-center text-white">
+        <div className="mt-10 glass-dark rounded-2xl px-6 py-10 text-center text-white">
           <h2 className="font-display text-xl">لم تجد إجابتك؟</h2>
           <p className="mt-2 text-[14px] text-navy-100">اكتب لنا وسنجيبك خلال أيام العمل.</p>
           <ButtonLink to="/contact" variant="gold" className="mt-5">

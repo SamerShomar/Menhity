@@ -133,7 +133,7 @@ function PrivacyCard() {
   return (
     <Card>
       <CardHeader title="الخصوصية" icon={<ShieldCheck className="size-4" />} />
-      <CardBody className="divide-y divide-ink-200 py-1">
+      <CardBody className="divide-y divide-ink-900/10 py-1">
         {error ? <Alert tone="danger">{error}</Alert> : null}
 
         <Switch
@@ -177,7 +177,7 @@ function NotificationsCard() {
   return (
     <Card>
       <CardHeader title="التنبيهات" icon={<Bell className="size-4" />} />
-      <CardBody className="divide-y divide-ink-200 py-1">
+      <CardBody className="divide-y divide-ink-900/10 py-1">
         {error ? <Alert tone="danger">{error}</Alert> : null}
 
         <Switch
@@ -313,10 +313,10 @@ function SessionsCard() {
         {loading ? (
           <LoadingBlock />
         ) : (
-          <ul className="divide-y divide-ink-200">
+          <ul className="divide-y divide-ink-900/10">
             {(data ?? []).map((session) => (
               <li key={session.id} className="flex items-center gap-4 px-5 py-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-600">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-600">
                   {session.device_type === "mobile" ? (
                     <Smartphone className="size-5" />
                   ) : (
@@ -382,7 +382,7 @@ function DangerZoneCard() {
         icon={<TriangleAlert className="size-4 text-[color:var(--color-danger)]" />}
       />
       <CardBody className="space-y-5">
-        <div className="flex flex-col gap-3 rounded-xl bg-warning-soft p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-xl bg-[color:var(--color-warning)]/16 backdrop-blur-md p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-bold text-[#78350f]">تعطيل الحساب مؤقتاً</p>
             <p className="mt-1 text-[13px] leading-6 text-[#78350f]">
@@ -396,7 +396,7 @@ function DangerZoneCard() {
 
         {deactivate.error ? <Alert tone="danger">{deactivate.error}</Alert> : null}
 
-        <form onSubmit={onDelete} className="rounded-xl bg-danger-soft p-4">
+        <form onSubmit={onDelete} className="rounded-xl bg-[color:var(--color-danger)]/12 backdrop-blur-md p-4">
           <p className="font-bold text-[#7f1d1d]">حذف الحساب نهائياً</p>
           <p className="mt-1 text-[13px] leading-6 text-[#7f1d1d]">
             سيُحذف ملفك ومستنداتك وكل بياناتك ولا يمكن التراجع. اكتب{" "}

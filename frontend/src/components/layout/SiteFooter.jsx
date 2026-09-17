@@ -96,7 +96,7 @@ function SocialLink({ label, children }) {
     <a
       href="#"
       aria-label={label}
-      className="flex size-8 items-center justify-center rounded-lg bg-white/10 text-white transition-colors hover:bg-gold-400 hover:text-navy-900"
+      className="flex size-8 items-center justify-center rounded-lg bg-white/12 backdrop-blur-sm text-white transition-colors hover:bg-gold-400 hover:text-navy-900"
     >
       {children}
     </a>

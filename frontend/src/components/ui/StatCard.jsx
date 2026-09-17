@@ -1,18 +1,19 @@
 import { cn } from "@/lib/utils";
 
+/* أيقونات شفّافة قليلاً لتندمج مع اللوح الزجاجي بدل أن تجلس فوقه */
 const TONES = {
-  navy: "bg-navy-50 text-navy-600",
-  gold: "bg-gold-100 text-gold-700",
-  success: "bg-success-soft text-[#166534]",
-  danger: "bg-danger-soft text-[#991b1b]",
-  info: "bg-info-soft text-[#1e40af]",
+  navy: "bg-navy-500/12 text-navy-700",
+  gold: "bg-gold-400/25 text-gold-800",
+  success: "bg-[color:var(--color-success)]/12 text-[#166534]",
+  danger: "bg-[color:var(--color-danger)]/12 text-[#991b1b]",
+  info: "bg-[color:var(--color-info)]/12 text-[#1e40af]",
 };
 
 export function StatCard({ label, value, icon, hint, tone = "navy", className }) {
   return (
     <div
       className={cn(
-        "flex items-center gap-3.5 rounded-2xl border border-ink-200 bg-white p-4 shadow-[0_1px_2px_rgb(15_23_42/0.04)]",
+        "glass flex items-center gap-3.5 rounded-2xl p-4",
         className,
       )}
     >

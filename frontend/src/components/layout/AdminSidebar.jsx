@@ -17,16 +17,16 @@ export function AdminSidebar() {
   }
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col border-e border-ink-200 bg-white lg:flex">
-      <div className="border-b border-ink-100 p-5">
+    <aside className="glass hidden w-64 shrink-0 flex-col rounded-none border-y-0 border-s-0 lg:flex">
+      <div className="border-b border-ink-900/8 p-5">
         <Logo to="/admin" />
 
-        <span className="mt-2.5 inline-flex items-center gap-1.5 rounded-md bg-navy-50 px-2 py-1 text-[11px] font-bold text-navy-700">
+        <span className="mt-2.5 inline-flex items-center gap-1.5 rounded-md bg-navy-500/10 px-2 py-1 text-[11px] font-bold text-navy-700">
           <ShieldCheck className="size-3" />
           لوحة تحكم إدارية
         </span>
 
-        <div className="mt-3 flex items-center justify-between rounded-lg bg-ink-50 px-2.5 py-1.5">
+        <div className="glass-soft mt-3 flex items-center justify-between rounded-lg px-2.5 py-1.5">
           <span className="flex items-center gap-1.5 text-[11px] font-medium text-ink-600">
             <span className="size-1.5 rounded-full bg-[color:var(--color-success)]" />
             النظام نشط ومستقر
@@ -44,7 +44,7 @@ export function AdminSidebar() {
             className={({ isActive }) =>
               cn(
                 "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[13.5px] font-semibold transition-colors",
-                isActive ? "bg-gold-400 text-navy-900" : "text-ink-600 hover:bg-ink-100 hover:text-ink-900",
+                isActive ? "glass-gold text-navy-900" : "text-ink-600 hover:bg-white/60 hover:text-ink-900",
               )
             }
           >
@@ -54,8 +54,8 @@ export function AdminSidebar() {
         ))}
       </nav>
 
-      <div className="border-t border-ink-100 p-3">
-        <div className="rounded-xl bg-ink-50 p-3">
+      <div className="border-t border-ink-900/8 p-3">
+        <div className="glass-soft rounded-xl p-3">
           <div className="flex items-center gap-2.5">
             <span className="flex size-9 items-center justify-center rounded-full bg-navy-700 text-[12px] font-bold text-white">
               {user?.name?.trim().charAt(0)}
@@ -69,7 +69,7 @@ export function AdminSidebar() {
           <button
             type="button"
             onClick={handleLogout}
-            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-lg bg-white px-3 py-2 text-[12.5px] font-semibold text-[color:var(--color-danger)] transition-colors hover:bg-danger-soft"
+            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-lg bg-white/70 px-3 py-2 text-[12.5px] font-semibold text-[color:var(--color-danger)] transition-colors hover:bg-[color:var(--color-danger)]/12"
           >
             <LogOut className="size-3.5" />
             تسجيل الخروج

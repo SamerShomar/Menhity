@@ -20,9 +20,9 @@ import { useApi } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
 
 const TONE_BOX = {
-  warning: "bg-warning-soft text-[#78350f]",
-  info: "bg-info-soft text-[#1e3a8a]",
-  danger: "bg-danger-soft text-[#7f1d1d]",
+  warning: "bg-[color:var(--color-warning)]/16 backdrop-blur-md text-[#78350f]",
+  info: "bg-[color:var(--color-info)]/12 backdrop-blur-md text-[#1e3a8a]",
+  danger: "bg-[color:var(--color-danger)]/12 backdrop-blur-md text-[#7f1d1d]",
 };
 
 export default function AdminDashboardPage() {

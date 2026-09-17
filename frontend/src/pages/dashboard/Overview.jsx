@@ -35,7 +35,7 @@ export default function DashboardOverviewPage() {
   return (
     <div className="space-y-6">
       {/* ترحيب */}
-      <div className="rounded-2xl bg-navy-700 p-6 text-white sm:p-7">
+      <div className="glass-dark rounded-2xl p-6 text-white sm:p-7">
         <h1 className="font-display text-xl sm:text-2xl">
           أهلاً {user?.first_name ?? user?.name} 👋
         </h1>
@@ -172,7 +172,7 @@ export default function DashboardOverviewPage() {
             {(data?.upcoming_deadlines ?? []).length === 0 ? (
               <p className="py-4 text-center text-[13px] text-ink-500">لا توجد مواعيد قريبة.</p>
             ) : (
-              <ul className="divide-y divide-ink-200">
+              <ul className="divide-y divide-ink-900/10">
                 {data.upcoming_deadlines.map((item) => (
                   <li key={item.id} className="flex items-center justify-between gap-3 py-3">
                     <Link to={`/scholarships/${item.slug}`} className="flex min-w-0 items-center gap-2.5">
@@ -208,7 +208,7 @@ export default function DashboardOverviewPage() {
             {(data?.documents ?? []).length === 0 ? (
               <p className="py-4 text-center text-[13px] text-ink-500">لم ترفع أي مستند بعد.</p>
             ) : (
-              <ul className="divide-y divide-ink-200">
+              <ul className="divide-y divide-ink-900/10">
                 {data.documents.map((document) => (
                   <li key={document.id} className="flex items-center justify-between gap-3 py-3">
                     <span className="flex min-w-0 items-center gap-2.5">
@@ -229,7 +229,7 @@ export default function DashboardOverviewPage() {
       </div>
 
       {/* دعوة لأدوات الذكاء الاصطناعي */}
-      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-gold-50 p-6 ring-1 ring-gold-200 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-gold-400/18 p-6 ring-1 ring-gold-200 sm:flex-row sm:items-center">
         <div className="flex items-start gap-3.5">
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gold-400 text-navy-900">
             <Sparkles className="size-5" />

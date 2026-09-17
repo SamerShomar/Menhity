@@ -53,7 +53,7 @@ export default function ProfilePage() {
         description="بياناتك هنا هي المصدر الوحيد للمطابقة مع المنح ولأدوات الذكاء الاصطناعي — أكملها مرة واحدة."
       />
 
-      <div className="rounded-2xl bg-white p-5 ring-1 ring-ink-200">
+      <div className="glass rounded-2xl p-5">
         <div className="flex items-center justify-between gap-4 text-sm">
           <span className="font-bold text-navy-800">نسبة اكتمال الملف</span>
           <span className="num font-extrabold text-navy-700">{profile.completion_percent}%</span>

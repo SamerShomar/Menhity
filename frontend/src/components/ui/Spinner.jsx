@@ -19,7 +19,7 @@ export function LoadingBlock({ label = "جارٍ التحميل…", className }
 /** شاشة تحميل كاملة — تُعرض أثناء استعادة الجلسة */
 export function FullPageLoader() {
   return (
-    <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-ink-100">
+    <div className="flex min-h-dvh flex-col items-center justify-center gap-4">
       <Spinner className="size-8" />
       <p className="text-[13px] text-ink-500">جارٍ التحميل…</p>
     </div>

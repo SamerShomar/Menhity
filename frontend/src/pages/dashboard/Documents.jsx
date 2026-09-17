@@ -94,10 +94,10 @@ export default function DocumentsPage() {
             onDrop={onDrop}
             className={cn(
               "rounded-2xl border-2 border-dashed px-6 py-10 text-center transition",
-              dragging ? "border-navy-500 bg-navy-50" : "border-ink-300 bg-ink-50",
+              dragging ? "border-navy-500 bg-navy-500/10" : "border-ink-900/15 bg-white/45",
             )}
           >
-            <span className="mx-auto grid size-14 place-items-center rounded-2xl bg-white text-navy-600 ring-1 ring-ink-200">
+            <span className="mx-auto grid size-14 place-items-center rounded-2xl glass text-navy-600">
               <Upload className="size-6" />
             </span>
 
@@ -153,10 +153,10 @@ export default function DocumentsPage() {
       ) : (
         <Card>
           <CardBody className="p-0">
-            <ul className="divide-y divide-ink-200">
+            <ul className="divide-y divide-ink-900/10">
               {data.map((document) => (
                 <li key={document.id} className="flex items-center gap-4 px-5 py-4">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy-50 text-navy-600">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-600">
                     <FileText className="size-5" />
                   </span>
 
@@ -177,7 +177,7 @@ export default function DocumentsPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`فتح ${document.original_name}`}
-                      className="grid size-9 place-items-center rounded-lg text-ink-400 hover:bg-navy-50 hover:text-navy-700"
+                      className="grid size-9 place-items-center rounded-lg text-ink-400 hover:bg-navy-500/10 hover:text-navy-700"
                     >
                       <Download className="size-4" />
                     </a>
@@ -186,7 +186,7 @@ export default function DocumentsPage() {
                       onClick={() => onRemove(document)}
                       disabled={remove.submitting}
                       aria-label={`حذف ${document.original_name}`}
-                      className="grid size-9 place-items-center rounded-lg text-ink-400 hover:bg-danger-soft hover:text-[color:var(--color-danger)] disabled:opacity-50"
+                      className="grid size-9 place-items-center rounded-lg text-ink-400 hover:bg-[color:var(--color-danger)]/12 hover:text-[color:var(--color-danger)] disabled:opacity-50"
                     >
                       <Trash2 className="size-4" />
                     </button>

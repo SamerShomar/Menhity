@@ -72,7 +72,7 @@ export default function CvOrderTrackingPage() {
   const passed = (order.ats_checks ?? []).filter((check) => check.passed).length;
 
   return (
-    <div className="bg-ink-100 py-10">
+    <div className="py-10">
       <div className="container-page max-w-5xl">
         <PageHeader
           title="تدقيق وصياغة الخبير"
@@ -88,17 +88,17 @@ export default function CvOrderTrackingPage() {
 
         {/* بطاقة الطلب */}
         <div className="grid gap-4 sm:grid-cols-3">
-          <div className="rounded-2xl bg-white p-5 ring-1 ring-ink-200">
+          <div className="glass rounded-2xl p-5">
             <p className="text-[12px] text-ink-500">رقم الطلب</p>
             <p className="num mt-1 font-display text-lg font-extrabold text-navy-800">{order.order_number}</p>
           </div>
-          <div className="rounded-2xl bg-white p-5 ring-1 ring-ink-200">
+          <div className="glass rounded-2xl p-5">
             <p className="text-[12px] text-ink-500">تاريخ الإرسال</p>
             <p className="mt-1 font-display text-lg font-extrabold text-navy-800">
               {formatDateAr(order.submitted_at)}
             </p>
           </div>
-          <div className="rounded-2xl bg-white p-5 ring-1 ring-ink-200">
+          <div className="glass rounded-2xl p-5">
             <p className="text-[12px] text-ink-500">
               {order.delivered_at ? "تاريخ التسليم" : "التسليم المتوقّع"}
             </p>
@@ -221,7 +221,7 @@ export default function CvOrderTrackingPage() {
                         key={item.id}
                         className={cn(
                           "rounded-xl p-4",
-                          item.author_role === "expert" ? "bg-navy-50" : "bg-ink-50",
+                          item.author_role === "expert" ? "bg-navy-500/10" : "bg-white/50",
                         )}
                       >
                         <div className="flex items-center gap-2.5">
@@ -251,7 +251,7 @@ export default function CvOrderTrackingPage() {
                     onChange={(event) => setNote(event.target.value)}
                     placeholder="اكتب رسالة للخبير…"
                     aria-label="رسالة للخبير"
-                    className="h-11 min-w-0 flex-1 rounded-xl border border-ink-300 bg-white px-3.5 text-[13px] focus:border-navy-500 focus:outline-none"
+                    className="h-11 min-w-0 flex-1 rounded-xl border border-ink-900/12 bg-white/60 backdrop-blur-md px-3.5 text-[13px] focus:border-navy-500 focus:outline-none"
                   />
                   <Button type="submit" loading={addNote.submitting} disabled={note.trim().length < 2}>
                     <Send className="size-4" />
@@ -281,7 +281,7 @@ export default function CvOrderTrackingPage() {
             ) : null}
 
             {order.final_file_url ? (
-              <div className="rounded-2xl bg-success-soft p-5 text-center">
+              <div className="rounded-2xl bg-[color:var(--color-success)]/12 backdrop-blur-md p-5 text-center">
                 <CircleCheck className="mx-auto size-8 text-[color:var(--color-success)]" />
                 <p className="mt-2 font-bold text-[#14532d]">سيرتك الذاتية جاهزة</p>
                 <ButtonLink to={order.final_file_url} external className="mt-4 w-full">

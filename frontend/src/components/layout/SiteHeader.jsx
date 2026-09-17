@@ -40,7 +40,7 @@ export function SiteHeader() {
   }, [isAuthenticated, location.pathname]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-200 bg-white/95 backdrop-blur">
+    <header className="glass-strong sticky top-0 z-40 rounded-none border-x-0 border-t-0 shadow-none">
       <div className="container-page flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
           <Logo />
@@ -77,14 +77,14 @@ export function SiteHeader() {
               <Link
                 to="/dashboard/notifications"
                 aria-label={`الإشعارات${unread ? ` (${unread} غير مقروء)` : ""}`}
-                className="relative rounded-full p-2 text-ink-500 transition-colors hover:bg-ink-100 hover:text-ink-800"
+                className="relative rounded-full p-2 text-ink-500 transition-colors hover:bg-white/60 hover:text-ink-800"
               >
                 <Bell className="size-5" />
                 {unread > 0 && (
                   <span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-[color:var(--color-danger)] ring-2 ring-white" />
                 )}
               </Link>
-              <span className="hidden h-7 w-px bg-ink-200 sm:block" />
+              <span className="hidden h-7 w-px bg-ink-900/10 sm:block" />
               <UserMenu />
             </>
           ) : (
@@ -102,7 +102,7 @@ export function SiteHeader() {
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label="فتح القائمة"
-            className="rounded-lg p-2 text-ink-600 transition-colors hover:bg-ink-100 md:hidden"
+            className="rounded-lg p-2 text-ink-600 transition-colors hover:bg-white/60 md:hidden"
           >
             <Menu className="size-5" />
           </button>
@@ -112,18 +112,18 @@ export function SiteHeader() {
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div
-            className="absolute inset-0 bg-navy-900/40"
+            className="absolute inset-0 bg-navy-900/40 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute inset-y-0 end-0 flex w-72 max-w-[85vw] flex-col bg-white p-5 shadow-2xl">
+          <div className="glass-strong absolute inset-y-0 end-0 flex w-72 max-w-[85vw] flex-col rounded-none border-y-0 border-e-0 p-5">
             <div className="mb-6 flex items-center justify-between">
               <span className="font-display font-bold text-navy-800">القائمة</span>
               <button
                 type="button"
                 onClick={() => setMobileOpen(false)}
                 aria-label="إغلاق القائمة"
-                className="rounded-lg p-1.5 text-ink-500 hover:bg-ink-100"
+                className="rounded-lg p-1.5 text-ink-500 hover:bg-white/60"
               >
                 <X className="size-5" />
               </button>
@@ -138,7 +138,7 @@ export function SiteHeader() {
                   className={({ isActive }) =>
                     cn(
                       "rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors",
-                      isActive ? "bg-navy-50 text-navy-700" : "text-ink-600 hover:bg-ink-100",
+                      isActive ? "bg-navy-500/12 text-navy-700" : "text-ink-600 hover:bg-white/60",
                     )
                   }
                 >
@@ -148,7 +148,7 @@ export function SiteHeader() {
             </nav>
 
             {!isAuthenticated && (
-              <div className="mt-auto flex flex-col gap-2 border-t border-ink-200 pt-4">
+              <div className="mt-auto flex flex-col gap-2 border-t border-ink-900/10 pt-4">
                 <ButtonLink to="/login" variant="outline" fullWidth>
                   تسجيل الدخول
                 </ButtonLink>

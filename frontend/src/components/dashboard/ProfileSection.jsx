@@ -94,7 +94,7 @@ export function ProfileSection({
         ) : null}
 
         {editing ? (
-          <form onSubmit={onSubmit} className="rounded-xl bg-ink-50 p-4 ring-1 ring-ink-200">
+          <form onSubmit={onSubmit} className="glass-soft rounded-xl p-4 ring-1 ring-ink-900/10">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-sm font-bold text-navy-800">
                 {editing === "new" ? addLabel : "تعديل العنصر"}
@@ -123,7 +123,7 @@ export function ProfileSection({
         ) : items.length === 0 ? (
           <p className="py-5 text-center text-[13px] text-ink-500">{emptyLabel}</p>
         ) : (
-          <ul className="divide-y divide-ink-200">
+          <ul className="divide-y divide-ink-900/10">
             {items.map((item) => (
               <li key={item.id} className="flex items-start justify-between gap-4 py-3.5 first:pt-0 last:pb-0">
                 <div className="min-w-0 flex-1">{renderItem(item)}</div>
@@ -133,7 +133,7 @@ export function ProfileSection({
                     type="button"
                     onClick={() => openEdit(item)}
                     aria-label="تعديل"
-                    className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-navy-50 hover:text-navy-700"
+                    className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-navy-500/10 hover:text-navy-700"
                   >
                     <Pencil className="size-4" />
                   </button>
@@ -142,7 +142,7 @@ export function ProfileSection({
                     onClick={() => onRemove(item)}
                     disabled={remove.submitting}
                     aria-label="حذف"
-                    className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-danger-soft hover:text-[color:var(--color-danger)] disabled:opacity-50"
+                    className="grid size-8 place-items-center rounded-lg text-ink-400 hover:bg-[color:var(--color-danger)]/12 hover:text-[color:var(--color-danger)] disabled:opacity-50"
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -208,7 +208,7 @@ export function TagSection({ type, title, icon, description, items = [], suggest
             onChange={(event) => setName(event.target.value)}
             placeholder={placeholder}
             aria-label={placeholder}
-            className="h-10 min-w-0 flex-1 rounded-lg border border-ink-300 bg-white px-3 text-[13px] focus:border-navy-500 focus:outline-none"
+            className="h-10 min-w-0 flex-1 rounded-lg border border-ink-900/12 bg-white/60 backdrop-blur-md px-3 text-[13px] focus:border-navy-500 focus:outline-none"
           />
           <Button type="submit" size="sm" loading={add.submitting}>
             <Plus className="size-4" />
@@ -221,7 +221,7 @@ export function TagSection({ type, title, icon, description, items = [], suggest
             {items.map((item) => (
               <span
                 key={item.id}
-                className="flex items-center gap-1.5 rounded-full bg-navy-50 px-3 py-1.5 text-[13px] font-semibold text-navy-700"
+                className="flex items-center gap-1.5 rounded-full bg-navy-500/10 px-3 py-1.5 text-[13px] font-semibold text-navy-700"
               >
                 {item.name}
                 <button
@@ -240,7 +240,7 @@ export function TagSection({ type, title, icon, description, items = [], suggest
         )}
 
         {remaining.length > 0 ? (
-          <div className="mt-4 border-t border-ink-200 pt-3">
+          <div className="mt-4 border-t border-ink-900/10 pt-3">
             <p className="mb-2 text-[12px] font-semibold text-ink-500">اقتراحات سريعة</p>
             <div className="flex flex-wrap gap-2">
               {remaining.map((suggestion) => (

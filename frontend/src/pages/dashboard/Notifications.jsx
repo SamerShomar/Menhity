@@ -64,7 +64,7 @@ export default function NotificationsPage() {
             onClick={() => setTab(item.key)}
             className={cn(
               "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold transition",
-              tab === item.key ? "bg-navy-700 text-white" : "bg-white text-ink-600 ring-1 ring-ink-200 hover:bg-ink-50",
+              tab === item.key ? "bg-navy-700 text-white" : "glass text-ink-600 hover:bg-white/55",
             )}
           >
             {item.label}
@@ -99,9 +99,9 @@ export default function NotificationsPage() {
               <li
                 key={notification.id}
                 className={cn(
-                  "rounded-2xl border-s-4 bg-white p-4 ring-1 ring-ink-200 transition",
+                  "rounded-2xl border-s-4 glass p-4 transition",
                   style.bar,
-                  !notification.is_read && "bg-navy-50/40",
+                  !notification.is_read && "bg-navy-500/8",
                 )}
               >
                 <div className="flex items-start gap-3.5">
