@@ -17,7 +17,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useEnum } from "@/context/MetaContext";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { USER_STATUS_TONES } from "@/lib/constants";
-import { cn, formatDateAr } from "@/lib/utils";
+import { cn, formatDateAr, formatDateTimeAr } from "@/lib/utils";
 
 export default function AdminUsersPage() {
   const [params, setParams] = useSearchParams();
@@ -171,6 +171,15 @@ export default function AdminUsersPage() {
       key: "created",
       header: "تاريخ التسجيل",
       cell: (row) => <span className="text-ink-600">{formatDateAr(row.created_at)}</span>,
+    },
+    {
+      key: "last_login",
+      header: "آخر دخول",
+      cell: (row) => (
+        <span className={row.last_login_at ? "text-ink-700" : "text-ink-400"}>
+          {row.last_login_at ? formatDateTimeAr(row.last_login_at) : "لم يدخل بعد"}
+        </span>
+      ),
     },
   ];
 

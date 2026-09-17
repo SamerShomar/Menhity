@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileUser, Sparkles, UserRoundCheck } from "lucide-react";
+import { ArrowLeft, FileText, FileUser, UserRoundCheck } from "lucide-react";
 
 import { Alert } from "@/components/ui/Alert";
 import { ButtonLink } from "@/components/ui/Button";
@@ -10,6 +10,37 @@ import { aiApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
 import { TOOL_ROUTES } from "@/lib/constants";
+
+/** المسار اليدوي — ثلاث خدمات يعمل عليها الفريق ويسلّم ملفاً نهائياً */
+const MANUAL_SERVICES = [
+  {
+    key: "cv_build",
+    title: "كتابة سيرة ذاتية من الصفر",
+    description:
+      "أكمل بيانات ملفك عبر خمس خطوات، ويتولّى الفريق صياغتها وتنسيقها وفق معايير لجان المنح وأنظمة الفرز الآلي.",
+    to: "/tools/cv-builder",
+    cta: "ابدأ الخطوات",
+    icon: FileUser,
+    primary: true,
+  },
+  {
+    key: "cv_improve",
+    title: "تحسين سيرة ذاتية",
+    description:
+      "أرفق سيرتك الحالية، ويعيد الفريق صياغتها وتنسيقها ويسلّمك النسخة المحسّنة جاهزة للتقديم.",
+    to: "/tools/request?kind=cv_improve",
+    cta: "ارفع سيرتك",
+    icon: FileText,
+  },
+  {
+    key: "letter_improve",
+    title: "تحسين خطاب دافع",
+    description: "أرفق خطابك، ويراجعه الفريق ليقوّي حججه وربطه بالمنحة وأسلوبه اللغوي.",
+    to: "/tools/request?kind=letter_improve",
+    cta: "ارفع خطابك",
+    icon: UserRoundCheck,
+  },
+];
 
 export default function ToolsHubPage() {
   const { isAuthenticated } = useAuth();
@@ -24,8 +55,8 @@ export default function ToolsHubPage() {
         <SectionHeading
           as="h1"
           eyebrow="مجاناً بالكامل"
-          title="أدوات الذكاء الاصطناعي"
-          description="خمس أدوات تكتب وتحسّن وتراجع مستندات تقديمك، تعمل مباشرة على بيانات ملفك الأكاديمي."
+          title="أدوات ومساعدة منحتي"
+          description="مساران: أدوات فورية يشغّلها الذكاء الاصطناعي، وخدمة يدوية يعمل عليها فريق منحتي بنفسه."
         />
 
         {error ? <Alert tone="danger" className="mt-8">{error}</Alert> : null}
@@ -42,8 +73,14 @@ export default function ToolsHubPage() {
         {loading ? (
           <LoadingBlock className="py-16" />
         ) : (
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {tools.map((tool) => (
+          <>
+            <div className="mt-12 flex flex-wrap items-baseline justify-between gap-3">
+              <h2 className="font-display text-xl font-bold text-navy-800">فوري — بالذكاء الاصطناعي</h2>
+              <p className="text-[13px] text-ink-500">نتيجة خلال ثوانٍ، تعمل على بيانات ملفك الأكاديمي.</p>
+            </div>
+
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {tools.map((tool) => (
               <Link
                 key={tool.key}
                 to={TOOL_ROUTES[tool.key] ?? "/tools"}
@@ -60,53 +97,44 @@ export default function ToolsHubPage() {
                   ابدأ الآن
                   <ArrowLeft className="size-3.5 transition group-hover:-translate-x-1" />
                 </span>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          </>
         )}
 
-        {/* خدمة الخبير */}
-        <div className="mt-10 overflow-hidden rounded-3xl bg-navy-700 text-white">
-          <div className="grid items-center gap-8 p-8 lg:grid-cols-[1fr_auto] lg:p-10">
-            <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-gold-400/20 px-4 py-1.5 text-sm font-semibold text-gold-200">
-                <Sparkles className="size-4" />
-                خدمة مجانية بإشراف خبير
+        {/* ---------- الخدمة اليدوية ---------- */}
+        <div className="mt-14 flex flex-wrap items-baseline justify-between gap-3">
+          <h2 className="font-display text-xl font-bold text-navy-800">يدوي — فريق منحتي</h2>
+          <p className="text-[13px] text-ink-500">يعمل الفريق على ملفك بنفسه ويسلّمك نسخة جاهزة خلال 24–48 ساعة.</p>
+        </div>
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          {MANUAL_SERVICES.map((service) => (
+            <div key={service.key} className="glass flex flex-col rounded-2xl p-6">
+              <span className="grid size-12 place-items-center rounded-xl bg-gold-400/25 text-gold-800">
+                <service.icon className="size-6" />
               </span>
 
-              <h2 className="mt-4 font-display text-2xl">صياغة سيرتك الذاتية بإشراف خبير</h2>
-              <p className="mt-3 max-w-2xl text-[15px] leading-8 text-navy-100">
-                أكمل بيانات ملفك عبر خمس خطوات، ثم يتولّى خبير مراجعة سيرتك وإعادة صياغتها وفق معايير
-                لجان المنح الدولية ومعايير أنظمة الفرز الآلي (ATS) — وتتابع مراحل العمل لحظة بلحظة.
-              </p>
+              <h3 className="mt-4 font-display text-lg font-bold text-navy-800">{service.title}</h3>
+              <p className="mt-2 flex-1 text-[13px] leading-7 text-ink-600">{service.description}</p>
 
-              <ul className="mt-5 grid gap-2.5 text-sm text-navy-100 sm:grid-cols-2">
-                {[
-                  "خمس خطوات مبنية على ملفك الأكاديمي",
-                  "مراجعة يدوية من خبير قبولات",
-                  "تقرير توافق مع أنظمة ATS",
-                  "متابعة مراحل الطلب حتى التسليم",
-                ].map((point) => (
-                  <li key={point} className="flex items-start gap-2.5">
-                    <span className="mt-1.5 size-2 shrink-0 rounded-full bg-gold-400" />
-                    {point}
-                  </li>
-                ))}
-              </ul>
-
-              <ButtonLink to={isAuthenticated ? "/tools/cv-builder" : "/register"} variant="gold" size="lg" className="mt-7">
-                <FileUser className="size-4" />
-                {isAuthenticated ? "ابدأ صياغة سيرتك" : "أنشئ حساباً وابدأ"}
+              <ButtonLink
+                to={isAuthenticated ? service.to : "/register"}
+                variant={service.primary ? "gold" : "outline"}
+                className="mt-5"
+              >
+                {isAuthenticated ? service.cta : "أنشئ حساباً وابدأ"}
               </ButtonLink>
             </div>
-
-            <div className="hidden lg:block">
-              <span className="grid size-40 place-items-center rounded-3xl bg-white/10">
-                <UserRoundCheck className="size-20 text-gold-300" />
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
+
+        <Alert tone="info" className="mt-6">
+          <span className="font-bold">الفرق بين المسارين: </span>
+          الأدوات الفورية يكتبها الذكاء الاصطناعي في ثوانٍ وتصلح كنقطة بداية. الخدمة اليدوية يراجعها
+          فريق منحتي بنفسه ويسلّمك ملفاً نهائياً — كلاهما مجاني.
+        </Alert>
       </div>
     </div>
   );

@@ -15,6 +15,10 @@ class CvOrderResource extends JsonResource
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
+            'kind' => $this->kind->value,
+            'kind_label' => $this->kind->label(),
+            'request_note' => $this->request_note,
+            'source_file_name' => $this->source_file_name,
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
             'current_step' => $this->current_step,
@@ -22,7 +26,8 @@ class CvOrderResource extends JsonResource
             'submitted_at' => $this->submitted_at,
             'expected_delivery_at' => $this->expected_delivery_at,
             'delivered_at' => $this->delivered_at,
-            'final_file_url' => $this->final_file_path,
+            'has_final_file' => filled($this->final_file_path),
+            'final_file_name' => $this->final_file_name,
             'data_snapshot' => $this->data_snapshot,
 
             'expert' => $this->whenLoaded('expert', fn () => $this->expert ? [

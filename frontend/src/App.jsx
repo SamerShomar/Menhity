@@ -40,6 +40,7 @@ import SettingsPage from "@/pages/dashboard/Settings";
 import ToolsHubPage from "@/pages/tools/ToolsHub";
 import ToolRunPage from "@/pages/tools/ToolRun";
 import CvWizardPage from "@/pages/tools/CvWizard";
+import ServiceRequestPage from "@/pages/tools/ServiceRequest";
 import CvOrderTrackingPage from "@/pages/tools/CvOrderTracking";
 
 /* لوحة الإدارة تُحمَّل عند الطلب — لا يحتاجها الطالب ولا الزائر */
@@ -96,6 +97,7 @@ export function App() {
                 path="/tools/cv-builder/:id"
                 element={<CvOrderTrackingPage />}
               />
+              <Route path="/tools/request" element={<ServiceRequestPage />} />
               <Route path="/tools/:key" element={<ToolRunPage />} />
             </Route>
           </Route>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\CvOrderKind;
 use App\Enums\CvOrderStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +14,11 @@ class CvOrder extends Model
     protected $fillable = [
         'order_number',
         'user_id',
+        'kind',
+        'source_file_path',
+        'source_file_name',
+        'final_file_name',
+        'request_note',
         'expert_id',
         'status',
         'current_step',
@@ -28,6 +34,7 @@ class CvOrder extends Model
     {
         return [
             'status' => CvOrderStatus::class,
+            'kind' => CvOrderKind::class,
             'data_snapshot' => 'array',
             'current_step' => 'integer',
             'ats_score' => 'integer',

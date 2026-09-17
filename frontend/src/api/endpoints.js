@@ -90,9 +90,33 @@ export const cvOrderApi = {
   active: () => api.get("/cv-orders/active").then((r) => r.data.data),
   readiness: () => api.get("/cv-orders/readiness").then((r) => r.data.data),
   show: (id) => api.get(`/cv-orders/${id}`).then((r) => r.data.data),
-  submit: () => api.post("/cv-orders").then((r) => r.data),
+  submit: ({ kind, file, note }) => {
+    const form = new FormData();
+    form.append("kind", kind);
+    if (file) form.append("file", file);
+    if (note) form.append("note", note);
+    return api
+      .post("/cv-orders", form, { headers: { "Content-Type": "multipart/form-data" } })
+      .then((r) => r.data);
+  },
+  /* الملفات على قرص خاص، فتُحمَّل عبر مسار مصرّح لا برابط مباشر */
+  downloadFinal: (id, name) => downloadFile(`/cv-orders/${id}/file`, name),
   addNote: (id, body) => api.post(`/cv-orders/${id}/notes`, { body }).then((r) => r.data.data),
 };
+
+/** يحمّل ملفاً محمياً بالتوكن ثم يسلّمه للمتصفح كتنزيل */
+async function downloadFile(url, fallbackName) {
+  const response = await api.get(url, { responseType: "blob" });
+  const objectUrl = URL.createObjectURL(response.data);
+  const link = document.createElement("a");
+
+  link.href = objectUrl;
+  link.download = fallbackName ?? "منحتي";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+}
 
 /* ---------------- لوحة الإدارة ---------------- */
 export const adminApi = {
@@ -117,6 +141,14 @@ export const adminApi = {
   toggleAiTool: (key) => api.patch(`/admin/ai-tools/${key}/toggle`).then((r) => r.data),
 
   orders: () => api.get("/admin/orders").then((r) => r.data),
+  downloadOrderSource: (id, name) => downloadFile(`/admin/orders/${id}/source`, name),
+  deliverOrder: (id, file) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api
+      .post(`/admin/orders/${id}/deliver`, form, { headers: { "Content-Type": "multipart/form-data" } })
+      .then((r) => r.data);
+  },
   advanceOrder: (id, status) => api.patch(`/admin/orders/${id}/advance`, { status }).then((r) => r.data),
 
   notifications: () => api.get("/admin/notifications").then((r) => r.data),

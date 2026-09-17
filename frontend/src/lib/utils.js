@@ -19,6 +19,23 @@ export function formatDateAr(value) {
   return `${date.getDate()} ${AR_MONTHS[date.getMonth()]} ${date.getFullYear()}`;
 }
 
+/**
+ * 17 سبتمبر 2026 · 02:47 م
+ * الوقت بصيغة 12 ساعة لأنها المألوفة عربياً، والأرقام لاتينية كبقية الأرقام.
+ */
+export function formatDateTimeAr(value) {
+  if (!value) return "—";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+
+  const hours = date.getHours();
+  const period = hours < 12 ? "ص" : "م";
+  const hour12 = hours % 12 || 12;
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+
+  return `${formatDateAr(date)} · ${hour12}:${minutes} ${period}`;
+}
+
 /** سبتمبر 2026 */
 export function formatMonthYearAr(value) {
   if (!value) return "—";
