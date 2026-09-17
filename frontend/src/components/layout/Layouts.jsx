@@ -6,8 +6,6 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { AdminTopbar } from "@/components/layout/AdminTopbar";
 import { FullPageLoader } from "@/components/ui/Spinner";
-import { profileApi } from "@/api/endpoints";
-import { useApi } from "@/hooks/useApi";
 import { useAuth } from "@/context/AuthContext";
 
 /* ============================================================
@@ -78,7 +76,12 @@ export function PublicLayout() {
 }
 
 export function DashboardLayout() {
-  const { data } = useApi(() => profileApi.completion(), []);
+  /*
+   * النسبة تأتي من سياق المصادقة لا من جلبٍ خاص: هذا التخطيط أب للمسارات
+   * فلا يُفكّ تركيبه عند التنقّل بينها، وجلبٌ بلا تبعيات كان ينفّذ مرة
+   * واحدة فتتجمّد النسبة حتى إعادة تحميل الصفحة كاملة.
+   */
+  const { user } = useAuth();
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -86,7 +89,7 @@ export function DashboardLayout() {
 
       <main className="container-page flex-1 py-8">
         <div className="grid gap-6 lg:grid-cols-[264px_1fr]">
-          <DashboardSidebar completionPercent={data?.percent ?? 0} />
+          <DashboardSidebar completionPercent={user?.completion_percent ?? 0} />
           <div className="min-w-0">
             <Outlet />
           </div>

@@ -22,6 +22,7 @@ import { Checkbox, Input, Select, Textarea } from "@/components/ui/Field";
 import { PageHeader } from "@/components/ui/Section";
 import { LoadingBlock } from "@/components/ui/Spinner";
 import { cvOrderApi, profileApi } from "@/api/endpoints";
+import { useAuth } from "@/context/AuthContext";
 import { useEnum } from "@/context/MetaContext";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { CV_STEPS, CV_TIPS, GPA_SCALES, LANGUAGE_PROFICIENCY, SKILL_SUGGESTIONS } from "@/lib/constants";
@@ -37,6 +38,13 @@ export default function CvWizardPage() {
   const [step, setStep] = useState(1);
 
   const { data: profile, loading, error, setData } = useApi(profileApi.show, []);
+  const { refresh } = useAuth();
+
+  /** كل كتابة هنا تمسّ الملف الأكاديمي، فتُحدَّث نسبة الاكتمال في السياق */
+  const applyProfile = (updated) => {
+    setData(updated);
+    refresh().catch(() => undefined);
+  };
   const { data: active, loading: loadingOrder } = useApi(cvOrderApi.active, []);
 
   if (loading || loadingOrder) return <LoadingBlock className="py-24" />;
@@ -83,10 +91,10 @@ export default function CvWizardPage() {
         </div>
 
         <div className="mt-6 space-y-6">
-          {step === 1 ? <StepPersonal profile={profile} onSaved={setData} /> : null}
-          {step === 2 ? <StepEducation profile={profile} onChange={setData} /> : null}
-          {step === 3 ? <StepExperience profile={profile} onChange={setData} /> : null}
-          {step === 4 ? <StepSkills profile={profile} onChange={setData} /> : null}
+          {step === 1 ? <StepPersonal profile={profile} onSaved={applyProfile} /> : null}
+          {step === 2 ? <StepEducation profile={profile} onChange={applyProfile} /> : null}
+          {step === 3 ? <StepExperience profile={profile} onChange={applyProfile} /> : null}
+          {step === 4 ? <StepSkills profile={profile} onChange={applyProfile} /> : null}
           {step === 5 ? <StepReview profile={profile} onSubmitted={(order) => navigate(`/tools/cv-builder/${order.id}`)} /> : null}
 
           <TipBox>{CV_TIPS[step]}</TipBox>

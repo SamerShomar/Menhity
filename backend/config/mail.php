@@ -120,6 +120,15 @@ return [
     |
     */
 
+    /*
+     * عنوان الردّ. عنوان المُرسِل مقيَّد بنطاق موثَّق لدى المزوّد، أما هذا
+     * فيمكن أن يكون أي بريد — فترسل المنصّة باسمها وتصل الردود إليك.
+     */
+    'reply_to' => [
+        'address' => env('MAIL_REPLY_TO_ADDRESS'),
+        'name' => env('MAIL_REPLY_TO_NAME', env('MAIL_FROM_NAME')),
+    ],
+
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
