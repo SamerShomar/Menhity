@@ -143,7 +143,7 @@ php artisan key:generate --show
 
 | الميزة | لماذا | الحل المجاني |
 |---|---|---|
-| **رسائل البريد** (تأكيد الحساب واستعادة كلمة المرور) | `MAIL_MAILER=log` يكتب الرسالة في السجل بدل إرسالها | اضبط SMTP — [الخطوات أدناه](#ربط-البريد-الإلكتروني-مجاناً) |
+| **رسائل البريد** (تأكيد الحساب واستعادة كلمة المرور) | `MAIL_MAILER=log` يكتب الرسالة في السجل بدل إرسالها | ناقل عبر HTTPS: Resend لنطاقك، أو حساب Gmail بلا نطاق — [الخطوات أدناه](#ربط-البريد-الإلكتروني-مجاناً) |
 | **المستندات المرفوعة** | قرص Render مؤقّت — تُمحى مع كل نشر | [Cloudflare R2](https://developers.cloudflare.com/r2/) مجاناً حتى ١٠GB |
 | **أدوات الذكاء الاصطناعي** | تعمل بوضع المحاكاة | أضف `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_API_TOKEN` — مجاني بلا بطاقة دفع ([الخطوات أدناه](#تفعيل-أدوات-الذكاء-الاصطناعي-مجاناً)) |
 | **دخول Google / Apple** | لا بيانات اعتماد OAuth | مجاني — يحتاج إعداد في Google Cloud Console |
@@ -243,16 +243,31 @@ Root Directory = `frontend`، وستكتشف Railway مشروع Vite وتبني�
 تأكيد الحساب واستعادة كلمة المرور يعتمدان على البريد. بدون ضبطه لا يستطيع
 أي مستخدم جديد إكمال التسجيل.
 
+> **القاعدة الأولى: لا SMTP على الاستضافة المجانية.** تحجب Railway وRender
+> المنافذ الصادرة 25 و465 و587، فيفشل كل إرسال بـ `Connection timed out`
+> مهما صحّ الإعداد. الناقلان التاليان يعملان عبر HTTPS (المنفذ 443) الذي لا يُحجب.
+
+| حالتك | الناقل | ما تحتاجه |
+|---|---|---|
+| تملك نطاقاً (أو ستشتريه) | `MAIL_MAILER=resend` | `RESEND_API_KEY` + نطاق موثَّق لدى Resend — [الخطوات](#أ-resend-لمن-يملك-نطاقاً) |
+| لا نطاق، وتريد الإرسال من حساب Gmail | `MAIL_MAILER=gmail` | عميل OAuth من Google Cloud + أمر `menhity:gmail-auth` — [الخطوات](#ب-gmail-بلا-نطاق-عبر-https) |
+| استضافة لا تحجب SMTP (خادم خاص مثلاً) | `MAIL_MAILER=smtp` | بيانات SMTP بالمنافذ الصحيحة — [الخطوات](#ج-smtp-حيث-لا-يُحجب) |
+
+للتشخيص في أي وقت: `php artisan menhity:mail-test <بريدك>` يفحص المنفذ قبل
+الإرسال ويطبع الخطأ مع الخطوة العملية المقابلة.
+
+### أ) Resend لمن يملك نطاقاً
+
 **[Resend](https://resend.com)** مجاني حتى ٣٠٠٠ رسالة/شهر ولا يحتاج بطاقة دفع.
 
-### ١. أنشئ الحساب والمفتاح
+#### ١. أنشئ الحساب والمفتاح
 
 1. سجّل في [resend.com](https://resend.com).
 2. من القائمة الجانبية: **API Keys** ← **Create API Key**.
 3. اتركه على **Sending access** واضغط **Add**، ثم انسخ المفتاح فوراً
    (لن يظهر مرة أخرى).
 
-### ٢. وثّق نطاق المُرسِل
+#### ٢. وثّق نطاق المُرسِل
 
 Resend يرفض الإرسال من نطاق لا تملكه.
 
@@ -262,7 +277,7 @@ Resend يرفض الإرسال من نطاق لا تملكه.
   (`onboarding@resend.dev`). **ينفع للاختبار فقط**: لن تصل الرسائل إلا إلى
   البريد الذي سجّلت به.
 
-### ٣. أضِف المتغيّرات للخادم
+#### ٣. أضِف المتغيّرات للخادم
 
 في Railway: **menhity-api ← Variables**، أضف:
 
@@ -294,12 +309,12 @@ Resend يرفض الإرسال من نطاق لا تملكه.
 > الحجب)، `MAIL_SCHEME=smtp`، `MAIL_USERNAME=resend`،
 > `MAIL_PASSWORD=<المفتاح>`.
 
-### ٤. تحقّق
+#### ٤. تحقّق
 
 أنشئ حساباً جديداً على الموقع. يجب أن تصل رسالة تحمل رمزاً من ستة أرقام
 خلال ثوانٍ. إن لم تجدها، راجع مجلد **Spam** ثم سجلّ **Logs** في Railway.
 
-### ٥. الرسالة تصل لكن في مجلد Spam
+#### ٥. الرسالة تصل لكن في مجلد Spam
 
 هذا **متوقَّع** مع `onboarding@resend.dev`: نطاق مشترك بين كل حسابات
 التجربة، فسمعته سيئة لدى Gmail مهما كان محتوى الرسالة سليماً.
@@ -327,10 +342,77 @@ Resend يرفض الإرسال من نطاق لا تملكه.
 > **`MAIL_SCHEME` يقبل `smtp` أو `smtps` فقط.** استخدم `smtp` مع المنفذ 587
 > و`smtps` مع المنفذ 465. القيمة `tls` **غير مقبولة** ويفشل كل إرسال معها.
 
-### بديل بلا دومين: Gmail
+### ب) Gmail بلا نطاق عبر HTTPS
 
-Resend يرفض الإرسال من نطاق لا تملكه، فإن لم يكن لديك دومين بعد استخدم
-Gmail: مجاني، **٥٠٠ رسالة/يوم**، ولا يحتاج نطاقاً.
+Gmail عبر SMTP هو ما يفشل على Railway وRender (المنافذ محجوبة)، لكن
+**واجهة Gmail API** تعمل عبر HTTPS ولا تحتاج نطاقاً: تصل الرسائل من حساب
+Gmail نفسه بتوقيع Google، وهو أفضل تسليم ممكن بلا نطاق. الحدّ ٥٠٠ رسالة/يوم.
+
+الإعداد مرة واحدة، نحو عشر دقائق:
+
+#### ١. مشروع في Google Cloud
+
+1. افتح [console.cloud.google.com](https://console.cloud.google.com) بحساب Gmail الذي سترسل منه المنصّة.
+2. **Select a project ← New Project** ← اسمه `menhity` ← **Create**.
+3. من البحث العلوي اكتب **Gmail API** ← افتحها ← **Enable**.
+
+#### ٢. شاشة الموافقة
+
+1. **APIs & Services ← OAuth consent screen** (تظهر أيضاً باسم **Google Auth Platform**).
+2. نوع المستخدمين **External**، اسم التطبيق `منحتي`، بريد الدعم بريدك، ثم **Save**.
+3. **Audience ← Publish app** ثم **Confirm**. لا تحتاج مراجعة Google لاستخدامك أنت،
+   لكن **بدون النشر يبقى التطبيق في وضع Testing وينتهي رمز الربط بعد سبعة أيام** فيتوقف الإرسال.
+
+#### ٣. عميل OAuth
+
+**APIs & Services ← Credentials ← Create Credentials ← OAuth client ID** ← النوع
+**Desktop app** ← **Create**. انسخ **Client ID** و**Client secret**.
+
+#### ٤. اربط الحساب من جهازك
+
+من مجلد `backend` على جهازك (لا على الخادم):
+
+```powershell
+php artisan menhity:gmail-auth
+```
+
+يسألك عن المعرّف والسرّ، ثم يطبع رابطاً: افتحه، سجّل الدخول بحساب Gmail،
+واقبل. إن ظهرت شاشة **Google hasn't verified this app** فاضغط **Advanced ← Go to منحتي**
+— فالتطبيق تطبيقك أنت. يعود المتصفح إلى الطرفية تلقائياً ويطبع الأمر:
+
+```
+MAIL_MAILER=gmail
+GMAIL_CLIENT_ID=…
+GMAIL_CLIENT_SECRET=…
+GMAIL_REFRESH_TOKEN=…
+MAIL_FROM_ADDRESS=you@gmail.com
+MAIL_FROM_NAME=منحتي
+```
+
+> إن لم يعد المتصفح إلى الطرفية (WSL أو جهاز آخر) فسيطلب الأمر منك لصق الرابط
+> الذي انتقل إليه المتصفح — انسخه من شريط العنوان كاملاً وإن بدت الصفحة فارغة.
+> وبالخيار `--manual` يبدأ الأمر بهذا الوضع مباشرة.
+
+#### ٥. أضِف المتغيّرات للخادم
+
+الصق الأسطر الستة في **Variables** (Railway) أو **Environment** (Render) واحفظ.
+`MAIL_FROM_ADDRESS` هو بريد الحساب المُخوَّل نفسه: يستبدل Gmail أي عنوان آخر به
+ويُبقي اسم المُرسِل. أضف `MAIL_REPLY_TO_ADDRESS` إن أردت أن تصل الردود إلى بريد آخر.
+
+بعد إعادة النشر تحقّق من **Console**:
+
+```
+php artisan menhity:mail-test your@email.com
+```
+
+> **المفاتيح الثلاثة سرّية** كما كلمة المرور: مكانها لوحة الاستضافة وحدها.
+> لإلغاء الربط في أي وقت: [myaccount.google.com/permissions](https://myaccount.google.com/permissions)
+> ← منحتي ← **Remove access**، ثم احذف المتغيّرات.
+
+### ج) SMTP حيث لا يُحجب
+
+على استضافة لا تحجب المنافذ الصادرة (خادم خاص مثلاً) يعمل SMTP بكلمة مرور
+تطبيق من Gmail: مجاني، ٥٠٠ رسالة/يوم، بلا نطاق.
 
 1. فعّل **التحقق بخطوتين** في حساب Google.
 2. افتح [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords).
@@ -340,12 +422,16 @@ Gmail: مجاني، **٥٠٠ رسالة/يوم**، ولا يحتاج نطاقا�
 |---|---|
 | `MAIL_MAILER` | `smtp` |
 | `MAIL_HOST` | `smtp.gmail.com` |
-| `MAIL_PORT` | `587` |
+| `MAIL_PORT` | `587` (أو `465` مع `MAIL_SCHEME=smtps`) |
 | `MAIL_SCHEME` | `smtp` |
 | `MAIL_USERNAME` | بريدك الكامل على Gmail |
 | `MAIL_PASSWORD` | الـ 16 محرفاً **بلا مسافات** |
 | `MAIL_FROM_ADDRESS` | نفس بريدك على Gmail |
 | `MAIL_FROM_NAME` | `منحتي` |
+
+> **Gmail يقدّم المنفذين 587 و465 فقط.** المنفذ `2587` الذي يظهر في إعداد Resend
+> خاص بـ Resend وحده، ومع `smtp.gmail.com` لا يستجيب أبداً — وهذا بالضبط ما
+> يطبعه السجل: `Unable to connect to smtp.gmail.com:2587 (Connection timed out)`.
 
 > Google يعرض كلمة المرور مقسّمة (`abcd efgh ijkl mnop`) — **احذف المسافات**
 > عند لصقها، وإلا رُفضت المصادقة.
@@ -465,12 +551,17 @@ Please update your code to use models/gemini-Y
 php artisan menhity:mail-test your@email.com
 ```
 
-يطبع الأمر الإعداد الفعّال ثم يحاول إرسال رسالة حقيقية، ويعرض نص خطأ SMTP
-كاملاً مع الخطوة العملية المقابلة. أشهر الأسباب:
+يطبع الأمر الإعداد الفعّال، ويفحص منفذ SMTP باتصال قصير قبل الإرسال (فيميّز
+المنفذ الخاطئ عن المنفذ المحجوب دون انتظار المهلة كاملة)، ثم يحاول إرسال
+رسالة حقيقية ويعرض نص الخطأ كاملاً مع الخطوة العملية المقابلة. أشهر الأسباب:
 
 | الخطأ | السبب |
 |---|---|
-| `Connection could not be established ... timed out` | **الأشهر** — الاستضافة تحجب منفذ SMTP الصادر. انتقل إلى `MAIL_MAILER=resend` مع `RESEND_API_KEY` (عبر HTTPS)، أو جرّب المنفذ البديل `2587` |
+| `Unable to connect to smtp.gmail.com:2587` | المنفذ لا يقدّمه المزوّد أصلاً: Gmail يعمل على `587` أو `465` فقط، و`2587` خاص بـ Resend. والأضمن على Railway/Render الانتقال إلى `MAIL_MAILER=gmail` |
+| `Connection could not be established ... timed out` بمنفذ صحيح | **الأشهر** — الاستضافة تحجب منافذ SMTP الصادرة. انتقل إلى ناقل HTTPS: `MAIL_MAILER=gmail` لحساب Gmail، أو `MAIL_MAILER=resend` لنطاق موثَّق |
+| `invalid_grant` | رمز الربط `GMAIL_REFRESH_TOKEN` انتهى أو أُلغي — غالباً لأن شاشة الموافقة ما زالت في وضع Testing (تنتهي رموزها بعد ٧ أيام). انشر التطبيق ثم أعد `menhity:gmail-auth` |
+| `invalid_client` | `GMAIL_CLIENT_ID` أو `GMAIL_CLIENT_SECRET` خاطئ — انسخهما من Credentials مجدداً |
+| `Gmail API has not been used in project` | فعّل **Gmail API** في مشروع Google Cloud ثم أعد المحاولة |
 | `The "tls" scheme is not supported` | `MAIL_SCHEME=tls` — استخدم `smtp` (منفذ 587) أو `smtps` (منفذ 465) |
 | `535 Username and Password not accepted` | مع Gmail: كلمة مرور الحساب بدل App Password، أو لُصقت بمسافات |
 | `550` أو `domain is not verified` | `MAIL_FROM_ADDRESS` على نطاق غير موثَّق لدى المزوّد |
@@ -478,7 +569,8 @@ php artisan menhity:mail-test your@email.com
 | لا خطأ لكن لا رسالة | `MAIL_MAILER` ما زال `log`، أو الرسالة في **Spam** |
 
 التطبيق يسجّل فشل الإرسال ولا يُسقط إنشاء الحساب، فالمستخدم يستطيع طلب رمز
-جديد بعد ضبط الإعداد.
+جديد بعد ضبط الإعداد. سطر السجل يحمل حقل `hint` بالخطوة العملية بجانب الخطأ،
+وتعرض شاشة التأكيد للمستخدم تنبيهاً بأن الرسالة لم تُرسَل بدل تركه ينتظرها.
 
 ### مستخدم قديم لا يستطيع الدخول بعد تحديث تأكيد البريد
 
