@@ -37,7 +37,7 @@ export function DataTable({ columns, rows, loading, empty = "لا توجد بي�
       </ul>
 
       <div className="hidden overflow-x-auto scrollbar-slim md:block">
-        <table className="w-full min-w-[720px] border-collapse text-start">
+        <table className="w-full min-w-[860px] border-collapse text-start">
           <thead>
             <tr className="border-b border-ink-900/10 bg-white/45">
               {columns.map((column) => (

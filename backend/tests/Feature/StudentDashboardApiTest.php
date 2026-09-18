@@ -232,7 +232,11 @@ class StudentDashboardApiTest extends TestCase
 
         $this->assertNotNull($response->json('data.order_number'));
         $this->assertSame(CvOrderStatus::InExpertReview->value, $response->json('data.status'));
-        $this->assertCount(4, $response->json('data.timeline'));
+        // خمس مراحل: تأكيد التحويل ثم الأربع التي يعمل الفريق خلالها
+        $this->assertCount(5, $response->json('data.timeline'));
+        // بلا سعر مضبوط تبقى الخدمة مجانية فتتجاوز انتظار التحويل
+        $this->assertFalse($response->json('data.is_paid'));
+        $this->assertSame('not_required', $response->json('data.payment_status'));
         $this->assertCount(4, $response->json('data.ats_checks'));
 
         $order = $user->cvOrders()->first();

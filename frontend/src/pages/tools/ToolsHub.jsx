@@ -6,9 +6,10 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/Section";
 import { LoadingBlock } from "@/components/ui/Spinner";
-import { aiApi } from "@/api/endpoints";
+import { aiApi, cvOrderApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
+import { cn, formatMoney } from "@/lib/utils";
 import { TOOL_ROUTES } from "@/lib/constants";
 
 /** المسار اليدوي — ثلاث خدمات يعمل عليها الفريق ويسلّم ملفاً نهائياً */
@@ -49,12 +50,20 @@ export default function ToolsHubPage() {
   const tools = data?.data ?? [];
   const aiConfigured = data?.meta?.ai_configured;
 
+  // الأسعار تُقرأ من إعدادات الإدارة: ما يظهر هنا هو ما سيُطلب فعلاً
+  const { data: payment } = useApi(
+    () => (isAuthenticated ? cvOrderApi.paymentInfo() : Promise.resolve(null)),
+    [isAuthenticated],
+  );
+
+  const priceOf = (kind) => payment?.services?.find((item) => item.kind === kind)?.price ?? null;
+
   return (
     <div className="py-12">
       <div className="container-page">
         <SectionHeading
           as="h1"
-          eyebrow="مجاناً بالكامل"
+          eyebrow="أدوات الذكاء الاصطناعي مجانية"
           title="أدوات ومساعدة منحتي"
           description="مساران: أدوات فورية يشغّلها الذكاء الاصطناعي، وخدمة يدوية يعمل عليها فريق منحتي بنفسه."
         />
@@ -116,7 +125,23 @@ export default function ToolsHubPage() {
                 <service.icon className="size-6" />
               </span>
 
-              <h3 className="mt-4 font-display text-lg font-bold text-navy-800">{service.title}</h3>
+              <div className="mt-4 flex items-start justify-between gap-3">
+                <h3 className="font-display text-lg font-bold text-navy-800">{service.title}</h3>
+                {priceOf(service.key) !== null ? (
+                  <span
+                    className={cn(
+                      "num shrink-0 rounded-full px-2.5 py-1 text-[12px] font-bold",
+                      priceOf(service.key) > 0
+                        ? "bg-gold-400/30 text-gold-800"
+                        : "bg-navy-500/12 text-navy-700",
+                    )}
+                  >
+                    {priceOf(service.key) > 0
+                      ? formatMoney(priceOf(service.key), payment.currency)
+                      : "مجاناً"}
+                  </span>
+                ) : null}
+              </div>
               <p className="mt-2 flex-1 text-[13px] leading-7 text-ink-600">{service.description}</p>
 
               <ButtonLink
@@ -132,8 +157,8 @@ export default function ToolsHubPage() {
 
         <Alert tone="info" className="mt-6">
           <span className="font-bold">الفرق بين المسارين: </span>
-          الأدوات الفورية يكتبها الذكاء الاصطناعي في ثوانٍ وتصلح كنقطة بداية. الخدمة اليدوية يراجعها
-          فريق منحتي بنفسه ويسلّمك ملفاً نهائياً — كلاهما مجاني.
+          الأدوات الفورية يكتبها الذكاء الاصطناعي في ثوانٍ وتصلح كنقطة بداية، وهي مجانية. أما الخدمة
+          اليدوية فيراجعها فريق منحتي بنفسه ويسلّمك ملفاً نهائياً، ويظهر سعرها على كل بطاقة.
         </Alert>
       </div>
     </div>

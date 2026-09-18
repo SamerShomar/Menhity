@@ -11,9 +11,11 @@ import {
   Lightbulb,
   Send,
   UserRound,
+  Wallet,
 } from "lucide-react";
 
 import { ProfileSection, TagSection } from "@/components/dashboard/ProfileSection";
+import { PaymentDetails } from "@/components/tools/PaymentDetails";
 import { WizardSteps } from "@/components/tools/WizardSteps";
 import { Alert, TipBox } from "@/components/ui/Alert";
 import { Button, ButtonLink } from "@/components/ui/Button";
@@ -77,7 +79,7 @@ export default function CvWizardPage() {
       <div className="container-page max-w-4xl">
         <PageHeader
           title="صياغة السيرة الذاتية"
-          description="أكمل الخطوات الخمس، ثم يتولّى خبير القبولات صياغة سيرتك وفق معايير لجان المنح — مجاناً."
+          description="أكمل الخطوات الخمس، ثم يتولّى خبير القبولات صياغة سيرتك وفق معايير لجان المنح."
           actions={
             <ButtonLink to="/tools" variant="outline" size="sm">
               <ArrowRight className="size-4" />
@@ -425,12 +427,19 @@ function StepSkills({ profile, onChange }) {
 
 function StepReview({ profile, onSubmitted }) {
   const { data: readiness, loading } = useApi(cvOrderApi.readiness, []);
-  const { submit, submitting, error } = useSubmit(cvOrderApi.submit);
+  const { data: payment } = useApi(cvOrderApi.paymentInfo, []);
+  const { submit, submitting, error, fieldErrors } = useSubmit(cvOrderApi.submit);
+  const [receipt, setReceipt] = useState(null);
 
   const blocking = (readiness ?? []).filter((item) => item.required && !item.done);
 
+  const price = payment?.services?.find((service) => service.kind === "cv_build")?.price ?? 0;
+  const isPaid = price > 0;
+  const blocked = isPaid && !payment?.configured;
+  const missingReceipt = isPaid && !receipt;
+
   const onSubmit = async () => {
-    const { ok, result } = await submit();
+    const { ok, result } = await submit({ kind: "cv_build", receipt });
     if (ok) onSubmitted(result.data ?? result);
   };
 
@@ -487,7 +496,37 @@ function StepReview({ profile, onSubmitted }) {
         </CardBody>
       </Card>
 
-      {error ? <Alert tone="danger">{error}</Alert> : null}
+      {isPaid && !blocked ? (
+        <Card>
+          <CardHeader
+            title="حوّل المبلغ ثم أرفق الإشعار"
+            subtitle="يبدأ الفريق العمل فور تأكيد التحويل."
+            icon={<Wallet className="size-4" />}
+          />
+          <CardBody className="space-y-4">
+            <PaymentDetails account={payment.account} price={price} currency={payment.currency} />
+
+            <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-ink-900/20 p-4 transition hover:bg-white/60">
+              <span className="text-[13px] font-semibold text-navy-800">
+                {receipt ? receipt.name : "أرفق إشعار التحويل"}
+              </span>
+              <span className="text-[12px] text-ink-500">PNG · JPG · PDF</span>
+              <input
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg"
+                className="hidden"
+                onChange={(event) => setReceipt(event.target.files?.[0] ?? null)}
+              />
+            </label>
+          </CardBody>
+        </Card>
+      ) : null}
+
+      {blocked ? (
+        <Alert tone="warning">خدمة الدفع غير مهيّأة بعد. تواصل معنا لإتمام طلبك.</Alert>
+      ) : null}
+
+      {error ? <Alert tone="danger">{fieldErrors.receipt?.[0] ?? error}</Alert> : null}
 
       {blocking.length > 0 ? (
         <Alert tone="warning" title="أكمل المتطلبات التالية قبل الإرسال">
@@ -499,10 +538,20 @@ function StepReview({ profile, onSubmitted }) {
         </Alert>
       ) : null}
 
-      <Button size="lg" className="w-full" onClick={onSubmit} loading={submitting} disabled={blocking.length > 0}>
+      <Button
+        size="lg"
+        className="w-full"
+        onClick={onSubmit}
+        loading={submitting}
+        disabled={blocking.length > 0 || missingReceipt || blocked}
+      >
         <Send className="size-4" />
         إرسال الطلب للخبير
       </Button>
+
+      {missingReceipt && !blocked ? (
+        <p className="text-center text-[12.5px] text-ink-500">أرفق إشعار التحويل لإتمام الطلب.</p>
+      ) : null}
     </div>
   );
 }

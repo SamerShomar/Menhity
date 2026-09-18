@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CvOrderResource;
 use App\Models\CvOrder;
 use App\Services\CvOrderService;
+use App\Services\SettingsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -22,7 +23,33 @@ class CvOrderController extends Controller
     public function __construct(
         private readonly CvOrderService $orders,
         private readonly ProfileController $profiles,
+        private readonly SettingsService $settings,
     ) {}
+
+    /**
+     * أسعار الخدمات وبيانات الحساب الذي يحوّل إليه الطالب.
+     * تُقرأ قبل إرسال الطلب ليعرف كم يحوّل وإلى أين.
+     */
+    public function paymentInfo(): JsonResponse
+    {
+        $currency = $this->settings->currency();
+
+        $services = collect(CvOrderKind::cases())->map(fn (CvOrderKind $kind) => [
+            'kind' => $kind->value,
+            'label' => $kind->label(),
+            'price' => $this->settings->priceFor($kind),
+            'currency' => $currency,
+        ])->all();
+
+        return response()->json([
+            'data' => [
+                'currency' => $currency,
+                'services' => $services,
+                'account' => $this->settings->payment(),
+                'configured' => $this->settings->hasPaymentDetails(),
+            ],
+        ]);
+    }
 
     /** الطلب النشط للمستخدم — تستخدمه شاشة الويزرد لتحويله للمتابعة */
     public function active(Request $request): JsonResponse
@@ -60,17 +87,18 @@ class CvOrderController extends Controller
     {
         $user = $request->user();
 
+        $maxKilobytes = config('menhity.uploads.max_bytes') / 1024;
+
         $validated = $request->validate([
             'kind' => ['required', Rule::enum(CvOrderKind::class)],
-            'file' => [
-                'nullable',
-                'file',
-                'mimes:pdf,doc,docx',
-                'max:'.(config('menhity.uploads.max_bytes') / 1024),
-            ],
+            'file' => ['nullable', 'file', 'mimes:pdf,doc,docx', "max:{$maxKilobytes}"],
             'note' => ['nullable', 'string', 'max:1000'],
+            // الإشعار صورة غالباً (لقطة من تطبيق البنك) أو PDF
+            'receipt' => ['nullable', 'file', 'mimes:pdf,png,jpg,jpeg', "max:{$maxKilobytes}"],
+            'payment_note' => ['nullable', 'string', 'max:500'],
         ], [
             'file.mimes' => 'الملف يجب أن يكون PDF أو Word.',
+            'receipt.mimes' => 'إشعار التحويل يجب أن يكون صورة أو PDF.',
         ]);
 
         $kind = CvOrderKind::from($validated['kind']);
@@ -95,6 +123,8 @@ class CvOrderController extends Controller
                 $kind,
                 $request->file('file'),
                 $validated['note'] ?? null,
+                $request->file('receipt'),
+                $validated['payment_note'] ?? null,
             );
         } catch (RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 422);
@@ -104,6 +134,37 @@ class CvOrderController extends Controller
             'message' => 'تم استلام طلبك بنجاح.',
             'data' => (new CvOrderResource($order->load(self::RELATIONS)))->resolve(),
         ], 201);
+    }
+
+    /** رفع إشعار تحويل بديل بعد رفض الأول */
+    public function replaceReceipt(Request $request, CvOrder $cvOrder): JsonResponse
+    {
+        abort_unless($cvOrder->user_id === $request->user()->id, 403);
+        abort_unless($cvOrder->isPaid(), 422, 'هذا الطلب مجاني ولا يحتاج إشعار تحويل.');
+
+        $validated = $request->validate([
+            'receipt' => [
+                'required',
+                'file',
+                'mimes:pdf,png,jpg,jpeg',
+                'max:'.(config('menhity.uploads.max_bytes') / 1024),
+            ],
+            'payment_note' => ['nullable', 'string', 'max:500'],
+        ], [
+            'receipt.required' => 'أرفق إشعار التحويل.',
+            'receipt.mimes' => 'إشعار التحويل يجب أن يكون صورة أو PDF.',
+        ]);
+
+        $order = $this->orders->replaceReceipt(
+            $cvOrder,
+            $request->file('receipt'),
+            $validated['payment_note'] ?? null,
+        );
+
+        return response()->json([
+            'message' => 'تم استلام الإشعار الجديد، وسنراجعه قريباً.',
+            'data' => (new CvOrderResource($order))->resolve(),
+        ]);
     }
 
     /** تحميل الملف النهائي — يُخدَّم من قرص خاص بعد التحقق من الملكية */

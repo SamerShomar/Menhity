@@ -235,7 +235,7 @@ export default function DashboardOverviewPage() {
             <Sparkles className="size-5" />
           </span>
           <div>
-            <p className="font-display font-bold text-navy-800">جهّز سيرتك الذاتية مجاناً</p>
+            <p className="font-display font-bold text-navy-800">جهّز سيرتك الذاتية</p>
             <p className="mt-1 text-[13px] leading-7 text-ink-600">
               اطلب صياغة سيرتك بإشراف خبير، أو استخدم أدوات الذكاء الاصطناعي لتحسين مستنداتك.
             </p>

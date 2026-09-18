@@ -91,13 +91,25 @@ export const cvOrderApi = {
   active: () => api.get("/cv-orders/active").then((r) => r.data.data),
   readiness: () => api.get("/cv-orders/readiness").then((r) => r.data.data),
   show: (id) => api.get(`/cv-orders/${id}`).then((r) => r.data.data),
-  submit: ({ kind, file, note }) => {
+  paymentInfo: () => api.get("/cv-orders/payment-info").then((r) => r.data.data),
+  submit: ({ kind = "cv_build", file, note, receipt, paymentNote } = {}) => {
     const form = new FormData();
     form.append("kind", kind);
     if (file) form.append("file", file);
     if (note) form.append("note", note);
+    if (receipt) form.append("receipt", receipt);
+    if (paymentNote) form.append("payment_note", paymentNote);
     return api
       .post("/cv-orders", form, { headers: { "Content-Type": "multipart/form-data" } })
+      .then((r) => r.data);
+  },
+  /** إشعار بديل بعد رفض الأول */
+  replaceReceipt: ({ id, receipt, paymentNote }) => {
+    const form = new FormData();
+    form.append("receipt", receipt);
+    if (paymentNote) form.append("payment_note", paymentNote);
+    return api
+      .post(`/cv-orders/${id}/receipt`, form, { headers: { "Content-Type": "multipart/form-data" } })
       .then((r) => r.data);
   },
   /* الملفات على قرص خاص، فتُحمَّل عبر مسار مصرّح لا برابط مباشر */
@@ -151,10 +163,14 @@ export const adminApi = {
       .then((r) => r.data);
   },
   advanceOrder: (id, status) => api.patch(`/admin/orders/${id}/advance`, { status }).then((r) => r.data),
+  downloadOrderReceipt: (id, name) => downloadFile(`/admin/orders/${id}/receipt`, name),
+  reviewPayment: (id, decision, reason) =>
+    api.post(`/admin/orders/${id}/payment`, { decision, reason }).then((r) => r.data),
 
   notifications: () => api.get("/admin/notifications").then((r) => r.data),
   broadcast: (payload) => api.post("/admin/notifications/broadcast", payload).then((r) => r.data),
 
   reports: () => api.get("/admin/reports").then((r) => r.data.data),
   settings: () => api.get("/admin/settings").then((r) => r.data.data),
+  updatePayment: (payload) => api.put("/admin/settings/payment", payload).then((r) => r.data),
 };

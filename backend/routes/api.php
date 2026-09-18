@@ -115,12 +115,14 @@ Route::prefix('v1')->group(function (): void {
             ->name('ai-tools.run');
 
         /* ---- طلبات صياغة السيرة الذاتية ---- */
+        Route::get('cv-orders/payment-info', [CvOrderController::class, 'paymentInfo'])->name('cv-orders.payment-info');
         Route::get('cv-orders/active', [CvOrderController::class, 'active'])->name('cv-orders.active');
         Route::get('cv-orders/readiness', [CvOrderController::class, 'readiness'])->name('cv-orders.readiness');
         Route::post('cv-orders', [CvOrderController::class, 'store'])->name('cv-orders.store');
         Route::get('cv-orders/{cvOrder}', [CvOrderController::class, 'show'])->name('cv-orders.show');
         Route::post('cv-orders/{cvOrder}/notes', [CvOrderController::class, 'addNote'])->name('cv-orders.notes');
         Route::get('cv-orders/{cvOrder}/file', [CvOrderController::class, 'downloadFinal'])->name('cv-orders.file');
+        Route::post('cv-orders/{cvOrder}/receipt', [CvOrderController::class, 'replaceReceipt'])->name('cv-orders.receipt');
 
         /* ================= لوحة الإدارة ================= */
 
@@ -147,6 +149,8 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('orders', [Admin\OrderController::class, 'index'])->name('admin.orders.index');
                 Route::patch('orders/{cvOrder}/advance', [Admin\OrderController::class, 'advance'])->name('admin.orders.advance');
                 Route::get('orders/{cvOrder}/source', [Admin\OrderController::class, 'downloadSource'])->name('admin.orders.source');
+                Route::get('orders/{cvOrder}/receipt', [Admin\OrderController::class, 'downloadReceipt'])->name('admin.orders.receipt');
+                Route::post('orders/{cvOrder}/payment', [Admin\OrderController::class, 'reviewPayment'])->name('admin.orders.payment');
                 Route::post('orders/{cvOrder}/deliver', [Admin\OrderController::class, 'deliver'])->name('admin.orders.deliver');
 
                 Route::get('notifications', [Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
@@ -154,6 +158,7 @@ Route::prefix('v1')->group(function (): void {
 
                 Route::get('reports', [Admin\ReportController::class, 'index'])->name('admin.reports');
                 Route::get('settings', [Admin\SettingsController::class, 'index'])->name('admin.settings');
+                Route::put('settings/payment', [Admin\SettingsController::class, 'updatePayment'])->name('admin.settings.payment');
             });
     });
 });
