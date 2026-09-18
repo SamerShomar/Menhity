@@ -9,6 +9,12 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(Boolean(getToken()));
 
+  /*
+   * خروجٌ صريح يختلف عن جلسة انتهت: الوجهة المحفوظة (next) تخصّ من كان
+   * داخلاً، ولا يصحّ أن يهبط عليها من يدخل بعده — وقد يكون حساباً آخر.
+   */
+  const [signedOut, setSignedOut] = useState(false);
+
   // استعادة الجلسة عند فتح التطبيق إن وُجد توكن محفوظ
   useEffect(() => {
     if (!getToken()) {
@@ -40,6 +46,7 @@ export function AuthProvider({ children }) {
     const data = await authApi.login(payload);
     setToken(data.token);
     setUser(data.user);
+    setSignedOut(false);
     return data.user;
   }, []);
 
@@ -53,12 +60,14 @@ export function AuthProvider({ children }) {
   const adoptSession = useCallback((token, nextUser) => {
     setToken(token);
     setUser(nextUser);
+    setSignedOut(false);
   }, []);
 
   const logout = useCallback(async () => {
     await authApi.logout().catch(() => undefined);
     setToken(null);
     setUser(null);
+    setSignedOut(true);
   }, []);
 
   /** تحديث بيانات المستخدم بعد تعديل الإعدادات أو الملف */
@@ -72,6 +81,7 @@ export function AuthProvider({ children }) {
   const clearSession = useCallback(() => {
     setToken(null);
     setUser(null);
+    setSignedOut(true);
   }, []);
 
   const value = useMemo(
@@ -80,6 +90,7 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: Boolean(user),
       isAdmin: Boolean(user?.is_admin_level),
+      signedOut,
       login,
       register,
       adoptSession,
@@ -88,7 +99,7 @@ export function AuthProvider({ children }) {
       setUser,
       clearSession,
     }),
-    [user, loading, login, register, adoptSession, logout, refresh, clearSession],
+    [user, loading, signedOut, login, register, adoptSession, logout, refresh, clearSession],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -15,13 +15,22 @@ import { useAuth } from "@/context/AuthContext";
 
 /** يشترط تسجيل الدخول */
 export function RequireAuth() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, loading, signedOut } = useAuth();
   const location = useLocation();
 
   if (loading) return <FullPageLoader />;
 
   if (!isAuthenticated) {
-    return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
+    /*
+     * الوجهة المحفوظة تخدم من فُصل عن صفحة أرادها فعلاً. أما بعد خروج
+     * صريح فهي تخصّ الجلسة المنتهية، وحملُها يهبط بالداخل بعده — وقد
+     * يكون حساباً آخر — على صفحة سابقه.
+     */
+    const target = signedOut
+      ? "/login"
+      : `/login?next=${encodeURIComponent(location.pathname)}`;
+
+    return <Navigate to={target} replace />;
   }
 
   return <Outlet />;
@@ -53,8 +62,18 @@ export function GuestOnly() {
 
   if (isAuthenticated) {
     const next = new URLSearchParams(location.search).get("next");
+    const home = isAdmin ? "/admin" : "/dashboard";
 
-    return <Navigate to={next || (isAdmin ? "/admin" : "/dashboard")} replace />;
+    /*
+     * حصانة ثانية: الوجهة تُحترم فقط إن ناسبت دور الداخل. مسار إداري لا
+     * يفتحه طالب، ومسارات الطلاب ليست وجهة المشرف الطبيعية.
+     */
+    const suitable =
+      next?.startsWith("/") &&
+      !next.startsWith("//") &&
+      (isAdmin ? next.startsWith("/admin") : !next.startsWith("/admin"));
+
+    return <Navigate to={suitable ? next : home} replace />;
   }
 
   return <Outlet />;

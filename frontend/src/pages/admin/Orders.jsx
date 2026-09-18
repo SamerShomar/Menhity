@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, Check, ClipboardList, Download, Receipt, Upload, X } from "lucide-react";
 
 import { DataTable } from "@/components/admin/DataTable";
@@ -38,6 +38,10 @@ export default function AdminOrdersPage() {
   const fileInput = useRef(null);
   const [target, setTarget] = useState(null);
   const [busy, setBusy] = useState(null);
+  const [receipt, setReceipt] = useState(null);
+
+  // رابط الكائن يحجز ذاكرة حتى يُلغى
+  useEffect(() => () => { if (receipt?.url) URL.revokeObjectURL(receipt.url); }, [receipt]);
 
   const meta = data?.meta ?? {};
 
@@ -50,10 +54,12 @@ export default function AdminOrdersPage() {
     }
   };
 
-  const onDownloadReceipt = async (row) => {
+  /* الإشعار يُعرض ليتأكّد المدير منه بالنظر، والتنزيل خيار داخل المعاينة */
+  const onViewReceipt = async (row) => {
     setBusy(`receipt-${row.id}`);
     try {
-      await adminApi.downloadOrderReceipt(row.id, row.receipt_file_name);
+      const file = await adminApi.openOrderReceipt(row.id);
+      setReceipt({ ...file, row });
     } finally {
       setBusy(null);
     }
@@ -176,12 +182,12 @@ export default function AdminOrdersPage() {
               <Button
                 size="sm"
                 variant="outline"
-                onClick={() => onDownloadReceipt(row)}
+                onClick={() => onViewReceipt(row)}
                 loading={busy === `receipt-${row.id}`}
-                loadingText="جارٍ التحميل…"
+                loadingText="جارٍ الفتح…"
               >
                 <Receipt className="size-3.5" />
-                الإشعار
+                عرض الإشعار
               </Button>
             ) : null}
 
@@ -283,6 +289,16 @@ export default function AdminOrdersPage() {
         className="hidden"
       />
 
+      {receipt ? (
+        <ReceiptViewer
+          receipt={receipt}
+          onClose={() => setReceipt(null)}
+          onDownload={() =>
+            adminApi.downloadOrderReceipt(receipt.row.id, receipt.row.receipt_file_name)
+          }
+        />
+      ) : null}
+
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="إجمالي الطلبات" value={meta.total ?? 0} icon={<ClipboardList className="size-5" />} />
         <StatCard
@@ -300,6 +316,68 @@ export default function AdminOrdersPage() {
           <DataTable columns={columns} rows={data?.data} loading={loading} empty="لا توجد طلبات بعد." />
         </CardBody>
       </Card>
+    </div>
+  );
+}
+
+/**
+ * معاينة إشعار التحويل.
+ *
+ * الإشعار غالباً لقطة شاشة من تطبيق البنك، والمدير يقبل أو يرفض بناءً على
+ * ما يراه فيها — فتنزيلها ليفتحها من مجلد التنزيلات يقطع العمل بلا داعٍ.
+ * الملف على قرص خاص فيُجلب بالتوكن ويُعرض من رابط كائن.
+ */
+function ReceiptViewer({ receipt, onClose, onDownload }) {
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === "Escape") onClose();
+    };
+
+    document.addEventListener("keydown", onKey);
+
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const isPdf = receipt.type === "application/pdf";
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center p-4">
+      {/* التعتيم طبقة شقيقة لا حاضنة: عنصر مموّه يحرم ما بداخله من تمويه ما وراءه */}
+      <div className="absolute inset-0 bg-navy-900/60 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+
+      <div className="glass-strong relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl">
+        <div className="flex items-center justify-between gap-3 border-b border-ink-900/10 px-5 py-3.5">
+          <div className="min-w-0">
+            <p className="font-display font-bold text-navy-800">إشعار التحويل</p>
+            <p className="num mt-0.5 truncate text-[12px] text-ink-500">
+              {receipt.row.order_number} — {receipt.row.student_name}
+            </p>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button size="sm" variant="outline" onClick={onDownload}>
+              <Download className="size-3.5" />
+              تنزيل
+            </Button>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="إغلاق المعاينة"
+              className="grid size-9 place-items-center rounded-lg text-ink-600 transition-colors hover:bg-white/60"
+            >
+              <X className="size-5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="min-h-0 flex-1 overflow-auto bg-white/45 p-4">
+          {isPdf ? (
+            <iframe src={receipt.url} title="إشعار التحويل" className="h-[70vh] w-full rounded-lg" />
+          ) : (
+            <img src={receipt.url} alt="إشعار التحويل" className="mx-auto max-w-full rounded-lg" />
+          )}
+        </div>
+      </div>
     </div>
   );
 }
