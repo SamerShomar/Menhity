@@ -285,6 +285,59 @@ class CvOrderPaymentTest extends TestCase
         $this->assertSame('987654321', $settings->payment()['account_number']);
     }
 
+    public function test_an_admin_fetches_the_receipt_to_look_at_it(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $user = User::factory()->withProfile()->create();
+
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', [
+            'kind' => 'cv_improve',
+            'file' => $this->sourceFile(),
+            'receipt' => $this->receipt(),
+        ])->assertCreated();
+
+        $order = $user->cvOrders()->first();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get("/api/v1/admin/orders/{$order->id}/receipt")
+            ->assertOk();
+    }
+
+    /**
+     * قرص الحاوية مؤقّت: إعادة النشر تمحو المرفوعات ويبقى سجلّها في
+     * قاعدة البيانات. بلا فحص الوجود يرمي Flysystem استثناءً فيصل المدير
+     * خطأ خادم غامض بدل سببٍ يفهمه.
+     */
+    public function test_a_receipt_wiped_off_disk_answers_with_a_clear_404(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $user = User::factory()->withProfile()->create();
+
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', [
+            'kind' => 'cv_improve',
+            'file' => $this->sourceFile(),
+            'receipt' => $this->receipt(),
+        ])->assertCreated();
+
+        $order = $user->cvOrders()->first();
+
+        Storage::disk('local')->delete($order->receipt_file_path);
+        Storage::disk('local')->delete($order->source_file_path);
+
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->getJson("/api/v1/admin/orders/{$order->id}/receipt")
+            ->assertNotFound()
+            ->assertJsonPath('message', 'الملف لم يعد موجوداً على الخادم. اطلب من الطالب رفعه مرة أخرى.');
+
+        $this->actingAs($admin)
+            ->getJson("/api/v1/admin/orders/{$order->id}/source")
+            ->assertNotFound();
+    }
+
     public function test_students_cannot_set_prices(): void
     {
         $this->actingAs(User::factory()->withProfile()->create())

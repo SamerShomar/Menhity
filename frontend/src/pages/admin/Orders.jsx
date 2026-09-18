@@ -4,11 +4,12 @@ import { ArrowLeft, Check, ClipboardList, Download, Receipt, Upload, X } from "l
 import { DataTable } from "@/components/admin/DataTable";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { Button, buttonClasses } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/Section";
 import { StatCard } from "@/components/ui/StatCard";
 import { adminApi } from "@/api/endpoints";
+import { parseApiError } from "@/api/client";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { formatMoney, timeAgoAr } from "@/lib/utils";
 
@@ -39,6 +40,8 @@ export default function AdminOrdersPage() {
   const [target, setTarget] = useState(null);
   const [busy, setBusy] = useState(null);
   const [receipt, setReceipt] = useState(null);
+  // فشل تنزيل ملف لا يظهر في أي نموذج، فبلا هذه الحالة يبتلعه الصمت
+  const [fileError, setFileError] = useState(null);
 
   // رابط الكائن يحجز ذاكرة حتى يُلغى
   useEffect(() => () => { if (receipt?.url) URL.revokeObjectURL(receipt.url); }, [receipt]);
@@ -47,8 +50,11 @@ export default function AdminOrdersPage() {
 
   const onDownloadSource = async (row) => {
     setBusy(row.id);
+    setFileError(null);
     try {
       await adminApi.downloadOrderSource(row.id, row.source_file_name);
+    } catch (err) {
+      setFileError(parseApiError(err).message);
     } finally {
       setBusy(null);
     }
@@ -57,9 +63,12 @@ export default function AdminOrdersPage() {
   /* الإشعار يُعرض ليتأكّد المدير منه بالنظر، والتنزيل خيار داخل المعاينة */
   const onViewReceipt = async (row) => {
     setBusy(`receipt-${row.id}`);
+    setFileError(null);
     try {
       const file = await adminApi.openOrderReceipt(row.id);
       setReceipt({ ...file, row });
+    } catch (err) {
+      setFileError(parseApiError(err).message);
     } finally {
       setBusy(null);
     }
@@ -280,6 +289,7 @@ export default function AdminOrdersPage() {
       {deliver.error ? <Alert tone="danger">{deliver.error}</Alert> : null}
       {deliver.success ? <Alert tone="success">تم تسليم الملف وإشعار الطالب.</Alert> : null}
       {review.error ? <Alert tone="danger">{review.error}</Alert> : null}
+      {fileError ? <Alert tone="danger">{fileError}</Alert> : null}
 
       <input
         ref={fileInput}
@@ -290,13 +300,7 @@ export default function AdminOrdersPage() {
       />
 
       {receipt ? (
-        <ReceiptViewer
-          receipt={receipt}
-          onClose={() => setReceipt(null)}
-          onDownload={() =>
-            adminApi.downloadOrderReceipt(receipt.row.id, receipt.row.receipt_file_name)
-          }
-        />
+        <ReceiptViewer receipt={receipt} onClose={() => setReceipt(null)} />
       ) : null}
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
@@ -327,7 +331,7 @@ export default function AdminOrdersPage() {
  * ما يراه فيها — فتنزيلها ليفتحها من مجلد التنزيلات يقطع العمل بلا داعٍ.
  * الملف على قرص خاص فيُجلب بالتوكن ويُعرض من رابط كائن.
  */
-function ReceiptViewer({ receipt, onClose, onDownload }) {
+function ReceiptViewer({ receipt, onClose }) {
   useEffect(() => {
     const onKey = (event) => {
       if (event.key === "Escape") onClose();
@@ -355,10 +359,15 @@ function ReceiptViewer({ receipt, onClose, onDownload }) {
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5">
-            <Button size="sm" variant="outline" onClick={onDownload}>
+            {/* الملف محمّل في الذاكرة أصلاً، فالتنزيل من رابطه لا من طلب ثانٍ قد يفشل */}
+            <a
+              href={receipt.url}
+              download={receipt.row.receipt_file_name ?? `إشعار-${receipt.row.order_number}`}
+              className={buttonClasses({ variant: "outline", size: "sm" })}
+            >
               <Download className="size-3.5" />
               تنزيل
-            </Button>
+            </a>
             <button
               type="button"
               onClick={onClose}

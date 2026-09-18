@@ -78,6 +78,7 @@ class OrderController extends Controller
     public function downloadSource(CvOrder $cvOrder): StreamedResponse
     {
         abort_unless($cvOrder->source_file_path, 404, 'لم يرفق الطالب ملفاً مع هذا الطلب.');
+        $this->guardFileExists($cvOrder->source_file_path);
 
         return Storage::disk('local')->download(
             $cvOrder->source_file_path,
@@ -89,6 +90,7 @@ class OrderController extends Controller
     public function downloadReceipt(CvOrder $cvOrder): StreamedResponse
     {
         abort_unless($cvOrder->receipt_file_path, 404, 'لم يرفق الطالب إشعار تحويل لهذا الطلب.');
+        $this->guardFileExists($cvOrder->receipt_file_path);
 
         return Storage::disk('local')->download(
             $cvOrder->receipt_file_path,
@@ -159,6 +161,20 @@ class OrderController extends Controller
             'message' => 'تم تسليم الملف وإشعار الطالب.',
             'data' => (new CvOrderResource($order))->resolve(),
         ]);
+    }
+
+    /**
+     * مسارٌ مسجَّل في قاعدة البيانات لا يعني ملفاً على القرص: تخزين الحاوية
+     * مؤقّت، فإعادة النشر بلا قرص مثبّت تمحو المرفوعات ويبقى سجلّها.
+     * بلا هذا الفحص يرمي Flysystem استثناءً فيصل المستخدم خطأ خادم غامض.
+     */
+    private function guardFileExists(string $path): void
+    {
+        abort_unless(
+            Storage::disk('local')->exists($path),
+            404,
+            'الملف لم يعد موجوداً على الخادم. اطلب من الطالب رفعه مرة أخرى.',
+        );
     }
 
     /** تحريك الطلب إلى المرحلة التالية */
