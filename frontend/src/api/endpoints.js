@@ -175,7 +175,6 @@ export const adminApi = {
       .then((r) => r.data);
   },
   advanceOrder: (id, status) => api.patch(`/admin/orders/${id}/advance`, { status }).then((r) => r.data),
-  downloadOrderReceipt: (id, name) => downloadFile(`/admin/orders/${id}/receipt`, name),
   /* الإشعار يُعاين لا يُنزَّل: المدير يتأكّد منه بالنظر */
   openOrderReceipt: (id) => fetchBlobUrl(`/admin/orders/${id}/receipt`),
   reviewPayment: (id, decision, reason) =>

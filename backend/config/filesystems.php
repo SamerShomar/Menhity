@@ -30,9 +30,18 @@ return [
 
     'disks' => [
 
+        /*
+         | مرفوعات الطلاب — سِيَرٌ وإشعارات تحويل وملفات مسلَّمة.
+         |
+         | قرص الحاوية على منصّات النشر مؤقّت: كل إعادة نشر تبدأ من صورة
+         | نظيفة فتُمحى المرفوعات ويبقى سجلّها في قاعدة البيانات، فيرى
+         | الطالب طلباً بمرفق لا ملف له. لذا يُوجَّه الجذر إلى قرصٍ مثبَّت
+         | عبر PRIVATE_STORAGE_ROOT (مثلاً /data على Railway)، ويبقى
+         | مسار المشروع افتراضاً للتطوير المحلّي.
+         */
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app/private'),
+            'root' => env('PRIVATE_STORAGE_ROOT') ?: storage_path('app/private'),
             'serve' => true,
             'throw' => false,
             'report' => false,

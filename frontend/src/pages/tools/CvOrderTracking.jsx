@@ -22,6 +22,7 @@ import { ProgressRing } from "@/components/ui/Progress";
 import { PageHeader } from "@/components/ui/Section";
 import { LoadingBlock } from "@/components/ui/Spinner";
 import { cvOrderApi } from "@/api/endpoints";
+import { parseApiError } from "@/api/client";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { cn, formatDateAr, formatMoney, timeAgoAr } from "@/lib/utils";
 
@@ -42,6 +43,8 @@ const TIMELINE_ICON = {
 
 export default function CvOrderTrackingPage() {
   const [downloading, setDownloading] = useState(false);
+  // التحميل خارج أي نموذج، فبلا حالة خطأ خاصّة به يفشل الزرّ بصمت
+  const [downloadError, setDownloadError] = useState(null);
   const { id } = useParams();
   const [note, setNote] = useState("");
 
@@ -49,8 +52,11 @@ export default function CvOrderTrackingPage() {
 
   const onDownload = async () => {
     setDownloading(true);
+    setDownloadError(null);
     try {
       await cvOrderApi.downloadFinal(order.id, order.final_file_name);
+    } catch (err) {
+      setDownloadError(parseApiError(err).message);
     } finally {
       setDownloading(false);
     }
@@ -305,6 +311,11 @@ export default function CvOrderTrackingPage() {
                   <Download className="size-4" />
                   تحميل الملف
                 </Button>
+                {downloadError ? (
+                  <Alert tone="danger" className="mt-3 text-start">
+                    {downloadError}
+                  </Alert>
+                ) : null}
               </div>
             ) : (
               <Alert tone="info" title="ما الخطوة التالية؟">

@@ -176,6 +176,13 @@ class CvOrderController extends Controller
         );
         abort_unless($cvOrder->final_file_path, 404, 'لم يُسلَّم ملف لهذا الطلب بعد.');
 
+        // مسارٌ في قاعدة البيانات لا يعني ملفاً على القرص — تخزين الحاوية مؤقّت
+        abort_unless(
+            Storage::disk('local')->exists($cvOrder->final_file_path),
+            404,
+            'الملف لم يعد موجوداً على الخادم. تواصل معنا لإعادة إرساله.',
+        );
+
         return Storage::disk('local')->download(
             $cvOrder->final_file_path,
             $cvOrder->final_file_name ?? "منحتي-{$cvOrder->order_number}.pdf",

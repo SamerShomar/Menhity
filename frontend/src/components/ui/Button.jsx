@@ -36,6 +36,11 @@ const BASE =
   "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy-500 " +
   "disabled:cursor-not-allowed disabled:opacity-60 select-none whitespace-nowrap";
 
+/** أصناف الزرّ لعنصرٍ ليس زرّاً — مثل رابط تنزيل يحتاج سمة download */
+export function buttonClasses({ variant = "primary", size = "md", fullWidth, className } = {}) {
+  return cn(BASE, VARIANTS[variant], SIZES[size], fullWidth && "w-full", className);
+}
+
 export function Button({
   variant = "primary",
   size = "md",

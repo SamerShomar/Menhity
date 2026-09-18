@@ -38,10 +38,27 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+/**
+ * طلب ينتظر ملفاً (responseType: "blob") يصله جسم الخطأ بلوباً أيضاً،
+ * فتضيع رسالة الخادم خلف «حدث خطأ غير متوقّع». نفكّها هنا مرّة واحدة
+ * لتقرأها كل الشاشات كما تقرأ أي خطأ آخر.
+ */
+async function unwrapBlobError(error) {
+  const data = error.response?.data;
+
+  if (!(data instanceof Blob) || !data.type.includes("json")) return;
+
+  try {
+    error.response.data = JSON.parse(await data.text());
+  } catch {
+    // جسم غير قابل للقراءة — نبقي البلوب كما هو
+  }
+}
+
 // انتهاء الجلسة يعيد المستخدم لصفحة الدخول
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const status = error.response?.status;
     const onAuthPage = /\/(login|register|forgot-password|verify|reset-password)/.test(
       window.location.pathname,
@@ -51,6 +68,8 @@ api.interceptors.response.use(
       setToken(null);
       window.location.href = `/login?next=${encodeURIComponent(window.location.pathname)}`;
     }
+
+    await unwrapBlobError(error);
 
     return Promise.reject(error);
   },
