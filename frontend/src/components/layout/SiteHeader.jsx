@@ -7,6 +7,7 @@ import { Logo } from "@/components/ui/Logo";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { notificationApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
+import { useHeaderOverDark } from "@/hooks/useHeaderOverDark";
 import { PUBLIC_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
@@ -15,6 +16,12 @@ export function SiteHeader() {
   const [unread, setUnread] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+
+  /*
+   * النصّ يقلب إلى الأبيض فوق الأسطح الداكنة: الترويسة زجاج شديد الشفافية،
+   * ولون ما خلفها هو خلفية نصّها فعلياً.
+   */
+  const overDark = useHeaderOverDark();
 
   // إغلاق قائمة الجوال عند تغيّر المسار
   useEffect(() => setMobileOpen(false), [location.pathname]);
@@ -41,10 +48,16 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="glass-header sticky top-0 z-40 rounded-none border-x-0 border-t-0">
+      <header
+        data-over-dark={overDark || undefined}
+        className={cn(
+          "sticky top-0 z-40 rounded-none border-x-0 border-t-0",
+          overDark ? "glass-header-dark" : "glass-header",
+        )}
+      >
         <div className="container-page flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-8">
-            <Logo />
+            <Logo tone={overDark ? "white" : "navy"} />
 
             <nav className="hidden items-center gap-1 md:flex">
               {PUBLIC_NAV.map((item) => (
@@ -55,7 +68,13 @@ export function SiteHeader() {
                   className={({ isActive }) =>
                     cn(
                       "relative rounded-lg px-3 py-2 text-[13.5px] font-semibold transition-colors",
-                      isActive ? "text-navy-900" : "text-ink-800 hover:text-navy-900",
+                      overDark
+                        ? isActive
+                          ? "text-white"
+                          : "text-white/85 hover:text-white"
+                        : isActive
+                          ? "text-navy-900"
+                          : "text-ink-800 hover:text-navy-900",
                     )
                   }
                 >
@@ -63,7 +82,12 @@ export function SiteHeader() {
                     <>
                       {item.label}
                       {isActive && (
-                        <span className="absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full bg-navy-900" />
+                        <span
+                          className={cn(
+                            "absolute inset-x-3 -bottom-[1px] h-0.5 rounded-full",
+                            overDark ? "bg-gold-400" : "bg-navy-900",
+                          )}
+                        />
                       )}
                     </>
                   )}
@@ -78,15 +102,25 @@ export function SiteHeader() {
                 <Link
                   to="/dashboard/notifications"
                   aria-label={`الإشعارات${unread ? ` (${unread} غير مقروء)` : ""}`}
-                  className="relative rounded-full p-2 text-ink-700 transition-colors hover:bg-white/60 hover:text-navy-900"
+                  className={cn(
+                  "relative rounded-full p-2 transition-colors",
+                  overDark
+                    ? "text-white/85 hover:bg-white/15 hover:text-white"
+                    : "text-ink-700 hover:bg-white/60 hover:text-navy-900",
+                )}
                 >
                   <Bell className="size-5" />
                   {unread > 0 && (
                     <span className="absolute end-1.5 top-1.5 size-2 rounded-full bg-[color:var(--color-danger)] ring-2 ring-white" />
                   )}
                 </Link>
-                <span className="hidden h-7 w-px bg-ink-900/20 sm:block" />
-                <UserMenu />
+                <span
+                className={cn(
+                  "hidden h-7 w-px sm:block",
+                  overDark ? "bg-white/25" : "bg-ink-900/20",
+                )}
+              />
+                <UserMenu overDark={overDark} />
               </>
             ) : (
               <>
@@ -94,11 +128,15 @@ export function SiteHeader() {
                   to="/login"
                   variant="ghost"
                   size="sm"
-                  className="hidden text-ink-800 sm:inline-flex"
+                  className={cn(
+                  "hidden sm:inline-flex",
+                  overDark ? "text-white hover:bg-white/15 hover:text-white" : "text-ink-800",
+                )}
                 >
                   تسجيل الدخول
                 </ButtonLink>
-                <ButtonLink to="/register" size="sm">
+                {/* الفعل الأساسي كحلي، ويذوب في الشريط الكحلي فيصير ذهبياً فوقه */}
+                <ButtonLink to="/register" size="sm" variant={overDark ? "gold" : "primary"}>
                   ابدأ الآن
                 </ButtonLink>
               </>
@@ -108,7 +146,12 @@ export function SiteHeader() {
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="فتح القائمة"
-              className="rounded-lg p-2 text-ink-800 transition-colors hover:bg-white/60 md:hidden"
+              className={cn(
+              "rounded-lg p-2 transition-colors md:hidden",
+              overDark
+                ? "text-white hover:bg-white/15"
+                : "text-ink-800 hover:bg-white/60",
+            )}
             >
               <Menu className="size-5" />
             </button>

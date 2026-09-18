@@ -87,7 +87,7 @@ export default function ScholarshipDetailPage() {
   return (
     <div className="pb-12">
       {/* الترويسة */}
-      <div className="bg-navy-700 text-white">
+      <div data-header-dark className="bg-navy-700 text-white">
         <div className="container-page py-8">
           <nav className="mb-4 flex items-center gap-1.5 text-[13px] text-navy-100">
             <Link to="/" className="hover:text-white">

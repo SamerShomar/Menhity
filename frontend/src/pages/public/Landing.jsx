@@ -75,7 +75,7 @@ export default function LandingPage() {
   return (
     <div>
       {/* ============ البطل ============ */}
-      <section className="relative overflow-hidden bg-navy-700 text-white">
+      <section data-header-dark className="relative overflow-hidden bg-navy-700 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(246,196,69,0.18),transparent_55%)]" />
 
         <div className="container-page relative grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
