@@ -52,7 +52,7 @@ export function SiteHeader() {
         data-over-dark={overDark || undefined}
         className={cn(
           "sticky top-0 z-40 rounded-none border-x-0 border-t-0",
-          overDark ? "glass-header-dark" : "glass-header",
+          overDark ? "glass-header-dark header-ink-shadow" : "glass-header",
         )}
       >
         <div className="container-page flex h-16 items-center justify-between gap-4">
