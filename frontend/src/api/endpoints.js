@@ -117,6 +117,18 @@ export const cvOrderApi = {
   addNote: (id, body) => api.post(`/cv-orders/${id}/notes`, { body }).then((r) => r.data.data),
 };
 
+/**
+ * يجلب ملفاً محمياً بالتوكن ويعيد رابط كائن لعرضه داخل الصفحة.
+ * الملفات على قرص خاص فلا يصلح وضع مسارها في src مباشرة.
+ *
+ * على المستدعي استدعاء URL.revokeObjectURL عند الإغلاق.
+ */
+async function fetchBlobUrl(url) {
+  const response = await api.get(url, { responseType: "blob" });
+
+  return { url: URL.createObjectURL(response.data), type: response.data.type };
+}
+
 /** يحمّل ملفاً محمياً بالتوكن ثم يسلّمه للمتصفح كتنزيل */
 async function downloadFile(url, fallbackName) {
   const response = await api.get(url, { responseType: "blob" });
@@ -164,6 +176,8 @@ export const adminApi = {
   },
   advanceOrder: (id, status) => api.patch(`/admin/orders/${id}/advance`, { status }).then((r) => r.data),
   downloadOrderReceipt: (id, name) => downloadFile(`/admin/orders/${id}/receipt`, name),
+  /* الإشعار يُعاين لا يُنزَّل: المدير يتأكّد منه بالنظر */
+  openOrderReceipt: (id) => fetchBlobUrl(`/admin/orders/${id}/receipt`),
   reviewPayment: (id, decision, reason) =>
     api.post(`/admin/orders/${id}/payment`, { decision, reason }).then((r) => r.data),
 
