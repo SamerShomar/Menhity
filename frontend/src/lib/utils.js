@@ -113,6 +113,28 @@ export function formatNumber(value) {
   return new Intl.NumberFormat("en-US").format(value ?? 0);
 }
 
+/** رموز العملات الشائعة في المنطقة — وما عداها يُعرض برمزه كما هو */
+const CURRENCY_SYMBOLS = {
+  ILS: "₪",
+  JOD: "د.أ",
+  USD: "$",
+  EUR: "€",
+  EGP: "ج.م",
+  SAR: "ر.س",
+  AED: "د.إ",
+};
+
+/** 50 ₪ */
+export function formatMoney(amount, currency = "ILS") {
+  const symbol = CURRENCY_SYMBOLS[currency] ?? currency;
+  const value = Number(amount ?? 0);
+
+  // الكسور تُعرض فقط إن وُجدت: 50 لا 50.00
+  const formatted = Number.isInteger(value) ? formatNumber(value) : value.toFixed(2);
+
+  return `${formatted} ${symbol}`;
+}
+
 /** 2.4 MB */
 export function formatFileSize(bytes) {
   if (bytes < 1024) return `${bytes} B`;

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\CvOrderKind;
 use App\Enums\CvOrderStatus;
 use App\Enums\NotificationType;
+use App\Enums\PaymentStatus;
 use App\Enums\TimelineStatus;
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
@@ -19,15 +20,26 @@ use RuntimeException;
 /** إنشاء طلبات صياغة السيرة الذاتية وتحريك مراحلها */
 class CvOrderService
 {
-    /** مراحل العمل الأربع — مطابقة للتايملاين في الواجهة */
+    /** العلاقات التي تحتاجها شاشة متابعة الطلب */
+    private const RELATIONS = ['timeline', 'atsChecks', 'notes.author', 'expert.expertProfile'];
+
+    /**
+     * مراحل العمل الخمس — مطابقة للتايملاين في الواجهة.
+     * مرحلة التحويل أولها دائماً، وتُعلَّم منتهية فوراً في الخدمة المجانية،
+     * فيبقى للمراحل ترتيب واحد لا يختلف بين طلب مدفوع وآخر مجاني.
+     */
     public const TIMELINE_STEPS = [
+        'استلام إشعار التحويل والتأكّد منه',
         'استلام ومطابقة البيانات الأكاديمية والوثائق المدخلة',
         'المراجعة اليدوية وإعادة صياغة الإنجازات بلغة المنح الأكاديمية',
         'الفحص الدقيق لمعايير ATS والتنسيق الأكاديمي الدولي المعتمد',
         'تسليم النسخة النهائية واعتمادها للتنزيل المباشر',
     ];
 
-    public function __construct(private readonly AtsReportService $ats) {}
+    public function __construct(
+        private readonly AtsReportService $ats,
+        private readonly SettingsService $settings,
+    ) {}
 
     /**
      * شروط جاهزية الملف للإرسال.
@@ -72,6 +84,8 @@ class CvOrderService
         CvOrderKind $kind = CvOrderKind::CvBuild,
         ?UploadedFile $sourceFile = null,
         ?string $note = null,
+        ?UploadedFile $receiptFile = null,
+        ?string $paymentNote = null,
     ): CvOrder {
         /*
          * اكتمال الملف الأكاديمي شرط للكتابة من الصفر وحدها — فهي تُبنى منه.
@@ -87,8 +101,24 @@ class CvOrderService
             throw new RuntimeException('أرفق ملفك الحالي ليتمكّن الفريق من تحسينه.');
         }
 
+        /*
+         * السعر يُقرأ الآن ويُجمَّد على الطلب: تعديل المدير له لاحقاً يجب ألا
+         * يغيّر ما اتّفق عليه طالبٌ أرسل طلبه وحوّل بالسعر القديم.
+         */
+        $price = $this->settings->priceFor($kind);
+        $isPaid = $price > 0;
+
+        if ($isPaid && ! $this->settings->hasPaymentDetails()) {
+            throw new RuntimeException('خدمة الدفع غير مهيّأة بعد. تواصل معنا لإتمام طلبك.');
+        }
+
+        if ($isPaid && ! $receiptFile) {
+            throw new RuntimeException('أرفق إشعار التحويل ليتمكّن الفريق من تأكيد الدفع.');
+        }
+
         // قرص خاص لا عام: هذه مستندات شخصية لا يجوز الوصول إليها برابط مباشر
         $sourcePath = $sourceFile?->store('cv-orders/source', 'local');
+        $receiptPath = $receiptFile?->store('cv-orders/receipts', 'local');
 
         $expert = User::where('role', UserRole::Expert)
             ->where('status', UserStatus::Active)
@@ -98,7 +128,7 @@ class CvOrderService
 
         $report = $this->ats->build($profile);
 
-        return DB::transaction(function () use ($user, $profile, $expert, $report, $kind, $sourceFile, $sourcePath, $note): CvOrder {
+        return DB::transaction(function () use ($user, $profile, $expert, $report, $kind, $sourceFile, $sourcePath, $note, $receiptFile, $receiptPath, $price, $isPaid, $paymentNote): CvOrder {
             $order = CvOrder::create([
                 'order_number' => CvOrder::generateOrderNumber(),
                 'user_id' => $user->id,
@@ -106,8 +136,15 @@ class CvOrderService
                 'source_file_path' => $sourcePath,
                 'source_file_name' => $sourceFile?->getClientOriginalName(),
                 'request_note' => $note,
+                'price_amount' => $price,
+                'price_currency' => $this->settings->currency(),
+                'payment_status' => $isPaid ? PaymentStatus::AwaitingReview : PaymentStatus::NotRequired,
+                'receipt_file_path' => $receiptPath,
+                'receipt_file_name' => $receiptFile?->getClientOriginalName(),
+                'payment_note' => $paymentNote,
                 'expert_id' => $expert?->id,
-                'status' => CvOrderStatus::InExpertReview,
+                // المدفوع ينتظر تأكيد التحويل قبل أن يبدأ الفريق العمل عليه
+                'status' => $isPaid ? CvOrderStatus::PendingApproval : CvOrderStatus::InExpertReview,
                 'current_step' => 5,
                 'ats_score' => $report['score'],
                 'submitted_at' => now(),
@@ -125,16 +162,19 @@ class CvOrderService
                 ],
             ]);
 
+            // المدفوع يقف عند مرحلة التحويل، والمجاني يتجاوزها إلى العمل مباشرة
+            $reached = $isPaid ? 0 : 2;
+
             foreach (self::TIMELINE_STEPS as $index => $title) {
                 $order->timeline()->create([
                     'title' => $title,
                     'sort_order' => $index,
                     'status' => match (true) {
-                        $index === 0 => TimelineStatus::Done,
-                        $index === 1 => TimelineStatus::InProgress,
+                        $index < $reached => TimelineStatus::Done,
+                        $index === $reached => TimelineStatus::InProgress,
                         default => TimelineStatus::Pending,
                     },
-                    'occurred_at' => $index <= 1 ? now() : null,
+                    'occurred_at' => $index <= $reached ? now() : null,
                 ]);
             }
 
@@ -149,14 +189,122 @@ class CvOrderService
             $user->notifications()->create([
                 'type' => NotificationType::OrderUpdate,
                 'title' => 'تم استلام طلبك: '.$kind->label(),
-                'body' => "رقم الطلب {$order->order_number}. سيعمل الفريق على ملفك ويسلّمك النسخة النهائية خلال 24–48 ساعة عمل.",
-                'badge_label' => 'قيد المراجعة',
+                'body' => $isPaid
+                    ? "رقم الطلب {$order->order_number}. نراجع إشعار التحويل، وفور تأكيده يبدأ الفريق العمل على ملفك."
+                    : "رقم الطلب {$order->order_number}. سيعمل الفريق على ملفك ويسلّمك النسخة النهائية خلال 24–48 ساعة عمل.",
+                'badge_label' => $isPaid ? 'بانتظار تأكيد التحويل' : 'قيد المراجعة',
                 'action_label' => 'متابعة الطلب',
                 'action_url' => "/tools/cv-builder/orders/{$order->id}",
             ]);
 
             return $order;
         });
+    }
+
+    /**
+     * قبول إشعار التحويل: هنا يبدأ العمل فعلياً على الطلب المدفوع.
+     */
+    public function acceptPayment(CvOrder $order, User $reviewer): CvOrder
+    {
+        DB::transaction(function () use ($order, $reviewer): void {
+            $order->update([
+                'payment_status' => PaymentStatus::Accepted,
+                'payment_rejection_reason' => null,
+                'payment_reviewed_at' => now(),
+                'payment_reviewed_by' => $reviewer->id,
+                'status' => CvOrderStatus::InExpertReview,
+                // المهلة تبدأ من تأكيد التحويل لا من إرسال الطلب
+                'expected_delivery_at' => now()->addHours(config('menhity.cv_order_sla_hours')),
+            ]);
+
+            $this->syncTimeline($order, CvOrderStatus::InExpertReview);
+
+            $order->user->notifications()->create([
+                'type' => NotificationType::OrderUpdate,
+                'title' => 'تم تأكيد تحويلك ✅',
+                'body' => "تأكّدنا من إشعار التحويل للطلب {$order->order_number}، وبدأ الفريق العمل على ملفك.",
+                'badge_label' => 'تم تأكيد التحويل',
+                'action_label' => 'متابعة الطلب',
+                'action_url' => "/tools/cv-builder/{$order->id}",
+            ]);
+        });
+
+        return $order->fresh(self::RELATIONS);
+    }
+
+    /**
+     * رفض الإشعار: الطلب يبقى قائماً ليرفع الطالب إشعاراً صحيحاً بدل أن يُلغى.
+     */
+    public function rejectPayment(CvOrder $order, User $reviewer, string $reason): CvOrder
+    {
+        DB::transaction(function () use ($order, $reviewer, $reason): void {
+            $order->update([
+                'payment_status' => PaymentStatus::Rejected,
+                'payment_rejection_reason' => $reason,
+                'payment_reviewed_at' => now(),
+                'payment_reviewed_by' => $reviewer->id,
+                'status' => CvOrderStatus::PendingApproval,
+            ]);
+
+            $order->user->notifications()->create([
+                'type' => NotificationType::OrderUpdate,
+                'title' => 'إشعار التحويل يحتاج مراجعة',
+                'body' => "لم نتمكّن من تأكيد التحويل للطلب {$order->order_number}: {$reason}",
+                'badge_label' => 'إشعار مرفوض',
+                'action_label' => 'رفع إشعار جديد',
+                'action_url' => "/tools/cv-builder/{$order->id}",
+            ]);
+        });
+
+        return $order->fresh(self::RELATIONS);
+    }
+
+    /**
+     * رفع إشعار بديل بعد رفض الأول — يستبدل الملف السابق ويعيد الطلب للمراجعة.
+     */
+    public function replaceReceipt(CvOrder $order, UploadedFile $receipt, ?string $note = null): CvOrder
+    {
+        $previous = $order->receipt_file_path;
+        $path = $receipt->store('cv-orders/receipts', 'local');
+
+        $order->update([
+            'receipt_file_path' => $path,
+            'receipt_file_name' => $receipt->getClientOriginalName(),
+            'payment_note' => $note,
+            'payment_status' => PaymentStatus::AwaitingReview,
+            'payment_rejection_reason' => null,
+            'payment_reviewed_at' => null,
+            'payment_reviewed_by' => null,
+            'status' => CvOrderStatus::PendingApproval,
+        ]);
+
+        if ($previous) {
+            Storage::disk('local')->delete($previous);
+        }
+
+        return $order->fresh(self::RELATIONS);
+    }
+
+    /** يوائم مراحل التايملاين مع حالة الطلب */
+    private function syncTimeline(CvOrder $order, CvOrderStatus $status): void
+    {
+        $target = $status->timelineIndex();
+
+        if ($target === null) {
+            return;
+        }
+
+        foreach ($order->timeline()->get() as $index => $event) {
+            $event->update([
+                'status' => match (true) {
+                    $status === CvOrderStatus::Delivered => TimelineStatus::Done,
+                    $index < $target => TimelineStatus::Done,
+                    $index === $target => TimelineStatus::InProgress,
+                    default => TimelineStatus::Pending,
+                },
+                'occurred_at' => $index <= $target ? ($event->occurred_at ?? now()) : null,
+            ]);
+        }
     }
 
     /** تحريك الطلب إلى مرحلة جديدة ومواءمة التايملاين معها */
@@ -166,6 +314,8 @@ class CvOrderService
      */
     public function deliver(CvOrder $order, UploadedFile $file): CvOrder
     {
+        $this->guardPaymentCleared($order, 'لا يمكن تسليم الملف قبل تأكيد التحويل.');
+
         $previous = $order->final_file_path;
         $path = $file->store('cv-orders/final', 'local');
 
@@ -198,22 +348,10 @@ class CvOrderService
 
     public function advance(CvOrder $order, CvOrderStatus $status): CvOrder
     {
-        $target = $status->timelineIndex();
+        $this->guardPaymentCleared($order, 'لا يمكن تحريك الطلب قبل تأكيد التحويل.');
 
-        DB::transaction(function () use ($order, $status, $target): void {
-            if ($target !== null) {
-                foreach ($order->timeline as $index => $event) {
-                    $event->update([
-                        'status' => match (true) {
-                            $status === CvOrderStatus::Delivered => TimelineStatus::Done,
-                            $index < $target => TimelineStatus::Done,
-                            $index === $target => TimelineStatus::InProgress,
-                            default => TimelineStatus::Pending,
-                        },
-                        'occurred_at' => $index <= $target ? ($event->occurred_at ?? now()) : null,
-                    ]);
-                }
-            }
+        DB::transaction(function () use ($order, $status): void {
+            $this->syncTimeline($order, $status);
 
             $order->update([
                 'status' => $status,
@@ -232,6 +370,14 @@ class CvOrderService
             ]);
         });
 
-        return $order->fresh(['timeline', 'atsChecks', 'notes.author', 'expert.expertProfile']);
+        return $order->fresh(self::RELATIONS);
+    }
+
+    /** العمل على طلب مدفوع لم يُؤكَّد تحويله بعد يسبق الدفع نفسه */
+    private function guardPaymentCleared(CvOrder $order, string $message): void
+    {
+        if ($order->payment_status->blocksWork()) {
+            throw new RuntimeException($message);
+        }
     }
 }

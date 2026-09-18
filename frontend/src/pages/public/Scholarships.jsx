@@ -93,7 +93,7 @@ export default function ScholarshipsPage() {
     <div className="py-8">
       <div className="container-page">
         {/* العنوان والبحث */}
-        <header className="glass-dark rounded-2xl p-6 text-white sm:p-8">
+        <header data-header-dark className="glass-dark rounded-2xl p-6 text-white sm:p-8">
           <h1 className="font-display text-2xl sm:text-3xl">اكتشف المنح الدراسية</h1>
           <p className="mt-2 text-sm text-navy-100 sm:text-base">
             ابحث بين المنح المتاحة وصفِّها حسب مرحلتك وتخصصك والدولة التي تريد الدراسة فيها.

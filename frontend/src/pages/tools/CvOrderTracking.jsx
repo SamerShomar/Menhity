@@ -7,6 +7,7 @@ import {
   Download,
   Loader,
   MessageSquare,
+  Receipt,
   Send,
   ShieldCheck,
   UserRoundCheck,
@@ -22,9 +23,10 @@ import { PageHeader } from "@/components/ui/Section";
 import { LoadingBlock } from "@/components/ui/Spinner";
 import { cvOrderApi } from "@/api/endpoints";
 import { useApi, useSubmit } from "@/hooks/useApi";
-import { cn, formatDateAr, timeAgoAr } from "@/lib/utils";
+import { cn, formatDateAr, formatMoney, timeAgoAr } from "@/lib/utils";
 
 const STATUS_TONE = {
+  pending_approval: "warning",
   submitted: "info",
   in_expert_review: "warning",
   ats_check: "warning",
@@ -117,6 +119,8 @@ export default function CvOrderTrackingPage() {
             </p>
           </div>
         </div>
+
+        {order.is_paid ? <PaymentPanel order={order} onDone={reload} /> : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="space-y-6">
@@ -311,5 +315,98 @@ export default function CvOrderTrackingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * حالة التحويل — تُعرض أعلى الصفحة لأنها ما يوقف الطلب أو يُطلقه.
+ * عند الرفض تحمل حقل رفع إشعار بديل: الطلب يبقى قائماً ولا يُلغى.
+ */
+function PaymentPanel({ order, onDone }) {
+  const [receipt, setReceipt] = useState(null);
+  const { submit, submitting, error, fieldErrors } = useSubmit(cvOrderApi.replaceReceipt);
+
+  const rejected = order.payment_status === "rejected";
+  const awaiting = order.payment_status === "awaiting_review";
+
+  const tone = rejected ? "danger" : awaiting ? "warning" : "success";
+  const Icon = rejected ? Receipt : awaiting ? Clock : CircleCheck;
+
+  const onResend = async (event) => {
+    event.preventDefault();
+    const { ok } = await submit({ id: order.id, receipt });
+
+    if (ok) {
+      setReceipt(null);
+      onDone?.();
+    }
+  };
+
+  return (
+    <Card
+      className={cn(
+        "mt-6",
+        rejected && "ring-1 ring-[color:var(--color-danger)]/40",
+      )}
+    >
+      <CardHeader
+        title="حالة التحويل"
+        icon={<Icon className="size-4" />}
+        action={<Badge tone={tone}>{order.payment_status_label}</Badge>}
+      />
+      <CardBody className="space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-[13px] text-ink-600">المبلغ</span>
+          <span className="num text-[15px] font-extrabold text-navy-800">
+            {formatMoney(order.price_amount, order.price_currency)}
+          </span>
+        </div>
+
+        {order.receipt_file_name ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-900/10 pt-3">
+            <span className="text-[13px] text-ink-600">الإشعار المرفق</span>
+            <span className="truncate text-[12.5px] font-semibold text-ink-800" dir="ltr">
+              {order.receipt_file_name}
+            </span>
+          </div>
+        ) : null}
+
+        {awaiting ? (
+          <Alert tone="info">
+            استلمنا إشعار التحويل، وسيبدأ الفريق العمل على ملفك فور تأكيده.
+          </Alert>
+        ) : null}
+
+        {rejected ? (
+          <>
+            <Alert tone="danger" title="لم نتمكّن من تأكيد التحويل">
+              {order.payment_rejection_reason}
+            </Alert>
+
+            {error ? <Alert tone="danger">{fieldErrors.receipt?.[0] ?? error}</Alert> : null}
+
+            <form onSubmit={onResend} className="space-y-3">
+              <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-dashed border-ink-900/20 p-4 transition hover:bg-white/60">
+                <span className="text-[13px] font-semibold text-navy-800">
+                  {receipt ? receipt.name : "اختر إشعاراً جديداً"}
+                </span>
+                <span className="text-[12px] text-ink-500">PNG · JPG · PDF</span>
+                <input
+                  type="file"
+                  accept=".pdf,.png,.jpg,.jpeg"
+                  className="hidden"
+                  onChange={(event) => setReceipt(event.target.files?.[0] ?? null)}
+                />
+              </label>
+
+              <Button type="submit" loading={submitting} disabled={!receipt}>
+                <Send className="size-4" />
+                إرسال الإشعار
+              </Button>
+            </form>
+          </>
+        ) : null}
+      </CardBody>
+    </Card>
   );
 }

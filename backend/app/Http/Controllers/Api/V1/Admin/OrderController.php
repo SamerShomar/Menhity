@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Enums\CvOrderStatus;
+use App\Enums\PaymentStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CvOrderResource;
 use App\Models\CvOrder;
@@ -12,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use RuntimeException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class OrderController extends Controller
@@ -40,10 +42,20 @@ class OrderController extends Controller
                 'has_final_file' => filled($order->final_file_path),
                 'final_file_name' => $order->final_file_name,
                 'request_note' => $order->request_note,
+                'price_amount' => (float) $order->price_amount,
+                'price_currency' => $order->price_currency,
+                'payment_status' => $order->payment_status->value,
+                'payment_status_label' => $order->payment_status->label(),
+                'has_receipt' => filled($order->receipt_file_path),
+                'receipt_file_name' => $order->receipt_file_name,
+                'payment_note' => $order->payment_note,
+                'payment_rejection_reason' => $order->payment_rejection_reason,
+                'awaiting_payment_review' => $order->payment_status === PaymentStatus::AwaitingReview,
                 'status' => $order->status->value,
                 'status_label' => $order->status->label(),
                 'next_status' => $order->status->next()?->value,
                 'next_status_label' => $order->status->next()?->label(),
+                'next_status_short' => $order->status->next()?->shortLabel(),
                 'ats_score' => $order->ats_score,
                 'student_name' => $order->user->name,
                 'student_email' => $order->user->email,
@@ -52,6 +64,7 @@ class OrderController extends Controller
             ])->all(),
             'meta' => [
                 'total' => CvOrder::where('status', '!=', CvOrderStatus::Draft)->count(),
+                'awaiting_payment' => CvOrder::where('payment_status', PaymentStatus::AwaitingReview)->count(),
                 'in_progress' => CvOrder::active()->count(),
                 'delivered' => CvOrder::where('status', CvOrderStatus::Delivered)->count(),
                 'unassigned' => CvOrder::whereNull('expert_id')
@@ -72,6 +85,51 @@ class OrderController extends Controller
         );
     }
 
+    /** تحميل إشعار التحويل الذي أرفقه الطالب للتأكّد منه */
+    public function downloadReceipt(CvOrder $cvOrder): StreamedResponse
+    {
+        abort_unless($cvOrder->receipt_file_path, 404, 'لم يرفق الطالب إشعار تحويل لهذا الطلب.');
+
+        return Storage::disk('local')->download(
+            $cvOrder->receipt_file_path,
+            $cvOrder->receipt_file_name ?? "إشعار-{$cvOrder->order_number}",
+        );
+    }
+
+    /**
+     * قبول التحويل أو رفضه بعد الاطّلاع على الإشعار.
+     * القبول وحده هو ما يبدأ العمل على الطلب المدفوع.
+     */
+    public function reviewPayment(Request $request, CvOrder $cvOrder): JsonResponse
+    {
+        $validated = $request->validate([
+            'decision' => ['required', 'in:accept,reject'],
+            'reason' => ['required_if:decision,reject', 'nullable', 'string', 'min:3', 'max:500'],
+        ], [
+            'reason.required_if' => 'اكتب سبب الرفض ليعرف الطالب ما عليه تصحيحه.',
+        ]);
+
+        abort_unless($cvOrder->isPaid(), 422, 'هذا الطلب مجاني ولا يحتاج تأكيد تحويل.');
+        abort_unless($cvOrder->receipt_file_path, 422, 'لم يرفق الطالب إشعار تحويل بعد.');
+
+        $accepted = $validated['decision'] === 'accept';
+
+        $order = $accepted
+            ? $this->orders->acceptPayment($cvOrder, $request->user())
+            : $this->orders->rejectPayment($cvOrder, $request->user(), $validated['reason']);
+
+        $this->audit->log($request->user(), 'cv_order.payment', 'CvOrder', $order->id, [
+            'decision' => $validated['decision'],
+        ]);
+
+        return response()->json([
+            'message' => $accepted
+                ? 'تم تأكيد التحويل وبدأ العمل على الطلب.'
+                : 'تم رفض الإشعار وإشعار الطالب.',
+            'data' => (new CvOrderResource($order))->resolve(),
+        ]);
+    }
+
     /** تسليم الملف النهائي بعد إعداده يدوياً */
     public function deliver(Request $request, CvOrder $cvOrder): JsonResponse
     {
@@ -87,7 +145,11 @@ class OrderController extends Controller
             'file.mimes' => 'الملف يجب أن يكون PDF أو Word.',
         ]);
 
-        $order = $this->orders->deliver($cvOrder, $request->file('file'));
+        try {
+            $order = $this->orders->deliver($cvOrder, $request->file('file'));
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         $this->audit->log($request->user(), 'cv_order.deliver', 'CvOrder', $order->id, [
             'file' => $order->final_file_name,
@@ -107,7 +169,12 @@ class OrderController extends Controller
         ]);
 
         $status = CvOrderStatus::from($validated['status']);
-        $order = $this->orders->advance($cvOrder, $status);
+
+        try {
+            $order = $this->orders->advance($cvOrder, $status);
+        } catch (RuntimeException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
 
         $this->audit->log($request->user(), 'cv_order.status', 'CvOrder', $order->id, [
             'status' => $status->value,

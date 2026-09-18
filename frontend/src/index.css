@@ -57,7 +57,7 @@
   --glass-tint: 255 255 255;
   --glass-blur: 30px;
   --glass-blur-strong: 64px;
-  --glass-blur-header: 72px;
+  --glass-blur-header: 88px;
 
   /*
    * ما يجعل السطح يُقرأ زجاجاً ليس الشفافية وحدها، بل ثلاثة معاً:
@@ -196,22 +196,45 @@
 }
 
 /*
- * رأس الصفحة: أكثر أسطح الواجهة شفافية.
- * التعتيم هنا ثلث ما في glass-strong ليمرّ لون المحتوى من تحته،
- * والتمويه العالي يعوّض ذلك: يذيب ما يمرّ خلفه إلى لون واحد
- * فلا يتنافس مع نصّ القائمة. رفع السطوع أكثر من هذا يُطفئ الشفافية
- * فوق خلفية الصفحة الفاتحة لأنه يشبعها إلى أبيض كامل.
+ * رأس الصفحة: أكثر أسطح الواجهة شفافية — تعتيم 0.22 وتمويه 88px.
+ *
+ * التعتيم المنخفض يجعل لون ما خلف الترويسة خلفيةَ نصّها فعلياً، ولا يصمد
+ * النصّ الداكن فوق بطل كحلي مهما ضُبط التعتيم والسطوع (قِيست ثماني
+ * تركيبات، وأفضلها بقي دون 3.5:1). لذلك يقلب النصّ إلى الأبيض فوق
+ * الأسطح الموسومة data-header-dark بدل التضحية بالشفافية في الصفحة كلّها.
+ *
+ * ورفع السطوع أكثر من هذا يُطفئ الشفافية فوق الخلفية الفاتحة لأنه
+ * يشبعها إلى أبيض كامل.
  */
 @utility glass-header {
-  background-color: rgb(var(--glass-tint) / 0.34);
+  background-color: rgb(var(--glass-tint) / 0.22);
   background-image: var(--glass-sheen);
-  backdrop-filter: blur(var(--glass-blur-header)) saturate(205%) brightness(1.12);
-  -webkit-backdrop-filter: blur(var(--glass-blur-header)) saturate(205%) brightness(1.12);
-  border: 1px solid rgb(255 255 255 / 0.45);
+  backdrop-filter: blur(var(--glass-blur-header)) saturate(185%) brightness(1.12);
+  -webkit-backdrop-filter: blur(var(--glass-blur-header)) saturate(185%) brightness(1.12);
+  border: 1px solid rgb(255 255 255 / 0.38);
   box-shadow:
-    inset 0 1px 0 0 rgb(255 255 255 / 0.70),
-    inset 0 -1px 0 0 rgb(255 255 255 / 0.30),
-    0 8px 28px -14px rgb(16 37 85 / 0.28);
+    inset 0 1px 0 0 rgb(255 255 255 / 0.62),
+    inset 0 -1px 0 0 rgb(255 255 255 / 0.26),
+    0 8px 28px -14px rgb(16 37 85 / 0.26);
+}
+
+/*
+ * الترويسة فوق سطح داكن: المادة نفسها تنقلب كحلية شفّافة.
+ *
+ * قلبُ النصّ إلى الأبيض وحده لا يكفي — البطل ليس داكناً بعرضه كلّه، ففيه
+ * بطاقات فاتحة تمرّ تحت جهة من الشريط، فيصير النصّ الأبيض عليها 1.5:1.
+ * الحجاب الكحلي يوحّد الشريط فيقرأ الأبيض على عرضه كلّه، ويبقى زجاجاً
+ * لأن تعتيمه ثلث الصلب.
+ */
+@utility glass-header-dark {
+  background-color: rgb(11 26 61 / 0.34);
+  background-image: linear-gradient(160deg, rgb(255 255 255 / 0.10) 0%, rgb(255 255 255 / 0) 60%);
+  backdrop-filter: blur(var(--glass-blur-header)) saturate(150%) brightness(0.92);
+  -webkit-backdrop-filter: blur(var(--glass-blur-header)) saturate(150%) brightness(0.92);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  box-shadow:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.22),
+    0 8px 28px -14px rgb(6 15 40 / 0.45);
 }
 
 /* أسطح متداخلة داخل لوح زجاجي — بلا ظلّ حتى لا تتراكم الطبقات */
@@ -261,7 +284,7 @@
     background-color: rgb(var(--glass-tint) / 0.96);
     background-image: none;
   }
-  .glass-dark { background-color: rgb(11 26 61 / 0.96); background-image: none; }
+  .glass-dark, .glass-header-dark { background-color: rgb(11 26 61 / 0.96); background-image: none; }
   .glass-gold { background-color: rgb(246 196 69 / 0.95); background-image: none; }
 }
 
@@ -270,7 +293,7 @@
     background-color: rgb(var(--glass-tint) / 0.96);
     background-image: none;
   }
-  .glass-dark { background-color: rgb(11 26 61 / 0.96); background-image: none; }
+  .glass-dark, .glass-header-dark { background-color: rgb(11 26 61 / 0.96); background-image: none; }
   .glass-gold { background-color: rgb(246 196 69 / 0.95); background-image: none; }
 }
 

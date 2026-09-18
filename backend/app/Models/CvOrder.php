@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\CvOrderKind;
 use App\Enums\CvOrderStatus;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,15 @@ class CvOrder extends Model
         'source_file_name',
         'final_file_name',
         'request_note',
+        'price_amount',
+        'price_currency',
+        'payment_status',
+        'receipt_file_path',
+        'receipt_file_name',
+        'payment_note',
+        'payment_rejection_reason',
+        'payment_reviewed_at',
+        'payment_reviewed_by',
         'expert_id',
         'status',
         'current_step',
@@ -35,6 +45,9 @@ class CvOrder extends Model
         return [
             'status' => CvOrderStatus::class,
             'kind' => CvOrderKind::class,
+            'payment_status' => PaymentStatus::class,
+            'price_amount' => 'decimal:2',
+            'payment_reviewed_at' => 'datetime',
             'data_snapshot' => 'array',
             'current_step' => 'integer',
             'ats_score' => 'integer',
@@ -52,6 +65,17 @@ class CvOrder extends Model
     public function expert(): BelongsTo
     {
         return $this->belongsTo(User::class, 'expert_id');
+    }
+
+    public function paymentReviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'payment_reviewed_by');
+    }
+
+    /** الطلب مدفوع إن جُمّد له سعر لحظة الإرسال */
+    public function isPaid(): bool
+    {
+        return (float) $this->price_amount > 0;
     }
 
     public function timeline(): HasMany
