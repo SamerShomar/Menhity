@@ -8,7 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useAnchoredPanel } from "@/hooks/useAnchoredPanel";
 import { cn } from "@/lib/utils";
 
-export function UserMenu({ overDark = false }) {
+export function UserMenu() {
   const { user, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -98,27 +98,11 @@ export function UserMenu({ overDark = false }) {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className={cn(
-          "flex items-center gap-2 rounded-full py-1 ps-1 pe-2 transition-colors",
-          overDark ? "hover:bg-white/15" : "hover:bg-white/60",
-        )}
+        className="flex items-center gap-2 rounded-full py-1 ps-1 pe-2 transition-colors hover:bg-white/60"
       >
         <Avatar name={user.name} src={user.avatar_url} size={34} />
-        <span
-          className={cn(
-            "hidden text-[13px] font-semibold sm:inline",
-            overDark ? "text-white" : "text-ink-800",
-          )}
-        >
-          {user.first_name}
-        </span>
-        <ChevronDown
-          className={cn(
-            "size-3.5 transition-transform",
-            overDark ? "text-white/70" : "text-ink-500",
-            open && "rotate-180",
-          )}
-        />
+        <span className="hidden text-[13px] font-semibold text-ink-800 sm:inline">{user.first_name}</span>
+        <ChevronDown className={cn("size-3.5 text-ink-500 transition-transform", open && "rotate-180")} />
       </button>
 
       {open && panelStyle ? createPortal(panel, document.body) : null}
