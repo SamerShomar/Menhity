@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\ContactController;
 use App\Http\Controllers\Api\V1\CvOrderController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\Expert;
 use App\Http\Controllers\Api\V1\MetaController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\ProfileController;
@@ -162,6 +163,18 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('reports', [Admin\ReportController::class, 'index'])->name('admin.reports');
                 Route::get('settings', [Admin\SettingsController::class, 'index'])->name('admin.settings');
                 Route::put('settings/payment', [Admin\SettingsController::class, 'updatePayment'])->name('admin.settings.payment');
+            });
+
+        /* ================= مساحة عمل الخبير ================= */
+
+        Route::prefix('expert')
+            ->middleware('role:expert')
+            ->group(function (): void {
+                Route::get('orders', [Expert\OrderController::class, 'index'])->name('expert.orders.index');
+                Route::get('orders/{cvOrder}', [Expert\OrderController::class, 'show'])->name('expert.orders.show');
+                Route::get('orders/{cvOrder}/source', [Expert\OrderController::class, 'downloadSource'])->name('expert.orders.source');
+                Route::post('orders/{cvOrder}/deliver', [Expert\OrderController::class, 'deliver'])->name('expert.orders.deliver');
+                Route::patch('orders/{cvOrder}/advance', [Expert\OrderController::class, 'advance'])->name('expert.orders.advance');
             });
     });
 });

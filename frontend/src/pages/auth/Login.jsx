@@ -38,7 +38,8 @@ export default function LoginPage() {
     }
 
     if (ok) {
-      navigate(next || (result?.is_admin_level ? "/admin" : "/dashboard"), { replace: true });
+      const home = result?.is_admin_level ? "/admin" : result?.role === "expert" ? "/expert" : "/dashboard";
+      navigate(next || home, { replace: true });
     }
   };
 
