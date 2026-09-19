@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Check, ClipboardList, Download, Receipt, Upload, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Check,
+  ClipboardList,
+  Download,
+  Receipt,
+  RotateCcw,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 
 import { DataTable } from "@/components/admin/DataTable";
 import { Alert } from "@/components/ui/Alert";
@@ -30,10 +40,17 @@ const STATUS_TONE = {
 };
 
 export default function AdminOrdersPage() {
-  const { data, loading, error, reload } = useApi(adminApi.orders, []);
+  // المحذوفة قائمة منفصلة تُطلب صراحةً، لا صفوف مشطوبة تزاحم العمل اليومي
+  const [showDeleted, setShowDeleted] = useState(false);
+  const { data, loading, error, reload } = useApi(
+    () => adminApi.orders(showDeleted),
+    [showDeleted],
+  );
   const advance = useSubmit(({ id, status }) => adminApi.advanceOrder(id, status));
   const deliver = useSubmit(({ id, file }) => adminApi.deliverOrder(id, file));
   const review = useSubmit(({ id, decision, reason }) => adminApi.reviewPayment(id, decision, reason));
+  const remove = useSubmit(({ id, reason }) => adminApi.deleteOrder(id, reason));
+  const restore = useSubmit(({ id }) => adminApi.restoreOrder(id));
 
   // مُدخل ملف واحد مخفي يخدم كل الصفوف — نتذكّر أي صفّ فتحه
   const fileInput = useRef(null);
@@ -101,6 +118,31 @@ export default function AdminOrdersPage() {
 
     const { ok } = await deliver.submit({ id: target, file });
     setTarget(null);
+    if (ok) reload(true);
+  };
+
+  /*
+   * الحذف ناعم: الطلب يختفي عن الطرفين ويبقى سجلّه. والسبب مطلوب لأن
+   * الطالب يقرؤه، وقد يكون دفع ثمن ما يُحذف.
+   */
+  const onDelete = async (row) => {
+    const paid = row.payment_status === "accepted";
+    const warning = paid
+      ? `تنبيه: هذا الطلب مؤكَّد الدفع بمبلغ ${formatMoney(row.price_amount, row.price_currency)}.\n`
+      : "";
+
+    const reason = window.prompt(
+      `${warning}اكتب سبب حذف الطلب ${row.order_number} — سيصل الطالب كما هو:`,
+    );
+
+    if (!reason?.trim()) return;
+
+    const { ok } = await remove.submit({ id: row.id, reason: reason.trim() });
+    if (ok) reload(true);
+  };
+
+  const onRestore = async (row) => {
+    const { ok } = await restore.submit({ id: row.id });
     if (ok) reload(true);
   };
 
@@ -239,13 +281,32 @@ export default function AdminOrdersPage() {
           {row.ats_score !== null && row.ats_score !== undefined ? (
             <span className="num text-[11.5px] text-ink-500">ATS {row.ats_score}</span>
           ) : null}
+
+          {row.deleted_at ? (
+            <p className="text-[11.5px] leading-5 text-ink-500">
+              حُذف {timeAgoAr(row.deleted_at)}
+              {row.deleted_by_name ? ` — ${row.deleted_by_name}` : ""}
+              <span className="block text-ink-700">{row.deletion_reason}</span>
+            </p>
+          ) : null}
         </div>
       ),
     },
     {
       key: "actions",
       header: "",
-      cell: (row) => (
+      cell: (row) =>
+        row.deleted_at ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onRestore(row)}
+            disabled={restore.submitting}
+          >
+            <RotateCcw className="size-3.5" />
+            استعادة
+          </Button>
+        ) : (
         <div className="flex flex-col items-start gap-1.5">
           <Button
             size="sm"
@@ -272,8 +333,19 @@ export default function AdminOrdersPage() {
               <ArrowLeft className="size-3.5" />
             </Button>
           ) : null}
+
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => onDelete(row)}
+            disabled={remove.submitting}
+            className="text-[color:var(--color-danger)] hover:bg-[color:var(--color-danger)]/12"
+          >
+            <Trash2 className="size-3.5" />
+            حذف
+          </Button>
         </div>
-      ),
+        ),
     },
   ];
 
@@ -290,6 +362,8 @@ export default function AdminOrdersPage() {
       {deliver.success ? <Alert tone="success">تم تسليم الملف وإشعار الطالب.</Alert> : null}
       {review.error ? <Alert tone="danger">{review.error}</Alert> : null}
       {fileError ? <Alert tone="danger">{fileError}</Alert> : null}
+      {remove.error ? <Alert tone="danger">{remove.error}</Alert> : null}
+      {restore.error ? <Alert tone="danger">{restore.error}</Alert> : null}
 
       <input
         ref={fileInput}
@@ -315,9 +389,37 @@ export default function AdminOrdersPage() {
         <StatCard label="مُسلّمة" value={meta.delivered ?? 0} tone="success" />
       </div>
 
+      {meta.deleted > 0 || showDeleted ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-[12.5px] text-ink-600">
+            {showDeleted
+              ? "تعرض الآن الطلبات المحذوفة — سجلّها ومرفقاتها محفوظة."
+              : `هناك ${meta.deleted} طلب محذوف.`}
+          </p>
+          <Button size="sm" variant="outline" onClick={() => setShowDeleted((value) => !value)}>
+            {showDeleted ? (
+              <>
+                <ArrowLeft className="size-3.5" />
+                رجوع للطلبات
+              </>
+            ) : (
+              <>
+                <Trash2 className="size-3.5" />
+                عرض المحذوفة
+              </>
+            )}
+          </Button>
+        </div>
+      ) : null}
+
       <Card>
         <CardBody className="p-0">
-          <DataTable columns={columns} rows={data?.data} loading={loading} empty="لا توجد طلبات بعد." />
+          <DataTable
+            columns={columns}
+            rows={data?.data}
+            loading={loading}
+            empty={showDeleted ? "لا توجد طلبات محذوفة." : "لا توجد طلبات بعد."}
+          />
         </CardBody>
       </Card>
     </div>

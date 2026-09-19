@@ -23,9 +23,13 @@ class OrderController extends Controller
         private readonly AuditService $audit,
     ) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $orders = CvOrder::with(['user:id,name,email', 'expert:id,name'])
+        // اللوحة تعرض القائمة العاملة، والمحذوفة تُطلب صراحةً للمراجعة
+        $deleted = $request->boolean('deleted');
+
+        $orders = CvOrder::with(['user:id,name,email', 'expert:id,name', 'deletedBy:id,name'])
+            ->when($deleted, fn ($query) => $query->onlyTrashed())
             ->where('status', '!=', CvOrderStatus::Draft)
             ->latest()
             ->limit(40)
@@ -60,6 +64,9 @@ class OrderController extends Controller
                 'student_name' => $order->user->name,
                 'student_email' => $order->user->email,
                 'expert_name' => $order->expert?->name,
+                'deleted_at' => $order->deleted_at,
+                'deletion_reason' => $order->deletion_reason,
+                'deleted_by_name' => $order->deletedBy?->name,
                 'updated_at' => $order->updated_at,
             ])->all(),
             'meta' => [
@@ -70,6 +77,8 @@ class OrderController extends Controller
                 'unassigned' => CvOrder::whereNull('expert_id')
                     ->where('status', '!=', CvOrderStatus::Draft)
                     ->count(),
+                'deleted' => CvOrder::onlyTrashed()->count(),
+                'showing_deleted' => $deleted,
             ],
         ]);
     }
@@ -161,6 +170,44 @@ class OrderController extends Controller
             'message' => 'تم تسليم الملف وإشعار الطالب.',
             'data' => (new CvOrderResource($order))->resolve(),
         ]);
+    }
+
+    /**
+     * حذف الطلب من اللوحة.
+     *
+     * متاحٌ في كل المراحل، وبعد تأكيد التحويل كذلك — لكنّ السبب مطلوب:
+     * الطالب يقرؤه في إشعاره، وهو ما يبقى في السجلّ لمن يراجع لاحقاً
+     * لماذا اختفى طلبٌ دُفع ثمنه.
+     */
+    public function destroy(Request $request, CvOrder $cvOrder): JsonResponse
+    {
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'min:3', 'max:500'],
+        ], [
+            'reason.required' => 'اكتب سبب الحذف — يصل الطالب ويبقى في السجلّ.',
+        ]);
+
+        $this->orders->remove($cvOrder, $request->user(), $validated['reason']);
+
+        $this->audit->log($request->user(), 'cv_order.delete', 'CvOrder', $cvOrder->id, [
+            'reason' => $validated['reason'],
+            'payment_status' => $cvOrder->payment_status->value,
+            'price_amount' => (float) $cvOrder->price_amount,
+        ]);
+
+        return response()->json(['message' => 'تم حذف الطلب وإشعار الطالب.']);
+    }
+
+    /** التراجع عن الحذف */
+    public function restore(Request $request, int $cvOrder): JsonResponse
+    {
+        $order = CvOrder::onlyTrashed()->findOrFail($cvOrder);
+
+        $this->orders->restore($order, $request->user());
+
+        $this->audit->log($request->user(), 'cv_order.restore', 'CvOrder', $order->id);
+
+        return response()->json(['message' => 'تمت استعادة الطلب.']);
     }
 
     /**
