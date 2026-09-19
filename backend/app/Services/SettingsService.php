@@ -25,6 +25,7 @@ class SettingsService
         'cv_build' => 0,
         'cv_improve' => 0,
         'letter_improve' => 0,
+        'letter_build' => 0,
     ];
 
     public const DEFAULT_PAYMENT = [

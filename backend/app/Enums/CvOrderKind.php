@@ -8,6 +8,7 @@ enum CvOrderKind: string
     case CvBuild = 'cv_build';
     case CvImprove = 'cv_improve';
     case LetterImprove = 'letter_improve';
+    case LetterBuild = 'letter_build';
 
     public function label(): string
     {
@@ -15,6 +16,7 @@ enum CvOrderKind: string
             self::CvBuild => 'كتابة سيرة ذاتية من الصفر',
             self::CvImprove => 'تحسين سيرة ذاتية',
             self::LetterImprove => 'تحسين خطاب دافع',
+            self::LetterBuild => 'كتابة خطاب دافع من الصفر',
         };
     }
 
@@ -24,12 +26,16 @@ enum CvOrderKind: string
             self::CvBuild => 'كتابة سيرة',
             self::CvImprove => 'تحسين سيرة',
             self::LetterImprove => 'تحسين خطاب',
+            self::LetterBuild => 'كتابة خطاب',
         };
     }
 
-    /** الأنواع التي تبدأ من ملف يرفعه الطالب لا من بيانات ملفه الأكاديمي */
+    /**
+     * الأنواع التي تبدأ من ملف يرفعه الطالب لا من بيانات ملفه الأكاديمي.
+     * الكتابة من الصفر — سيرة أو خطاب — لا ملف سابق لها أصلاً.
+     */
     public function requiresSourceFile(): bool
     {
-        return $this !== self::CvBuild;
+        return $this !== self::CvBuild && $this !== self::LetterBuild;
     }
 }

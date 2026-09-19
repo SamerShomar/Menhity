@@ -64,7 +64,7 @@ export default function CvWizardPage() {
     return (
       <div className="container-page max-w-3xl py-12">
         <Alert tone="info" title="لديك طلب قائم">
-          طلبك رقم <span className="num font-bold">{active.order_number}</span> قيد المعالجة — تابع مراحله من
+          طلبك رقم <span className="num font-bold">{active.order_number}</span> {active.status_label} — تابع مراحله من
           صفحة المتابعة.
         </Alert>
         <ButtonLink to={`/tools/cv-builder/${active.id}`} className="mt-6">

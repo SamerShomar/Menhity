@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { FileText, Receipt, Sparkles, Upload, UserCheck, Wallet } from "lucide-react";
+import { FileText, PenLine, Receipt, Sparkles, Upload, UserCheck, Wallet } from "lucide-react";
 
 import { PaymentDetails } from "@/components/tools/PaymentDetails";
 import { Alert } from "@/components/ui/Alert";
@@ -13,19 +13,39 @@ import { cvOrderApi } from "@/api/endpoints";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { cn, formatFileSize, formatMoney } from "@/lib/utils";
 
-/** الخدمتان اللتان تبدآن من ملف يرفعه الطالب */
+/**
+ * الخدمات اليدوية الأربع. اثنتان تبدآن من ملف يرفعه الطالب (تحسين)،
+ * واثنتان من بياناته وملاحظاته (كتابة من الصفر) — لمن لا خطاب أو سيرة
+ * سابقة لديه ليحسّنها.
+ */
 const KINDS = [
   {
     key: "cv_improve",
     label: "تحسين سيرة ذاتية",
     hint: "أرفق سيرتك الحالية ليعيد الفريق صياغتها وتنسيقها.",
     icon: FileText,
+    requiresFile: true,
+    noteLabel: "ملاحظات للفريق",
+    notePlaceholder: "مثال: أرجو إبراز خبرتي البحثية، وأتقدّم لمنحة ماجستير في هولندا.",
   },
   {
     key: "letter_improve",
     label: "تحسين خطاب دافع",
     hint: "أرفق خطابك ليراجعه الفريق ويقوّي حججه وأسلوبه.",
     icon: Sparkles,
+    requiresFile: true,
+    noteLabel: "ملاحظات للفريق",
+    notePlaceholder: "مثال: أرجو إبراز خبرتي البحثية، وأتقدّم لمنحة ماجستير في هولندا.",
+  },
+  {
+    key: "letter_build",
+    label: "كتابة خطاب دافع من الصفر",
+    hint: "لا خطاب لديك بعد؟ صف دوافعك وهدفك، ويكتبه الفريق من الصفر.",
+    icon: PenLine,
+    requiresFile: false,
+    noteLabel: "عن ماذا يتحدّث خطابك؟",
+    notePlaceholder:
+      "اذكر: التخصص والجامعة والمنحة التي تتقدّم لها، دوافعك للدراسة، وأبرز إنجازاتك التي تريد إبرازها.",
   },
 ];
 
@@ -36,9 +56,11 @@ export default function ServiceRequestPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
-  const [kind, setKind] = useState(
-    KINDS.some((k) => k.key === params.get("kind")) ? params.get("kind") : KINDS[0].key,
-  );
+  // رابطٌ يحدّد الخدمة (كل روابط الأدوات تفعل) لا يحتاج المستخدم يختارها مجدداً
+  const requestedKind = params.get("kind");
+  const lockedKind = KINDS.some((k) => k.key === requestedKind);
+
+  const [kind, setKind] = useState(lockedKind ? requestedKind : KINDS[0].key);
   const [file, setFile] = useState(null);
   const [note, setNote] = useState("");
   const [receipt, setReceipt] = useState(null);
@@ -47,13 +69,14 @@ export default function ServiceRequestPage() {
   const { data: payment, loading: loadingPayment } = useApi(cvOrderApi.paymentInfo, []);
   const { submit, submitting, error, fieldErrors } = useSubmit(cvOrderApi.submit);
 
+  const current = KINDS.find((k) => k.key === kind) ?? KINDS[0];
   const price = payment?.services?.find((service) => service.kind === kind)?.price ?? 0;
   const currency = payment?.currency ?? "ILS";
   const isPaid = price > 0;
 
   // خدمة مدفوعة بلا بيانات حساب لا يمكن التحويل إليها أصلاً
   const blocked = isPaid && !payment?.configured;
-  const ready = Boolean(file) && (!isPaid || Boolean(receipt)) && !blocked;
+  const ready = (!current.requiresFile || Boolean(file)) && (!isPaid || Boolean(receipt)) && !blocked;
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -85,60 +108,80 @@ export default function ServiceRequestPage() {
         ) : null}
 
         <form onSubmit={onSubmit} className="space-y-5">
-          <Card>
-            <CardHeader title="نوع الخدمة" icon={<UserCheck className="size-4" />} />
-            <CardBody className="grid gap-3 sm:grid-cols-2">
-              {KINDS.map((item) => {
-                const active = kind === item.key;
-                const itemPrice =
-                  payment?.services?.find((service) => service.kind === item.key)?.price ?? 0;
+          {lockedKind ? (
+            /* الخدمة محدَّدة من الرابط الذي وصل منه الطالب — لا داعي ليختارها مجدداً */
+            <Card>
+              <CardBody className="flex items-center gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-gold-400/25 text-gold-800">
+                  <current.icon className="size-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[13.5px] font-bold text-navy-800">{current.label}</p>
+                  <p className="mt-0.5 text-[12px] leading-6 text-ink-500">{current.hint}</p>
+                </div>
+                <span className="num shrink-0 rounded-full bg-navy-500/12 px-2.5 py-1 text-[12px] font-bold text-navy-700">
+                  {price > 0 ? formatMoney(price, currency) : "مجاناً"}
+                </span>
+              </CardBody>
+            </Card>
+          ) : (
+            <Card>
+              <CardHeader title="نوع الخدمة" icon={<UserCheck className="size-4" />} />
+              <CardBody className="grid gap-3 sm:grid-cols-3">
+                {KINDS.map((item) => {
+                  const active = kind === item.key;
+                  const itemPrice =
+                    payment?.services?.find((service) => service.kind === item.key)?.price ?? 0;
 
-                return (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() => setKind(item.key)}
-                    aria-pressed={active}
-                    className={cn(
-                      "rounded-xl p-4 text-start transition",
-                      active ? "glass-gold text-navy-900" : "glass-soft hover:bg-white/60",
-                    )}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <item.icon className="size-5" />
-                      <span
-                        className={cn(
-                          "num shrink-0 rounded-full px-2 py-0.5 text-[12px] font-bold",
-                          active ? "bg-navy-900/12" : "bg-navy-500/12 text-navy-700",
-                        )}
-                      >
-                        {itemPrice > 0 ? formatMoney(itemPrice, currency) : "مجاناً"}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-[13.5px] font-bold">{item.label}</p>
-                    <p className="mt-1 text-[12px] leading-6 opacity-80">{item.hint}</p>
-                  </button>
-                );
-              })}
-            </CardBody>
-          </Card>
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => setKind(item.key)}
+                      aria-pressed={active}
+                      className={cn(
+                        "rounded-xl p-4 text-start transition",
+                        active ? "glass-gold text-navy-900" : "glass-soft hover:bg-white/60",
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <item.icon className="size-5" />
+                        <span
+                          className={cn(
+                            "num shrink-0 rounded-full px-2 py-0.5 text-[12px] font-bold",
+                            active ? "bg-navy-900/12" : "bg-navy-500/12 text-navy-700",
+                          )}
+                        >
+                          {itemPrice > 0 ? formatMoney(itemPrice, currency) : "مجاناً"}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-[13.5px] font-bold">{item.label}</p>
+                      <p className="mt-1 text-[12px] leading-6 opacity-80">{item.hint}</p>
+                    </button>
+                  );
+                })}
+              </CardBody>
+            </Card>
+          )}
 
-          <Card>
-            <CardHeader
-              title="ملفك الحالي"
-              subtitle="PDF أو Word، حتى 10 ميجابايت."
-              icon={<Upload className="size-4" />}
-            />
-            <CardBody>
-              <FileDrop
-                accept={ACCEPT_WORK}
-                file={file}
-                onPick={setFile}
-                title="اختر ملفاً من جهازك"
-                hint="PDF · DOC · DOCX"
+          {current.requiresFile ? (
+            <Card>
+              <CardHeader
+                title="ملفك الحالي"
+                subtitle="PDF أو Word، حتى 10 ميجابايت."
+                icon={<Upload className="size-4" />}
               />
-            </CardBody>
-          </Card>
+              <CardBody>
+                <FileDrop
+                  accept={ACCEPT_WORK}
+                  file={file}
+                  onPick={setFile}
+                  title="اختر ملفاً من جهازك"
+                  hint="PDF · DOC · DOCX"
+                />
+              </CardBody>
+            </Card>
+          ) : null}
 
           {isPaid && !blocked ? (
             <>
@@ -185,10 +228,10 @@ export default function ServiceRequestPage() {
           <Card>
             <CardBody>
               <Textarea
-                label="ملاحظات للفريق"
+                label={current.noteLabel}
                 rows={4}
                 counter={1000}
-                placeholder="مثال: أرجو إبراز خبرتي البحثية، وأتقدّم لمنحة ماجستير في هولندا."
+                placeholder={current.notePlaceholder}
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 error={fieldErrors.note?.[0]}
@@ -207,7 +250,7 @@ export default function ServiceRequestPage() {
 
           {!ready && !blocked ? (
             <p className="text-[12.5px] text-ink-500">
-              {!file
+              {current.requiresFile && !file
                 ? "أرفق ملفك أولاً ليتمكّن الفريق من العمل عليه."
                 : "أرفق إشعار التحويل لإتمام الطلب."}
             </p>

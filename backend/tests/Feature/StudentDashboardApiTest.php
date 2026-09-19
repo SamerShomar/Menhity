@@ -309,6 +309,97 @@ class StudentDashboardApiTest extends TestCase
             ->assertJsonPath('message', 'أرفق ملفك الحالي ليتمكّن الفريق من تحسينه.');
     }
 
+    /**
+     * كتابة خطاب من الصفر كالسيرة تماماً: لا ملف سابق يُرفق، بل بيانات
+     * الملف الأكاديمي وملاحظة الطالب عمّا يريد أن يتحدّث عنه الخطاب.
+     */
+    public function test_a_letter_build_request_does_not_require_a_source_file(): void
+    {
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+
+        $response = $this->actingAs($user)->postJson('/api/v1/cv-orders', [
+            'kind' => 'letter_build',
+            'note' => 'أتقدّم لمنحة ماجستير في هولندا وأريد إبراز شغفي بالبحث العلمي.',
+        ])->assertCreated();
+
+        $this->assertSame('letter_build', $response->json('data.kind'));
+        $this->assertNull($response->json('data.source_file_name'));
+    }
+
+    public function test_a_letter_build_request_cannot_be_submitted_with_an_incomplete_profile(): void
+    {
+        $user = $this->student();
+
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'letter_build'])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'أكمل «المعلومات الشخصية والنبذة» قبل إرسال الطلب.');
+    }
+
+    /**
+     * نقطة «الطلب النشط» يستخدمها ويزرد كتابة السيرة تحديداً، فلا يجوز أن
+     * يحجبه طلبٌ من نوع آخر (تحسين سيرة، أو خطاب) قائمٌ بالتوازي.
+     */
+    public function test_the_active_endpoint_ignores_orders_of_other_kinds(): void
+    {
+        Storage::fake('local');
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', [
+            'kind' => 'cv_improve',
+            'file' => UploadedFile::fake()->create('سيرتي.pdf', 80, 'application/pdf'),
+        ])->assertCreated();
+
+        $this->actingAs($user)->getJson('/api/v1/cv-orders/active')
+            ->assertOk()
+            ->assertJsonPath('data', null);
+    }
+
+    /**
+     * طلبٌ سُلِّم انتهى أمره. بلا هذا الاستثناء يظل ويزرد كتابة السيرة
+     * يصف طلباً مُسلَّماً بأنه «قيد المعالجة» إلى الأبد، ويمنع طلباً جديداً.
+     */
+    public function test_the_active_endpoint_ignores_a_delivered_order(): void
+    {
+        Storage::fake('local');
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+
+        $orderId = $this->actingAs($user)
+            ->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->json('data.id');
+
+        $admin = User::factory()->admin()->create();
+        $this->actingAs($admin)->post("/api/v1/admin/orders/{$orderId}/deliver", [
+            'file' => UploadedFile::fake()->create('النهائية.pdf', 90, 'application/pdf'),
+        ])->assertOk();
+
+        $this->actingAs($user)->getJson('/api/v1/cv-orders/active')
+            ->assertOk()
+            ->assertJsonPath('data', null);
+
+        // ولا يمنع طلب «كتابة سيرة» جديداً
+        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])
+            ->assertCreated();
+    }
+
+    public function test_the_active_endpoint_reports_an_in_progress_cv_build_order(): void
+    {
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+
+        $orderId = $this->actingAs($user)
+            ->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->json('data.id');
+
+        $this->actingAs($user)->getJson('/api/v1/cv-orders/active')
+            ->assertOk()
+            ->assertJsonPath('data.id', $orderId);
+    }
+
     public function test_an_improvement_request_stores_the_file_privately(): void
     {
         Storage::fake('local');
