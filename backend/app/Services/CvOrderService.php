@@ -373,6 +373,67 @@ class CvOrderService
         return $order->fresh(self::RELATIONS);
     }
 
+    /**
+     * حذف الطلب من اللوحة — حذفٌ ناعم يبقى بعده السجلّ.
+     *
+     * يجوز الحذف في أي مرحلة، وبعد تأكيد التحويل كذلك: قد يُكرَّر الطلب
+     * أو يُلغى بالاتّفاق أو يُرسَل خطأً. لكنّ المال الذي وصل لا يمحوه زرّ،
+     * فيبقى السجلّ ومرفقاته وسبب الحذف ومَن حذفه للمراجعة والمحاسبة.
+     *
+     * والطالب يُخطَر دائماً: طلبٌ اختفى من لوحته بلا كلمة أسوأ من رفضٍ
+     * مُعلَّل، وأسوأ منهما أن يكون قد دفع ثمنه.
+     */
+    public function remove(CvOrder $order, User $admin, string $reason): CvOrder
+    {
+        DB::transaction(function () use ($order, $admin, $reason): void {
+            $paid = $order->payment_status === PaymentStatus::Accepted;
+
+            $order->user->notifications()->create([
+                'type' => NotificationType::OrderUpdate,
+                'title' => 'أُلغي طلبك: '.$order->kind->label(),
+                'body' => $paid
+                    ? "أُلغي الطلب {$order->order_number} بعد تأكيد تحويلك: {$reason} — تواصل معنا بخصوص المبلغ المحوَّل."
+                    : "أُلغي الطلب {$order->order_number}: {$reason}",
+                'badge_label' => 'ملغى',
+                'action_label' => 'تواصل معنا',
+                'action_url' => '/contact',
+            ]);
+
+            $order->update([
+                'deletion_reason' => $reason,
+                'deleted_by' => $admin->id,
+            ]);
+
+            $order->delete();
+        });
+
+        return $order;
+    }
+
+    /** التراجع عن حذف: يعود الطلب كما كان بحالته ومرفقاته */
+    public function restore(CvOrder $order, User $admin): CvOrder
+    {
+        DB::transaction(function () use ($order): void {
+            $order->restore();
+
+            $order->update([
+                'deletion_reason' => null,
+                'deleted_by' => null,
+            ]);
+
+            $order->user->notifications()->create([
+                'type' => NotificationType::OrderUpdate,
+                'title' => 'أُعيد طلبك: '.$order->kind->label(),
+                'body' => "عاد الطلب {$order->order_number} إلى المتابعة بعد مراجعة إلغائه.",
+                'badge_label' => $order->status->label(),
+                'action_label' => 'متابعة الطلب',
+                'action_url' => "/tools/cv-builder/{$order->id}",
+            ]);
+        });
+
+        return $order->fresh(self::RELATIONS);
+    }
+
     /** العمل على طلب مدفوع لم يُؤكَّد تحويله بعد يسبق الدفع نفسه */
     private function guardPaymentCleared(CvOrder $order, string $message): void
     {

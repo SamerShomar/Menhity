@@ -165,7 +165,11 @@ export const adminApi = {
   aiTools: () => api.get("/admin/ai-tools").then((r) => r.data),
   toggleAiTool: (key) => api.patch(`/admin/ai-tools/${key}/toggle`).then((r) => r.data),
 
-  orders: () => api.get("/admin/orders").then((r) => r.data),
+  orders: (deleted) =>
+    api.get("/admin/orders", { params: deleted ? { deleted: 1 } : {} }).then((r) => r.data),
+  deleteOrder: (id, reason) =>
+    api.delete(`/admin/orders/${id}`, { data: { reason } }).then((r) => r.data),
+  restoreOrder: (id) => api.post(`/admin/orders/${id}/restore`).then((r) => r.data),
   downloadOrderSource: (id, name) => downloadFile(`/admin/orders/${id}/source`, name),
   deliverOrder: (id, file) => {
     const form = new FormData();

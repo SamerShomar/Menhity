@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\CvOrderKind;
 use App\Enums\CvOrderStatus;
 use App\Enums\PaymentStatus;
+use App\Models\CvOrder;
 use App\Models\User;
 use App\Services\SettingsService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -336,6 +337,140 @@ class CvOrderPaymentTest extends TestCase
         $this->actingAs($admin)
             ->getJson("/api/v1/admin/orders/{$order->id}/source")
             ->assertNotFound();
+    }
+
+    /** طلبٌ أُرسل ودُفع ثمنه وأُكّد تحويله — أقصى حالة يصعب فيها الحذف */
+    private function paidConfirmedOrder(User $student): CvOrder
+    {
+        $this->actingAs($student)->postJson('/api/v1/cv-orders', [
+            'kind' => 'cv_improve',
+            'file' => $this->sourceFile(),
+            'receipt' => $this->receipt(),
+        ])->assertCreated();
+
+        $order = $student->cvOrders()->first();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->postJson("/api/v1/admin/orders/{$order->id}/payment", ['decision' => 'accept'])
+            ->assertOk();
+
+        return $order->refresh();
+    }
+
+    public function test_an_admin_deletes_an_order_even_after_the_transfer_was_confirmed(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $student = User::factory()->withProfile()->create();
+        $order = $this->paidConfirmedOrder($student);
+
+        $this->assertSame(PaymentStatus::Accepted, $order->payment_status);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->deleteJson("/api/v1/admin/orders/{$order->id}", ['reason' => 'طلب مكرّر بالخطأ'])
+            ->assertOk();
+
+        // اختفى عن الطرفين
+        $this->assertSoftDeleted('cv_orders', ['id' => $order->id]);
+        $this->actingAs($student)->getJson("/api/v1/cv-orders/{$order->id}")->assertNotFound();
+    }
+
+    /** المال الذي وصل لا يمحوه زرّ: السجلّ والمرفقات والسبب تبقى */
+    public function test_deleting_keeps_the_record_the_receipt_and_the_reason(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $student = User::factory()->withProfile()->create();
+        $order = $this->paidConfirmedOrder($student);
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->deleteJson("/api/v1/admin/orders/{$order->id}", ['reason' => 'أُلغي بالاتّفاق مع الطالب'])
+            ->assertOk();
+
+        $trashed = CvOrder::onlyTrashed()->find($order->id);
+
+        $this->assertSame('أُلغي بالاتّفاق مع الطالب', $trashed->deletion_reason);
+        $this->assertSame($admin->id, $trashed->deleted_by);
+        $this->assertSame(50.0, (float) $trashed->price_amount);
+        Storage::disk('local')->assertExists($trashed->receipt_file_path);
+    }
+
+    public function test_deleting_is_refused_without_a_reason(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $student = User::factory()->withProfile()->create();
+        $order = $this->paidConfirmedOrder($student);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->deleteJson("/api/v1/admin/orders/{$order->id}", ['reason' => ''])
+            ->assertStatus(422);
+
+        $this->assertNotSoftDeleted('cv_orders', ['id' => $order->id]);
+    }
+
+    /** طلبٌ دُفع ثمنه واختفى بلا كلمة أسوأ من رفضٍ مُعلَّل */
+    public function test_the_student_is_told_why_a_paid_order_was_deleted(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $student = User::factory()->withProfile()->create();
+        $order = $this->paidConfirmedOrder($student);
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->deleteJson("/api/v1/admin/orders/{$order->id}", ['reason' => 'الخدمة غير متاحة حالياً'])
+            ->assertOk();
+
+        $notification = $student->notifications()->latest('id')->first();
+
+        $this->assertStringContainsString('الخدمة غير متاحة حالياً', $notification->body);
+        $this->assertStringContainsString('المبلغ المحوَّل', $notification->body);
+    }
+
+    public function test_a_deleted_order_leaves_the_list_and_returns_when_restored(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $student = User::factory()->withProfile()->create();
+        $order = $this->paidConfirmedOrder($student);
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)
+            ->deleteJson("/api/v1/admin/orders/{$order->id}", ['reason' => 'حُذف بالخطأ'])
+            ->assertOk();
+
+        $this->actingAs($admin)->getJson('/api/v1/admin/orders')
+            ->assertOk()
+            ->assertJsonCount(0, 'data')
+            ->assertJsonPath('meta.deleted', 1);
+
+        $this->actingAs($admin)->getJson('/api/v1/admin/orders?deleted=1')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.deletion_reason', 'حُذف بالخطأ')
+            ->assertJsonPath('data.0.deleted_by_name', $admin->name);
+
+        $this->actingAs($admin)
+            ->postJson("/api/v1/admin/orders/{$order->id}/restore")
+            ->assertOk();
+
+        $this->assertNotSoftDeleted('cv_orders', ['id' => $order->id]);
+        $this->actingAs($student)->getJson("/api/v1/cv-orders/{$order->id}")->assertOk();
+    }
+
+    public function test_students_cannot_delete_orders(): void
+    {
+        Storage::fake('local');
+        $this->priceTheService();
+        $student = User::factory()->withProfile()->create();
+        $order = $this->paidConfirmedOrder($student);
+
+        $this->actingAs($student)
+            ->deleteJson("/api/v1/admin/orders/{$order->id}", ['reason' => 'بدي احذفه'])
+            ->assertForbidden();
+
+        $this->assertNotSoftDeleted('cv_orders', ['id' => $order->id]);
     }
 
     public function test_students_cannot_set_prices(): void

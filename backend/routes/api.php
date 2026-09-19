@@ -152,6 +152,9 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('orders/{cvOrder}/receipt', [Admin\OrderController::class, 'downloadReceipt'])->name('admin.orders.receipt');
                 Route::post('orders/{cvOrder}/payment', [Admin\OrderController::class, 'reviewPayment'])->name('admin.orders.payment');
                 Route::post('orders/{cvOrder}/deliver', [Admin\OrderController::class, 'deliver'])->name('admin.orders.deliver');
+                Route::delete('orders/{cvOrder}', [Admin\OrderController::class, 'destroy'])->name('admin.orders.destroy');
+                // المحذوف خارج نطاق ربط النموذج، فيُستقبل رقمه ويُجلب من المحذوفات
+                Route::post('orders/{cvOrder}/restore', [Admin\OrderController::class, 'restore'])->name('admin.orders.restore');
 
                 Route::get('notifications', [Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
                 Route::post('notifications/broadcast', [Admin\NotificationController::class, 'broadcast'])->name('admin.notifications.broadcast');

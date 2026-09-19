@@ -9,9 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CvOrder extends Model
 {
+    /** الحذف ناعم: الطلب المدفوع سجلٌّ ماليّ لا يُمحى بمحوه من اللوحة */
+    use SoftDeletes;
+
     protected $fillable = [
         'order_number',
         'user_id',
@@ -38,6 +42,8 @@ class CvOrder extends Model
         'submitted_at',
         'delivered_at',
         'final_file_path',
+        'deletion_reason',
+        'deleted_by',
     ];
 
     protected function casts(): array
@@ -70,6 +76,11 @@ class CvOrder extends Model
     public function paymentReviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'payment_reviewed_by');
+    }
+
+    public function deletedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 
     /** الطلب مدفوع إن جُمّد له سعر لحظة الإرسال */
