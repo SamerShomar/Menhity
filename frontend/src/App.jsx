@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 
 import {
   AdminLayout,
@@ -58,6 +58,16 @@ const AdminNotificationsPage = lazy(
 const AdminReportsPage = lazy(() => import("@/pages/admin/Reports"));
 const AdminSettingsPage = lazy(() => import("@/pages/admin/Settings"));
 
+/**
+ * إشعارات أُنشئت قبل تصحيح الرابط تحمل مساراً بقطعة «orders/» زائدة لا
+ * تطابق أي مسار مسجَّل، فتصل 404. الرابط الصحيح بلا هذه القطعة، فنحوّل
+ * إليه بدل أن يُطبع الخطأ إلى الأبد في كل إشعار قديم مخزَّن.
+ */
+function RedirectToOrder() {
+  const { id } = useParams();
+  return <Navigate to={`/tools/cv-builder/${id}`} replace />;
+}
+
 export function App() {
   return (
     <>
@@ -96,6 +106,11 @@ export function App() {
               <Route
                 path="/tools/cv-builder/:id"
                 element={<CvOrderTrackingPage />}
+              />
+              {/* رابط قديم في إشعارات سابقة — عوّجناه، فنعيد توجيهه بدل 404 */}
+              <Route
+                path="/tools/cv-builder/orders/:id"
+                element={<RedirectToOrder />}
               />
               <Route path="/tools/request" element={<ServiceRequestPage />} />
               <Route path="/tools/:key" element={<ToolRunPage />} />
