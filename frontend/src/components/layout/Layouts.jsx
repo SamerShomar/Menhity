@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { AdminTopbar } from "@/components/layout/AdminTopbar";
+import { ExpertTopbar } from "@/components/layout/ExpertTopbar";
 import { FullPageLoader } from "@/components/ui/Spinner";
 import { useAuth } from "@/context/AuthContext";
 
@@ -47,6 +48,17 @@ export function RequireAdmin() {
   return <Outlet />;
 }
 
+/** يشترط حساب خبير — مساحة عمل مستقلّة عن لوحة الطالب ولوحة الإدارة */
+export function RequireExpert() {
+  const { isAuthenticated, isExpert, loading } = useAuth();
+
+  if (loading) return <FullPageLoader />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isExpert) return <Navigate to="/dashboard" replace />;
+
+  return <Outlet />;
+}
+
 /**
  * يمنع المستخدم المسجّل من فتح صفحات الدخول والتسجيل.
  *
@@ -55,23 +67,28 @@ export function RequireAdmin() {
  * لذا يحترم next ويميّز المشرف — وإلا هبط المشرف على لوحة الطالب.
  */
 export function GuestOnly() {
-  const { isAuthenticated, isAdmin, loading } = useAuth();
+  const { isAuthenticated, isAdmin, isExpert, loading } = useAuth();
   const location = useLocation();
 
   if (loading) return <FullPageLoader />;
 
   if (isAuthenticated) {
     const next = new URLSearchParams(location.search).get("next");
-    const home = isAdmin ? "/admin" : "/dashboard";
+    const home = isAdmin ? "/admin" : isExpert ? "/expert" : "/dashboard";
 
     /*
-     * حصانة ثانية: الوجهة تُحترم فقط إن ناسبت دور الداخل. مسار إداري لا
-     * يفتحه طالب، ومسارات الطلاب ليست وجهة المشرف الطبيعية.
+     * حصانة ثانية: الوجهة تُحترم فقط إن ناسبت دور الداخل. مسار إداري أو
+     * مساحة الخبير لا يفتحهما من ليس صاحبهما، ومسارات الطلاب ليست وجهة
+     * المشرف أو الخبير الطبيعية.
      */
     const suitable =
       next?.startsWith("/") &&
       !next.startsWith("//") &&
-      (isAdmin ? next.startsWith("/admin") : !next.startsWith("/admin"));
+      (isAdmin
+        ? next.startsWith("/admin")
+        : isExpert
+          ? next.startsWith("/expert")
+          : !next.startsWith("/admin") && !next.startsWith("/expert"));
 
     return <Navigate to={suitable ? next : home} replace />;
   }
@@ -142,6 +159,24 @@ export function AdminLayout() {
           </p>
         </footer>
       </div>
+    </div>
+  );
+}
+
+/**
+ * مساحة عمل الخبير — قسم مستقلّ عن لوحة الطالب ولوحة الإدارة، بصفحة
+ * واحدة (طلباتي)، فلا يحتاج قائمة جانبية كالإدارة، شريطاً علوياً يكفي.
+ */
+export function ExpertLayout() {
+  return (
+    <div className="flex min-h-dvh flex-col">
+      <ExpertTopbar />
+
+      <main className="container-page flex-1 py-8">
+        <Outlet />
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }

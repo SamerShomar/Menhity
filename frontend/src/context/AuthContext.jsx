@@ -90,6 +90,7 @@ export function AuthProvider({ children }) {
       loading,
       isAuthenticated: Boolean(user),
       isAdmin: Boolean(user?.is_admin_level),
+      isExpert: user?.role === "expert",
       signedOut,
       login,
       register,

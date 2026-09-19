@@ -9,7 +9,7 @@ import { useAnchoredPanel } from "@/hooks/useAnchoredPanel";
 import { cn } from "@/lib/utils";
 
 export function UserMenu() {
-  const { user, isAdmin, logout } = useAuth();
+  const { user, isAdmin, isExpert, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const anchorRef = useRef(null);
@@ -76,6 +76,11 @@ export function UserMenu() {
       {isAdmin && (
         <MenuLink to="/admin" onClick={() => setOpen(false)} icon={<LayoutGrid className="size-4" />}>
           لوحة التحكم الإدارية
+        </MenuLink>
+      )}
+      {isExpert && (
+        <MenuLink to="/expert" onClick={() => setOpen(false)} icon={<LayoutGrid className="size-4" />}>
+          مساحة عمل الخبير
         </MenuLink>
       )}
 

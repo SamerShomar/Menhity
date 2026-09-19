@@ -4,10 +4,12 @@ import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import {
   AdminLayout,
   DashboardLayout,
+  ExpertLayout,
   GuestOnly,
   PublicLayout,
   RequireAdmin,
   RequireAuth,
+  RequireExpert,
 } from "@/components/layout/Layouts";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { FullPageLoader } from "@/components/ui/Spinner";
@@ -57,6 +59,8 @@ const AdminNotificationsPage = lazy(
 );
 const AdminReportsPage = lazy(() => import("@/pages/admin/Reports"));
 const AdminSettingsPage = lazy(() => import("@/pages/admin/Settings"));
+/* مساحة الخبير مستقلّة أيضاً — لا يحتاجها الطالب ولا الزائر */
+const ExpertOrdersPage = lazy(() => import("@/pages/expert/Orders"));
 
 /**
  * إشعارات أُنشئت قبل تصحيح الرابط تحمل مساراً بقطعة «orders/» زائدة لا
@@ -142,6 +146,13 @@ export function App() {
               />
               <Route path="/admin/reports" element={<AdminReportsPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />
+            </Route>
+          </Route>
+
+          {/* ---------- مساحة عمل الخبير ---------- */}
+          <Route element={<RequireExpert />}>
+            <Route element={<ExpertLayout />}>
+              <Route path="/expert" element={<ExpertOrdersPage />} />
             </Route>
           </Route>
 

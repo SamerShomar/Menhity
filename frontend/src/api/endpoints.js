@@ -191,3 +191,19 @@ export const adminApi = {
   settings: () => api.get("/admin/settings").then((r) => r.data.data),
   updatePayment: (payload) => api.put("/admin/settings/payment", payload).then((r) => r.data),
 };
+
+/* ---------------- مساحة عمل الخبير ---------------- */
+export const expertApi = {
+  orders: () => api.get("/expert/orders").then((r) => r.data),
+  order: (id) => api.get(`/expert/orders/${id}`).then((r) => r.data.data),
+  downloadOrderSource: (id, name) => downloadFile(`/expert/orders/${id}/source`, name),
+  deliverOrder: (id, file) => {
+    const form = new FormData();
+    form.append("file", file);
+    return api
+      .post(`/expert/orders/${id}/deliver`, form, { headers: { "Content-Type": "multipart/form-data" } })
+      .then((r) => r.data);
+  },
+  advanceOrder: (id, status) => api.patch(`/expert/orders/${id}/advance`, { status }).then((r) => r.data),
+  addNote: (id, body) => api.post(`/cv-orders/${id}/notes`, { body }).then((r) => r.data),
+};

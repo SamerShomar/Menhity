@@ -200,7 +200,11 @@ class CvOrderController extends Controller
     /** إرسال ملاحظة خاصة إلى الخبير */
     public function addNote(Request $request, CvOrder $cvOrder): CvOrderResource
     {
-        abort_unless($cvOrder->user_id === $request->user()->id, 403);
+        // الطالب صاحب الطلب، أو الخبير المسنَد إليه — قناة التواصل بينهما
+        abort_unless(
+            $cvOrder->user_id === $request->user()->id || $cvOrder->expert_id === $request->user()->id,
+            403,
+        );
 
         $validated = $request->validate([
             'body' => ['required', 'string', 'min:3', 'max:2000'],
