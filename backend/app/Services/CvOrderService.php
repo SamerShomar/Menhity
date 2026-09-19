@@ -88,10 +88,11 @@ class CvOrderService
         ?string $paymentNote = null,
     ): CvOrder {
         /*
-         * اكتمال الملف الأكاديمي شرط للكتابة من الصفر وحدها — فهي تُبنى منه.
-         * أما التحسين فيبدأ من ملف يرفعه الطالب، فالشرط عليه أن يرفعه.
+         * اكتمال الملف الأكاديمي شرط للكتابة من الصفر — سيرة أو خطاب — فهي
+         * تُبنى منه. أما التحسين فيبدأ من ملف يرفعه الطالب، فالشرط عليه أن
+         * يرفعه.
          */
-        if ($kind === CvOrderKind::CvBuild) {
+        if (! $kind->requiresSourceFile()) {
             foreach ($this->readiness($profile) as $requirement) {
                 if ($requirement['required'] && ! $requirement['done']) {
                     throw new RuntimeException("أكمل «{$requirement['label']}» قبل إرسال الطلب.");

@@ -27,6 +27,7 @@ class CvOrderPaymentTest extends TestCase
             'cv_build' => $price,
             'cv_improve' => $price,
             'letter_improve' => $price,
+            'letter_build' => $price,
         ]);
 
         $settings->put(SettingsService::PAYMENT, [
@@ -271,7 +272,7 @@ class CvOrderPaymentTest extends TestCase
         $this->actingAs(User::factory()->admin()->create())
             ->putJson('/api/v1/admin/settings/payment', [
                 'currency' => 'ILS',
-                'prices' => ['cv_build' => 80, 'cv_improve' => 50, 'letter_improve' => 35],
+                'prices' => ['cv_build' => 80, 'cv_improve' => 50, 'letter_improve' => 35, 'letter_build' => 35],
                 'account_holder' => 'منصة منحتي',
                 'bank_name' => 'بنك فلسطين',
                 'account_number' => '987654321',

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Enums\CvOrderKind;
-use App\Enums\CvOrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CvOrderResource;
 use App\Models\CvOrder;
@@ -51,11 +50,20 @@ class CvOrderController extends Controller
         ]);
     }
 
-    /** الطلب النشط للمستخدم — تستخدمه شاشة الويزرد لتحويله للمتابعة */
+    /**
+     * طلب «كتابة سيرة من الصفر» النشط للمستخدم — تستخدمه شاشة الويزرد
+     * لتحويله للمتابعة بدل بدء طلب جديد.
+     *
+     * مقصورٌ على هذا النوع تحديداً: الويزرد لا يُرسل غيره، فطلب تحسين
+     * قائم لا يجوز أن يمنعه. ومحصورٌ بالنشط لا المُسلَّم: طلبٌ سُلِّم
+     * انتهى أمره، ومنعُ طلب جديد بعده يُبقي شاشة الويزرد تصفه خطأً بأنه
+     * «قيد المعالجة» بلا نهاية.
+     */
     public function active(Request $request): JsonResponse
     {
         $order = $request->user()->cvOrders()
-            ->whereIn('status', [...CvOrderStatus::active(), CvOrderStatus::Delivered->value])
+            ->where('kind', CvOrderKind::CvBuild)
+            ->active()
             ->latest()
             ->first();
 

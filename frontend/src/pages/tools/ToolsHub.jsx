@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileText, FileUser, UserRoundCheck } from "lucide-react";
+import { ArrowLeft, FileText, FileUser, PenLine, UserRoundCheck } from "lucide-react";
 
 import { Alert } from "@/components/ui/Alert";
 import { ButtonLink } from "@/components/ui/Button";
@@ -40,6 +40,15 @@ const MANUAL_SERVICES = [
     to: "/tools/request?kind=letter_improve",
     cta: "ارفع خطابك",
     icon: UserRoundCheck,
+  },
+  {
+    key: "letter_build",
+    title: "كتابة خطاب دافع من الصفر",
+    description:
+      "لا خطاب لديك بعد؟ صف دوافعك وهدفك والمنحة التي تتقدّم لها، ويكتبه الفريق من الصفر.",
+    to: "/tools/request?kind=letter_build",
+    cta: "ابدأ الطلب",
+    icon: PenLine,
   },
 ];
 
@@ -118,7 +127,7 @@ export default function ToolsHubPage() {
           <p className="text-[13px] text-ink-500">يعمل الفريق على ملفك بنفسه ويسلّمك نسخة جاهزة خلال 24–48 ساعة.</p>
         </div>
 
-        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {MANUAL_SERVICES.map((service) => (
             <div key={service.key} className="glass flex flex-col rounded-2xl p-6">
               <span className="grid size-12 place-items-center rounded-xl bg-gold-400/25 text-gold-800">
