@@ -455,6 +455,37 @@ class StudentDashboardApiTest extends TestCase
         $this->actingAs($intruder)->get("/api/v1/cv-orders/{$orderId}/file")->assertForbidden();
     }
 
+    /**
+     * رابط إشعار «سيرتك جاهزة» كان يحمل قطعة «orders/» زائدة لا تطابق أي
+     * مسار في الواجهة، فيصل الطالب 404 بدل صفحة متابعة طلبه. كل إشعار
+     * يخصّ طلب سيرة يجب أن يشير إلى المسار الحقيقي: /tools/cv-builder/{id}.
+     */
+    public function test_order_notifications_link_to_the_real_tracking_route(): void
+    {
+        User::factory()->expert()->create();
+        $user = $this->student();
+        $this->completeProfile($user);
+        $orderId = $this->actingAs($user)
+            ->postJson('/api/v1/cv-orders', ['kind' => 'cv_build'])->json('data.id');
+
+        $admin = User::factory()->admin()->create();
+        $this->actingAs($admin)->patchJson("/api/v1/admin/orders/{$orderId}/advance", [
+            'status' => 'ats_check',
+        ])->assertOk();
+        $this->actingAs($admin)->patchJson("/api/v1/admin/orders/{$orderId}/advance", [
+            'status' => 'delivered',
+        ])->assertOk();
+
+        $urls = $user->notifications()->pluck('action_url');
+
+        $this->assertNotEmpty($urls);
+        foreach ($urls as $url) {
+            if (str_starts_with($url, '/tools/cv-builder')) {
+                $this->assertSame("/tools/cv-builder/{$orderId}", $url);
+            }
+        }
+    }
+
     public function test_settings_password_change_revokes_other_devices(): void
     {
         $user = User::factory()->create(['password' => 'Menhity@2026']);

@@ -195,7 +195,7 @@ class CvOrderService
                     : "رقم الطلب {$order->order_number}. سيعمل الفريق على ملفك ويسلّمك النسخة النهائية خلال 24–48 ساعة عمل.",
                 'badge_label' => $isPaid ? 'بانتظار تأكيد التحويل' : 'قيد المراجعة',
                 'action_label' => 'متابعة الطلب',
-                'action_url' => "/tools/cv-builder/orders/{$order->id}",
+                'action_url' => "/tools/cv-builder/{$order->id}",
             ]);
 
             return $order;
@@ -367,7 +367,7 @@ class CvOrderService
                 'body' => "رقم الطلب {$order->order_number}: {$status->label()}.",
                 'badge_label' => $status->label(),
                 'action_label' => 'متابعة الطلب',
-                'action_url' => "/tools/cv-builder/orders/{$order->id}",
+                'action_url' => "/tools/cv-builder/{$order->id}",
             ]);
         });
 
