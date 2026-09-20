@@ -40,7 +40,6 @@ import NotificationsPage from "@/pages/dashboard/Notifications";
 import SettingsPage from "@/pages/dashboard/Settings";
 
 import ToolsHubPage from "@/pages/tools/ToolsHub";
-import ToolRunPage from "@/pages/tools/ToolRun";
 import CvWizardPage from "@/pages/tools/CvWizard";
 import ServiceRequestPage from "@/pages/tools/ServiceRequest";
 import CvOrderTrackingPage from "@/pages/tools/CvOrderTracking";
@@ -117,7 +116,6 @@ export function App() {
                 element={<RedirectToOrder />}
               />
               <Route path="/tools/request" element={<ServiceRequestPage />} />
-              <Route path="/tools/:key" element={<ToolRunPage />} />
             </Route>
           </Route>
 

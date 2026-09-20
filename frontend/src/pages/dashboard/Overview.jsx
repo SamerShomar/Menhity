@@ -228,7 +228,7 @@ export default function DashboardOverviewPage() {
         </Card>
       </div>
 
-      {/* دعوة لأدوات الذكاء الاصطناعي */}
+      {/* دعوة لخدمة صياغة السيرة والخطاب */}
       <div className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-gold-400/18 p-6 ring-1 ring-gold-200 sm:flex-row sm:items-center">
         <div className="flex items-start gap-3.5">
           <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-gold-400 text-navy-900">
@@ -237,12 +237,12 @@ export default function DashboardOverviewPage() {
           <div>
             <p className="font-display font-bold text-navy-800">جهّز سيرتك الذاتية</p>
             <p className="mt-1 text-[13px] leading-7 text-ink-600">
-              اطلب صياغة سيرتك بإشراف خبير، أو استخدم أدوات الذكاء الاصطناعي لتحسين مستنداتك.
+              اطلب صياغة سيرتك الذاتية أو خطاب دافعك — من الصفر أو تحسيناً لما لديك — بإشراف خبير أكاديمي.
             </p>
           </div>
         </div>
         <ButtonLink to="/tools" variant="gold" className="shrink-0">
-          افتح الأدوات
+          ابدأ الطلب
         </ButtonLink>
       </div>
     </div>

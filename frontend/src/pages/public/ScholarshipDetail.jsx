@@ -221,11 +221,11 @@ export default function ScholarshipDetailPage() {
                 </ul>
 
                 <Alert tone="info" className="mt-4">
-                  جهّز سيرتك الذاتية وخطاب التحفيز مجاناً عبر{" "}
+                  يجهّز فريق منحتي سيرتك الذاتية وخطاب دافعك بإشراف خبير أكاديمي — تصفّح{" "}
                   <Link to="/tools" className="font-bold underline">
-                    أدوات الذكاء الاصطناعي
-                  </Link>{" "}
-                  في منحتي.
+                    خدمة صياغة السيرة الذاتية وخطاب الدافع
+                  </Link>
+                  .
                 </Alert>
               </CardBody>
             </Card>
