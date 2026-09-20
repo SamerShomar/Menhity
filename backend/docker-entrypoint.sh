@@ -82,5 +82,17 @@ echo "→ تخزين الإعدادات والمسارات مؤقتاً"
 php artisan config:cache
 php artisan route:cache
 
-echo "→ تشغيل الخادم على المنفذ ${PORT:-8080}"
-exec php artisan serve --host=0.0.0.0 --port="${PORT:-8080}"
+# Apache's workers run as www-data; migrations/cache warmup above run as root.
+chown -R www-data:www-data storage bootstrap/cache
+
+PORT=${PORT:-8080}
+case "$PORT" in
+  *[!0-9]*|'') fail "PORT يجب أن يكون رقماً بين 1 و65535" ;;
+esac
+if [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
+  fail "PORT يجب أن يكون رقماً بين 1 و65535"
+fi
+export PORT
+
+echo "→ تشغيل Apache على المنفذ ${PORT}"
+exec apache2-foreground

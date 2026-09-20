@@ -16,34 +16,41 @@ import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { FullPageLoader } from "@/components/ui/Spinner";
 
 import LandingPage from "@/pages/public/Landing";
-import ScholarshipsPage from "@/pages/public/Scholarships";
-import ScholarshipDetailPage from "@/pages/public/ScholarshipDetail";
-import AboutPage from "@/pages/public/About";
-import ContactPage from "@/pages/public/Contact";
-import FaqPage from "@/pages/public/Faq";
-import HelpPage from "@/pages/public/Help";
-import { PrivacyPage, TermsPage } from "@/pages/public/LegalPage";
-import NotFoundPage from "@/pages/public/NotFound";
 
-import LoginPage from "@/pages/auth/Login";
-import RegisterPage from "@/pages/auth/Register";
-import ForgotPasswordPage from "@/pages/auth/ForgotPassword";
-import VerifyCodePage from "@/pages/auth/VerifyCode";
-import VerifyEmailPage from "@/pages/auth/VerifyEmail";
-import ResetPasswordPage from "@/pages/auth/ResetPassword";
-import ResetSuccessPage from "@/pages/auth/ResetSuccess";
+// Keep the landing page eager; all other screens load only when visited.
+const ScholarshipsPage = lazy(() => import("@/pages/public/Scholarships"));
+const ScholarshipDetailPage = lazy(() => import("@/pages/public/ScholarshipDetail"));
+const AboutPage = lazy(() => import("@/pages/public/About"));
+const ContactPage = lazy(() => import("@/pages/public/Contact"));
+const FaqPage = lazy(() => import("@/pages/public/Faq"));
+const HelpPage = lazy(() => import("@/pages/public/Help"));
+const PrivacyPage = lazy(() =>
+  import("@/pages/public/LegalPage").then((module) => ({ default: module.PrivacyPage })),
+);
+const TermsPage = lazy(() =>
+  import("@/pages/public/LegalPage").then((module) => ({ default: module.TermsPage })),
+);
+const NotFoundPage = lazy(() => import("@/pages/public/NotFound"));
 
-import DashboardOverviewPage from "@/pages/dashboard/Overview";
-import ProfilePage from "@/pages/dashboard/Profile";
-import SavedPage from "@/pages/dashboard/Saved";
-import DocumentsPage from "@/pages/dashboard/Documents";
-import NotificationsPage from "@/pages/dashboard/Notifications";
-import SettingsPage from "@/pages/dashboard/Settings";
+const LoginPage = lazy(() => import("@/pages/auth/Login"));
+const RegisterPage = lazy(() => import("@/pages/auth/Register"));
+const ForgotPasswordPage = lazy(() => import("@/pages/auth/ForgotPassword"));
+const VerifyCodePage = lazy(() => import("@/pages/auth/VerifyCode"));
+const VerifyEmailPage = lazy(() => import("@/pages/auth/VerifyEmail"));
+const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPassword"));
+const ResetSuccessPage = lazy(() => import("@/pages/auth/ResetSuccess"));
 
-import ToolsHubPage from "@/pages/tools/ToolsHub";
-import CvWizardPage from "@/pages/tools/CvWizard";
-import ServiceRequestPage from "@/pages/tools/ServiceRequest";
-import CvOrderTrackingPage from "@/pages/tools/CvOrderTracking";
+const DashboardOverviewPage = lazy(() => import("@/pages/dashboard/Overview"));
+const ProfilePage = lazy(() => import("@/pages/dashboard/Profile"));
+const SavedPage = lazy(() => import("@/pages/dashboard/Saved"));
+const DocumentsPage = lazy(() => import("@/pages/dashboard/Documents"));
+const NotificationsPage = lazy(() => import("@/pages/dashboard/Notifications"));
+const SettingsPage = lazy(() => import("@/pages/dashboard/Settings"));
+
+const ToolsHubPage = lazy(() => import("@/pages/tools/ToolsHub"));
+const CvWizardPage = lazy(() => import("@/pages/tools/CvWizard"));
+const ServiceRequestPage = lazy(() => import("@/pages/tools/ServiceRequest"));
+const CvOrderTrackingPage = lazy(() => import("@/pages/tools/CvOrderTracking"));
 
 /* لوحة الإدارة تُحمَّل عند الطلب — لا يحتاجها الطالب ولا الزائر */
 const AdminDashboardPage = lazy(() => import("@/pages/admin/Dashboard"));
