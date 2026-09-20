@@ -24,12 +24,21 @@ import { TIMEZONES } from "@/lib/constants";
 import { formatDateAr, timeAgoAr } from "@/lib/utils";
 
 export default function SettingsPage() {
+  // الخصوصية إظهار الملف الأكاديمي للجامعات — مفهوم طالبي لا يخصّ حساباً إدارياً أو خبيراً
+  const { isAdmin, isExpert } = useAuth();
+  const isStaff = isAdmin || isExpert;
+
   return (
     <div className="space-y-6">
-      <PageHeader title="الإعدادات" description="أمان حسابك وخصوصيتك وتنبيهاتك وجلساتك النشطة." />
+      <PageHeader
+        title="الإعدادات"
+        description={
+          isStaff ? "أمان حسابك وتنبيهاتك وجلساتك النشطة." : "أمان حسابك وخصوصيتك وتنبيهاتك وجلساتك النشطة."
+        }
+      />
 
       <PasswordCard />
-      <PrivacyCard />
+      {isStaff ? null : <PrivacyCard />}
       <NotificationsCard />
       <LocaleCard />
       <SessionsCard />
@@ -156,8 +165,9 @@ function PrivacyCard() {
 /* ---------------- الإشعارات ---------------- */
 
 function NotificationsCard() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, isAdmin, isExpert } = useAuth();
   const { submit, error } = useSubmit(settingsApi.updateNotifications);
+  const isStaff = isAdmin || isExpert;
 
   const settings = user?.settings ?? {};
 
@@ -180,18 +190,23 @@ function NotificationsCard() {
       <CardBody className="divide-y divide-ink-900/10 py-1">
         {error ? <Alert tone="danger">{error}</Alert> : null}
 
-        <Switch
-          label="منح جديدة تطابق ملفي"
-          description="تنبيه عند إضافة منحة تتوافق مع مؤهلاتك."
-          checked={Boolean(settings.notify_new_matches)}
-          onChange={(value) => toggle("notify_new_matches", value)}
-        />
-        <Switch
-          label="تحديثات طلباتي ومواعيد التقديم"
-          description="تذكير قبل إغلاق باب التقديم وتحديثات طلب صياغة السيرة الذاتية."
-          checked={Boolean(settings.notify_application_status)}
-          onChange={(value) => toggle("notify_application_status", value)}
-        />
+        {/* منح ومواعيد تقديم — تخصّ طالباً يتابع طلباته، لا حساباً إدارياً أو خبيراً */}
+        {isStaff ? null : (
+          <>
+            <Switch
+              label="منح جديدة تطابق ملفي"
+              description="تنبيه عند إضافة منحة تتوافق مع مؤهلاتك."
+              checked={Boolean(settings.notify_new_matches)}
+              onChange={(value) => toggle("notify_new_matches", value)}
+            />
+            <Switch
+              label="تحديثات طلباتي ومواعيد التقديم"
+              description="تذكير قبل إغلاق باب التقديم وتحديثات طلب صياغة السيرة الذاتية."
+              checked={Boolean(settings.notify_application_status)}
+              onChange={(value) => toggle("notify_application_status", value)}
+            />
+          </>
+        )}
         <Switch
           label="أخبار المنصة"
           description="مغلق افتراضياً — رسائل عن المزايا الجديدة في منحتي."
