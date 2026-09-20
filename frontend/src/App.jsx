@@ -57,6 +57,9 @@ const AdminOrdersPage = lazy(() => import("@/pages/admin/Orders"));
 const AdminNotificationsPage = lazy(
   () => import("@/pages/admin/Notifications"),
 );
+const AdminContactMessagesPage = lazy(
+  () => import("@/pages/admin/ContactMessages"),
+);
 const AdminReportsPage = lazy(() => import("@/pages/admin/Reports"));
 const AdminSettingsPage = lazy(() => import("@/pages/admin/Settings"));
 /* مساحة الخبير مستقلّة أيضاً — لا يحتاجها الطالب ولا الزائر */
@@ -147,6 +150,10 @@ export function App() {
               <Route
                 path="/admin/notifications"
                 element={<AdminNotificationsPage />}
+              />
+              <Route
+                path="/admin/contact-messages"
+                element={<AdminContactMessagesPage />}
               />
               <Route path="/admin/reports" element={<AdminReportsPage />} />
               <Route path="/admin/settings" element={<AdminSettingsPage />} />

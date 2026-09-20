@@ -160,6 +160,9 @@ Route::prefix('v1')->group(function (): void {
                 Route::get('notifications', [Admin\NotificationController::class, 'index'])->name('admin.notifications.index');
                 Route::post('notifications/broadcast', [Admin\NotificationController::class, 'broadcast'])->name('admin.notifications.broadcast');
 
+                Route::get('contact-messages', [Admin\ContactMessageController::class, 'index'])->name('admin.contact-messages.index');
+                Route::get('contact-messages/{contactMessage}', [Admin\ContactMessageController::class, 'show'])->name('admin.contact-messages.show');
+
                 Route::get('reports', [Admin\ReportController::class, 'index'])->name('admin.reports');
                 Route::get('settings', [Admin\SettingsController::class, 'index'])->name('admin.settings');
                 Route::put('settings/payment', [Admin\SettingsController::class, 'updatePayment'])->name('admin.settings.payment');

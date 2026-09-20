@@ -187,6 +187,9 @@ export const adminApi = {
   notifications: () => api.get("/admin/notifications").then((r) => r.data),
   broadcast: (payload) => api.post("/admin/notifications/broadcast", payload).then((r) => r.data),
 
+  contactMessages: () => api.get("/admin/contact-messages").then((r) => r.data),
+  contactMessage: (id) => api.get(`/admin/contact-messages/${id}`).then((r) => r.data.data),
+
   reports: () => api.get("/admin/reports").then((r) => r.data.data),
   settings: () => api.get("/admin/settings").then((r) => r.data.data),
   updatePayment: (payload) => api.put("/admin/settings/payment", payload).then((r) => r.data),
