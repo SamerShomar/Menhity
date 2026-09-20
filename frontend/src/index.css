@@ -254,18 +254,17 @@
 
 /*
  * بلا دعم backdrop-filter لا يبقى إلا سطح شاحب فوق خلفية ملوّنة،
- * فنرفع التعتيم حتى تبقى النصوص مقروءة. وكذلك لمن يطلب تقليل الشفافية.
+ * فنرفع التعتيم حتى تبقى النصوص مقروءة. هذا فقط حين يتعذّر رسم
+ * التمويه فعلياً — لا حين يطلب المستخدم تقليل الشفافية من نظامه.
+ *
+ * كنّا نطبّق نفس التعتيم شبه المصمت (0.96) على prefers-reduced-transparency
+ * أيضاً، فكل شفافية نضبطها بالكود تنكسر صامتة عند أي مستخدم أطفأ خاصية
+ * الشفافية من إعدادات النظام (زر شائع في ويندوز 11 لا علاقة غالباً
+ * لمستخدمه بإعاقة بصرية) — وهذا بالضبط ما كان يظهر: قائمة منسدلة شبه
+ * مصمتة رغم أن الكود يضبطها زجاجاً خفيفاً. backdrop-filter نفسه يبقى
+ * فعّالاً تحت هذا التفضيل، فلا حاجة لأي استثناء هنا أصلاً.
  */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass, .glass-soft, .glass-strong, .glass-header {
-    background-color: rgb(var(--glass-tint) / 0.96);
-    background-image: none;
-  }
-  .glass-dark { background-color: rgb(11 26 61 / 0.96); background-image: none; }
-  .glass-gold { background-color: rgb(246 196 69 / 0.95); background-image: none; }
-}
-
-@media (prefers-reduced-transparency: reduce) {
   .glass, .glass-soft, .glass-strong, .glass-header {
     background-color: rgb(var(--glass-tint) / 0.96);
     background-image: none;

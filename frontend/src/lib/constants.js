@@ -44,9 +44,12 @@ export const FOOTER_LINKS = {
   ],
 };
 
-/** أدوات الذكاء الاصطناعي — الروابط والأيقونات (البيانات نفسها تأتي من الـ API) */
+/*
+ * أدوات الذكاء الاصطناعي — الروابط والأيقونات (البيانات نفسها تأتي من الـ API).
+ * لا أداة فورية لإنشاء سيرة من الصفر: تلك مقصورة على المسار اليدوي
+ * المدفوع (بطاقة «كتابة سيرة ذاتية من الصفر» أسفل الصفحة).
+ */
 export const TOOL_ROUTES = {
-  "cv-builder": "/tools/cv-builder",
   "cv-enhancer": "/tools/cv-enhancer",
   "letter-builder": "/tools/letter-builder",
   "letter-enhancer": "/tools/letter-enhancer",
