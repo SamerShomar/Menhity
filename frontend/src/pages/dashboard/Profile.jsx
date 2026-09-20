@@ -50,7 +50,7 @@ export default function ProfilePage() {
     <div className="space-y-6">
       <PageHeader
         title="الملف الأكاديمي"
-        description="بياناتك هنا هي المصدر الوحيد للمطابقة مع المنح ولأدوات الذكاء الاصطناعي — أكملها مرة واحدة."
+        description="بياناتك هنا هي المصدر الوحيد للمطابقة مع المنح ولصياغة سيرتك الذاتية وخطاب دافعك — أكملها مرة واحدة."
       />
 
       <div className="glass rounded-2xl p-5">

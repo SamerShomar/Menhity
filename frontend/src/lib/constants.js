@@ -3,7 +3,7 @@
 export const PUBLIC_NAV = [
   { to: "/", label: "الرئيسية", end: true },
   { to: "/scholarships", label: "اكتشف المنح" },
-  { to: "/tools", label: "أدوات الذكاء الاصطناعي" },
+  { to: "/tools", label: "صياغة السيرة والخطاب" },
   { to: "/about", label: "من نحن" },
 ];
 
@@ -32,7 +32,7 @@ export const FOOTER_LINKS = {
   quick: [
     { to: "/", label: "الرئيسية" },
     { to: "/scholarships", label: "اكتشف المنح" },
-    { to: "/tools", label: "أدوات الذكاء الاصطناعي" },
+    { to: "/tools", label: "صياغة السيرة والخطاب" },
     { to: "/about", label: "من نحن؟" },
   ],
   support: [
@@ -42,46 +42,6 @@ export const FOOTER_LINKS = {
     { to: "/terms", label: "شروط الاستخدام" },
     { to: "/privacy", label: "سياسة الخصوصية" },
   ],
-};
-
-/*
- * أدوات الذكاء الاصطناعي — الروابط والأيقونات (البيانات نفسها تأتي من الـ API).
- * لا أداة فورية لإنشاء سيرة من الصفر: تلك مقصورة على المسار اليدوي
- * المدفوع (بطاقة «كتابة سيرة ذاتية من الصفر» أسفل الصفحة).
- */
-export const TOOL_ROUTES = {
-  "cv-enhancer": "/tools/cv-enhancer",
-  "letter-builder": "/tools/letter-builder",
-  "letter-enhancer": "/tools/letter-enhancer",
-  "profile-review": "/tools/profile-review",
-};
-
-/** إعدادات نموذج كل أداة تحليلية */
-export const TOOL_FORMS = {
-  "cv-enhancer": {
-    needsText: true,
-    textLabel: "الصق نص سيرتك الذاتية الحالية",
-    textPlaceholder: "انسخ محتوى سيرتك الذاتية والصقه هنا…",
-    showTarget: true,
-    cta: "حلّل وحسّن السيرة الذاتية",
-  },
-  "letter-builder": {
-    needsText: false,
-    showTarget: true,
-    cta: "توليد خطاب الدافع",
-  },
-  "letter-enhancer": {
-    needsText: true,
-    textLabel: "الصق نص خطاب الدافع",
-    textPlaceholder: "انسخ خطاب الدافع الحالي والصقه هنا…",
-    showTarget: true,
-    cta: "حلّل وحسّن الخطاب",
-  },
-  "profile-review": {
-    needsText: false,
-    showTarget: false,
-    cta: "قيّم ملفي الأكاديمي",
-  },
 };
 
 export const SORT_OPTIONS = [

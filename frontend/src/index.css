@@ -183,11 +183,15 @@
 
 /*
  * ما يطفو فوق المحتوى: القوائم المنسدلة، الأدراج، النوافذ.
- * تعتيم منخفض وتمويه عالٍ — بشرط أن يكون العنصر خارج أي سلف مموّه،
- * وإلا مات تمويهه وصار التعتيم المنخفض طبقة شاحبة فوق نصّ حادّ.
+ *
+ * التعتيم عالٍ عمداً، كرأس الصفحة تماماً: هذه عناصر تطفو فوق محتوى
+ * الصفحة نفسه — نصّ القائمة أو البطاقة تحتها يبقى ظاهراً إن اكتفينا
+ * بتمويه خفيف، فيتشوّش النصّان معاً بدل أن يُقرآ أحدهما بوضوح.
+ * التمويه القوي (64px) يعطي الإحساس الزجاجي؛ التعتيم هو ما يمنع ما
+ * خلفه من الظهور.
  */
 @utility glass-strong {
-  background-color: rgb(var(--glass-tint) / 0.44);
+  background-color: rgb(var(--glass-tint) / 0.86);
   background-image: var(--glass-sheen);
   backdrop-filter: blur(var(--glass-blur-strong)) saturate(200%) brightness(1.10);
   -webkit-backdrop-filter: blur(var(--glass-blur-strong)) saturate(200%) brightness(1.10);

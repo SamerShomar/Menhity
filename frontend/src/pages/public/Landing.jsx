@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   BellRing,
@@ -16,14 +16,12 @@ import {
 import { HeroScene } from "@/components/public/HeroScene";
 import { ScholarshipCard, ScholarshipCardSkeleton } from "@/components/scholarships/ScholarshipCard";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { Icon } from "@/components/ui/Icon";
 import { SectionHeading } from "@/components/ui/Section";
-import { aiApi, metaApi, scholarshipApi } from "@/api/endpoints";
+import { metaApi, scholarshipApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
 import { useMeta } from "@/context/MetaContext";
 import { useApi } from "@/hooks/useApi";
 import { useSaved } from "@/hooks/useSaved";
-import { TOOL_ROUTES } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 
 const STAT_LABELS = [
@@ -65,7 +63,6 @@ export default function LandingPage() {
 
   const { data: stats } = useApi(metaApi.stats, []);
   const { data: featured, loading: featuredLoading } = useApi(scholarshipApi.featured, []);
-  const { data: tools } = useApi(aiApi.tools, []);
 
   const onSearch = (event) => {
     event.preventDefault();
@@ -211,33 +208,20 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ============ أدوات الذكاء الاصطناعي ============ */}
+      {/* ============ الخدمة اليدوية ============ */}
       <section className="py-14">
         <div className="container-page">
           <SectionHeading
-            eyebrow="أدوات مجانية"
-            title="الذكاء الاصطناعي يجهّز ملفك"
-            description="خمس أدوات تكتب وتحسّن وتراجع مستندات تقديمك خطوة بخطوة."
+            eyebrow="بإشراف خبير أكاديمي"
+            title="صياغة سيرتك الذاتية وخطاب دافعك"
+            description="يعمل فريق منحتي على ملفك بنفسه — من الصفر أو تحسيناً لما لديك — ويسلّمك نسخة جاهزة للتقديم."
           />
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {(tools?.data ?? []).map((tool) => (
-              <Link
-                key={tool.key}
-                to={TOOL_ROUTES[tool.key] ?? "/tools"}
-                className="group glass rounded-2xl p-5 transition hover:-translate-y-0.5 hover:shadow-lg hover:ring-navy-200"
-              >
-                <span className="grid size-12 place-items-center rounded-xl bg-navy-500/10 text-navy-700 transition group-hover:bg-navy-700 group-hover:text-white">
-                  <Icon name={tool.icon} className="size-6" />
-                </span>
-                <h3 className="mt-4 font-display text-base font-bold text-navy-800">{tool.name_ar}</h3>
-                <p className="mt-2 text-[13px] leading-7 text-ink-600">{tool.description}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-bold text-navy-600">
-                  ابدأ الآن
-                  <ArrowLeft className="size-3.5 transition group-hover:-translate-x-1" />
-                </span>
-              </Link>
-            ))}
+          <div className="mt-8 flex justify-center">
+            <ButtonLink to="/tools" variant="gold" size="lg">
+              تعرّف على الخدمة
+              <ArrowLeft className="size-4" />
+            </ButtonLink>
           </div>
         </div>
       </section>
