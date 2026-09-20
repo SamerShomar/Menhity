@@ -8,6 +8,17 @@
 
 ## Local measurements
 
+Live HTTP inspection on 2026-09-20 confirmed the production frontend at
+`https://menhity.pages.dev/` still serves a 600,800-byte JavaScript entry point
+and calls `https://menhity-api-production-fad3.up.railway.app/api/v1`.
+The public metadata, statistics and scholarship endpoints returned HTTP 200.
+An authorization-header preflight returned HTTP 204 with
+`Access-Control-Max-Age: 0`. The proposed config now uses 600 seconds to avoid
+repeating eligible preflights for the same endpoint. Origin restrictions and
+per-request authentication are unchanged. CI verifies both allowed origins and
+rejection of a lookalike unrelated origin. Timing observed through the inspection
+environment's network proxy is not a reliable measurement of user latency.
+
 Same lockfile, Node 24, production Vite build; baseline commit `0153c142f621a312424eaaf8b00b7c48430fd4a5`.
 
 | Metric | Before | After |

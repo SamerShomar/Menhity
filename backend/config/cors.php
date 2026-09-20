@@ -34,7 +34,8 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    // Reuse successful preflight checks; authentication still runs on each API request.
+    'max_age' => 600,
 
     // نستخدم توكنات Bearer لا كوكيز، فلا حاجة لإرسال الاعتمادات
     'supports_credentials' => false,
