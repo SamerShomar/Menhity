@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import { SiteFooter } from "@/components/layout/SiteFooter";
@@ -7,7 +7,7 @@ import { DashboardSidebar } from "@/components/layout/DashboardSidebar";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { AdminTopbar } from "@/components/layout/AdminTopbar";
 import { ExpertTopbar } from "@/components/layout/ExpertTopbar";
-import { FullPageLoader } from "@/components/ui/Spinner";
+import { FullPageLoader, LoadingBlock } from "@/components/ui/Spinner";
 import { useAuth } from "@/context/AuthContext";
 
 /* ============================================================
@@ -124,7 +124,9 @@ export function PublicLayout() {
     <div className="flex min-h-dvh flex-col">
       <SiteHeader />
       <main className="flex-1">
-        <Outlet />
+        <Suspense fallback={<LoadingBlock />}>
+          <Outlet />
+        </Suspense>
       </main>
       <SiteFooter />
     </div>
@@ -147,7 +149,9 @@ export function DashboardLayout() {
         <div className="grid gap-6 lg:grid-cols-[264px_1fr]">
           <DashboardSidebar completionPercent={user?.completion_percent ?? 0} />
           <div className="min-w-0">
-            <Outlet />
+            <Suspense fallback={<LoadingBlock />}>
+              <Outlet />
+            </Suspense>
           </div>
         </div>
       </main>
@@ -169,7 +173,9 @@ export function AdminLayout() {
         <AdminTopbar onOpenNav={() => setNavOpen(true)} />
 
         <main className="flex-1 p-4 sm:p-6">
-          <Outlet />
+          <Suspense fallback={<LoadingBlock />}>
+            <Outlet />
+          </Suspense>
         </main>
 
         <footer className="glass-soft rounded-none border-x-0 border-b-0 px-4 py-4 sm:px-6">
@@ -192,7 +198,9 @@ export function ExpertLayout() {
       <ExpertTopbar />
 
       <main className="container-page flex-1 py-8">
-        <Outlet />
+        <Suspense fallback={<LoadingBlock />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <SiteFooter />

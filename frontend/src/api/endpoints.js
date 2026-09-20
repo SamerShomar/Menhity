@@ -1,11 +1,11 @@
-import { AI_TIMEOUT, api } from "./client";
+import { AI_TIMEOUT, api, cachedGet } from "./client";
 
 /** كل نداءات الـ API في مكان واحد حتى لا تتناثر المسارات في المكوّنات */
 
 /* ---------------- عام ---------------- */
 export const metaApi = {
-  meta: () => api.get("/meta").then((r) => r.data.data),
-  stats: () => api.get("/stats").then((r) => r.data.data),
+  meta: () => cachedGet("/meta", 300_000).then((r) => r.data.data),
+  stats: () => cachedGet("/stats", 60_000).then((r) => r.data.data),
   contact: (payload) => api.post("/contact", payload).then((r) => r.data),
 };
 
@@ -13,7 +13,7 @@ export const metaApi = {
 export const authApi = {
   register: (payload) => api.post("/auth/register", payload).then((r) => r.data),
   login: (payload) => api.post("/auth/login", payload).then((r) => r.data),
-  me: () => api.get("/auth/me").then((r) => r.data.data),
+  me: () => cachedGet("/auth/me").then((r) => r.data.data),
   logout: () => api.post("/auth/logout").then((r) => r.data),
   verifyEmail: ({ email, token }) =>
     api.post("/auth/verify-email", { email, token }).then((r) => r.data),
@@ -28,9 +28,9 @@ export const authApi = {
 export const scholarshipApi = {
   list: (params) => api.get("/scholarships", { params }).then((r) => r.data),
   featured: () => api.get("/scholarships/featured").then((r) => r.data.data),
-  facets: () => api.get("/scholarships/facets").then((r) => r.data.data),
+  facets: () => cachedGet("/scholarships/facets", 60_000).then((r) => r.data.data),
   show: (slug) => api.get(`/scholarships/${slug}`).then((r) => r.data.data),
-  saved: () => api.get("/saved").then((r) => r.data.data),
+  saved: () => cachedGet("/saved").then((r) => r.data.data),
   toggleSave: (slug) => api.post(`/saved/${slug}`).then((r) => r.data),
 };
 
@@ -63,7 +63,7 @@ export const documentApi = {
 
 export const notificationApi = {
   list: (tab) => api.get("/notifications", { params: { tab } }).then((r) => r.data),
-  unreadCount: () => api.get("/notifications/unread-count").then((r) => r.data.count),
+  unreadCount: () => cachedGet("/notifications/unread-count").then((r) => r.data.count),
   markAllRead: () => api.post("/notifications/read-all").then((r) => r.data),
   markRead: (id) => api.post(`/notifications/${id}/read`).then((r) => r.data),
 };

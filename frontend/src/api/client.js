@@ -1,6 +1,8 @@
 import axios from "axios";
+import { createReadCache } from "./readCache.js";
 
 const TOKEN_KEY = "menhity_token";
+const readCache = createReadCache();
 
 export function getToken() {
   try {
@@ -11,6 +13,7 @@ export function getToken() {
 }
 
 export function setToken(token) {
+  readCache.clear();
   try {
     if (token) localStorage.setItem(TOKEN_KEY, token);
     else localStorage.removeItem(TOKEN_KEY);
@@ -33,6 +36,7 @@ export const api = axios.create({
 
 // إرفاق توكن الوصول مع كل طلب
 api.interceptors.request.use((config) => {
+  if (!["get", "head", "options"].includes(config.method)) readCache.clear();
   const token = getToken();
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
@@ -57,8 +61,12 @@ async function unwrapBlobError(error) {
 
 // انتهاء الجلسة يعيد المستخدم لصفحة الدخول
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (!["get", "head", "options"].includes(response.config.method)) readCache.clear();
+    return response;
+  },
   async (error) => {
+    if (error.config && !["get", "head", "options"].includes(error.config.method)) readCache.clear();
     const status = error.response?.status;
     const onAuthPage = /\/(login|register|forgot-password|verify|reset-password)/.test(
       window.location.pathname,
@@ -74,6 +82,15 @@ api.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
+/** Only explicitly opted-in reads are cached, separately for each session. */
+export function cachedGet(url, ttl = 0) {
+  return readCache.get(
+    JSON.stringify([getToken(), url]),
+    () => api.get(url),
+    ttl,
+  );
+}
 
 /**
  * يستخرج رسالة خطأ عربية صالحة للعرض،
