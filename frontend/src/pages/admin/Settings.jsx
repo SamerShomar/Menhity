@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Activity, Database, Mail, MessageSquare, Save, Server, Sparkles, Wallet } from "lucide-react";
 
 import { BarList, CHART_COLORS } from "@/components/admin/Charts";
@@ -38,12 +39,14 @@ export default function AdminSettingsPage() {
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
         <StatCard label="الجلسات النشطة" value={data?.active_sessions ?? 0} icon={<Activity className="size-5" />} />
-        <StatCard
-          label="رسائل تواصل غير مقروءة"
-          value={data?.unread_messages ?? 0}
-          icon={<MessageSquare className="size-5" />}
-          tone="gold"
-        />
+        <Link to="/admin/contact-messages" className="block transition hover:-translate-y-0.5">
+          <StatCard
+            label="رسائل تواصل غير مقروءة"
+            value={data?.unread_messages ?? 0}
+            icon={<MessageSquare className="size-5" />}
+            tone="gold"
+          />
+        </Link>
         <StatCard
           label="التكاملات العاملة"
           value={`${(data?.integrations ?? []).filter((item) => item.ok).length} / ${(data?.integrations ?? []).length}`}

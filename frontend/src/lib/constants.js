@@ -33,6 +33,7 @@ export const ADMIN_NAV = [
   { to: "/admin/ai-tools", label: "أدوات الذكاء الاصطناعي", icon: "Sparkles" },
   { to: "/admin/orders", label: "الطلبات", icon: "ClipboardList" },
   { to: "/admin/notifications", label: "الإشعارات", icon: "Bell" },
+  { to: "/admin/contact-messages", label: "رسائل تواصل معنا", icon: "Mail" },
   { to: "/admin/reports", label: "التقارير والإحصائيات", icon: "BarChart3" },
   { to: "/admin/settings", label: "الإعدادات", icon: "Settings" },
 ];
