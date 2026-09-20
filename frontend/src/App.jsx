@@ -10,6 +10,7 @@ import {
   RequireAdmin,
   RequireAuth,
   RequireExpert,
+  RequireStudent,
 } from "@/components/layout/Layouts";
 import { ScrollToTop } from "@/components/layout/ScrollToTop";
 import { FullPageLoader } from "@/components/ui/Spinner";
@@ -92,10 +93,15 @@ export function App() {
           {/* ---------- لوحة الطالب ---------- */}
           <Route element={<RequireAuth />}>
             <Route element={<DashboardLayout />}>
-              <Route path="/dashboard" element={<DashboardOverviewPage />} />
-              <Route path="/dashboard/profile" element={<ProfilePage />} />
-              <Route path="/dashboard/saved" element={<SavedPage />} />
-              <Route path="/dashboard/documents" element={<DocumentsPage />} />
+              {/* مبنية على بيانات طالب — لا يصلها أدمن ولا خبير */}
+              <Route element={<RequireStudent />}>
+                <Route path="/dashboard" element={<DashboardOverviewPage />} />
+                <Route path="/dashboard/profile" element={<ProfilePage />} />
+                <Route path="/dashboard/saved" element={<SavedPage />} />
+                <Route path="/dashboard/documents" element={<DocumentsPage />} />
+              </Route>
+
+              {/* عامّة لكل حساب: إشعاراته وإعداداته الشخصية */}
               <Route
                 path="/dashboard/notifications"
                 element={<NotificationsPage />}

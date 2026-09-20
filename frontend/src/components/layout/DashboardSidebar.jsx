@@ -4,7 +4,7 @@ import { CircleHelp, LogOut } from "lucide-react";
 import { Avatar } from "@/components/ui/Avatar";
 import { Icon } from "@/components/ui/Icon";
 import { useAuth } from "@/context/AuthContext";
-import { DASHBOARD_NAV } from "@/lib/constants";
+import { DASHBOARD_NAV, STAFF_DASHBOARD_NAV } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 const LINK_BASE =
@@ -16,10 +16,17 @@ const LINK_BASE =
  * على الشاشات الكبيرة عمود ملتصق إلى جانب المحتوى. وعلى الهاتف تُطوى إلى
  * صفّ مدمج: بطاقة المستخدم أفقية، والأقسام شريط أزرار يُمرَّر جانبياً —
  * وإلا سبق المحتوى عمودٌ بطول الشاشة في كل صفحة.
+ *
+ * هذه اللوحة تصل إليها الآن حسابات إدارية وخبراء أيضاً — للإعدادات
+ * والإشعارات وحدها، فباقي الصفحات مقصورة على الطلاب (RequireStudent).
+ * نسبة الاكتمال وزرّ تحديث الملف مفهومان طالبيّان بحتان فلا يظهران
+ * لغيرهم، والأقسام المعروضة تقتصر على ما يصلونه فعلاً.
  */
 export function DashboardSidebar({ completionPercent }) {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin, isExpert } = useAuth();
   const navigate = useNavigate();
+  const isStaff = isAdmin || isExpert;
+  const navItems = isStaff ? STAFF_DASHBOARD_NAV : DASHBOARD_NAV;
 
   async function handleLogout() {
     await logout();
@@ -41,16 +48,24 @@ export function DashboardSidebar({ completionPercent }) {
           <div className="min-w-0 flex-1 lg:mt-3 lg:flex-none">
             <p className="truncate text-[15px] font-bold text-ink-900">{user?.name}</p>
             <p className="mt-0.5 text-[12px] text-ink-500">
-              مكتمل بنسبة <span className="num font-semibold">{completionPercent ?? 0}%</span>
+              {isStaff ? (
+                user?.role_label
+              ) : (
+                <>
+                  مكتمل بنسبة <span className="num font-semibold">{completionPercent ?? 0}%</span>
+                </>
+              )}
             </p>
           </div>
 
-          <NavLink
-            to="/dashboard/profile"
-            className="flex min-h-10 shrink-0 items-center rounded-lg bg-navy-700 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-navy-800 lg:mt-3 lg:w-full lg:justify-center"
-          >
-            تحديث الملف
-          </NavLink>
+          {isStaff ? null : (
+            <NavLink
+              to="/dashboard/profile"
+              className="flex min-h-10 shrink-0 items-center rounded-lg bg-navy-700 px-3 text-[13px] font-semibold text-white transition-colors hover:bg-navy-800 lg:mt-3 lg:w-full lg:justify-center"
+            >
+              تحديث الملف
+            </NavLink>
+          )}
         </div>
 
         {/*
@@ -59,7 +74,7 @@ export function DashboardSidebar({ completionPercent }) {
          * الزرّ الأخير مقصوصاً في المنتصف.
          */}
         <nav className="-mx-4 mt-4 flex gap-1.5 overflow-x-auto px-4 pb-1 scrollbar-slim lg:mx-0 lg:mt-4 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0">
-          {DASHBOARD_NAV.map((item) => (
+          {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}

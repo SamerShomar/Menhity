@@ -64,25 +64,31 @@ export function UserMenu() {
         <p className="truncate text-[13px] font-bold text-ink-900">{user.name}</p>
       </div>
 
-      <MenuLink to="/dashboard" onClick={() => setOpen(false)} icon={<LayoutGrid className="size-4" />}>
-        لوحتي
-      </MenuLink>
-      <MenuLink to="/dashboard/profile" onClick={() => setOpen(false)} icon={<UserRound className="size-4" />}>
-        الملف الأكاديمي
-      </MenuLink>
-      <MenuLink to="/dashboard/settings" onClick={() => setOpen(false)} icon={<Settings className="size-4" />}>
-        الإعدادات
-      </MenuLink>
-      {isAdmin && (
+      {/*
+       * حساب إداري أو خبير ليس طالباً: وجهته مساحته الخاصة لا لوحة
+       * الطالب ولا ملفها الأكاديمي — فلا تظهر له روابطهما أصلاً.
+       */}
+      {isAdmin ? (
         <MenuLink to="/admin" onClick={() => setOpen(false)} icon={<LayoutGrid className="size-4" />}>
           لوحة التحكم الإدارية
         </MenuLink>
-      )}
-      {isExpert && (
+      ) : isExpert ? (
         <MenuLink to="/expert" onClick={() => setOpen(false)} icon={<LayoutGrid className="size-4" />}>
           مساحة عمل الخبير
         </MenuLink>
+      ) : (
+        <>
+          <MenuLink to="/dashboard" onClick={() => setOpen(false)} icon={<LayoutGrid className="size-4" />}>
+            لوحتي
+          </MenuLink>
+          <MenuLink to="/dashboard/profile" onClick={() => setOpen(false)} icon={<UserRound className="size-4" />}>
+            الملف الأكاديمي
+          </MenuLink>
+        </>
       )}
+      <MenuLink to="/dashboard/settings" onClick={() => setOpen(false)} icon={<Settings className="size-4" />}>
+        الإعدادات
+      </MenuLink>
 
       <button
         type="button"

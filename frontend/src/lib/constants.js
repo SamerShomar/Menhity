@@ -16,6 +16,15 @@ export const DASHBOARD_NAV = [
   { to: "/dashboard/settings", label: "الإعدادات", icon: "Settings" },
 ];
 
+/**
+ * حساب إداري أو خبير يصل هذه اللوحة لإعداداته وإشعاراته وحدها — لا ملف
+ * أكاديمي له ولا مطابقة منح ولا محفوظات، فلا تظهر له تلك الأقسام.
+ */
+export const STAFF_DASHBOARD_NAV = [
+  { to: "/dashboard/notifications", label: "الإشعارات", icon: "Bell" },
+  { to: "/dashboard/settings", label: "الإعدادات", icon: "Settings" },
+];
+
 /** السايدبار الإداري — دمج النسختين اللتين ظهرتا في ملف التصاميم */
 export const ADMIN_NAV = [
   { to: "/admin", label: "الرئيسية", icon: "LayoutDashboard", end: true },

@@ -60,6 +60,25 @@ export function RequireExpert() {
 }
 
 /**
+ * يقصر صفحات لوحة الطالب على الطلاب وحدهم.
+ *
+ * نظرة عامة، الملف الأكاديمي، المحفوظات، والمستندات كلها مبنية على
+ * بيانات طالب (ملف أكاديمي، مطابقة منح، مستندات مرفوعة) — لا معنى لها
+ * لحساب إداري أو خبير، وقد لا يملك أصلاً السجلّ الذي تعتمد عليه هذه
+ * الشاشات. الإعدادات والإشعارات عامّة لكل حساب فلا تمرّ بهذا الحارس.
+ */
+export function RequireStudent() {
+  const { isAuthenticated, isAdmin, isExpert, loading } = useAuth();
+
+  if (loading) return <FullPageLoader />;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (isAdmin) return <Navigate to="/admin" replace />;
+  if (isExpert) return <Navigate to="/expert" replace />;
+
+  return <Outlet />;
+}
+
+/**
  * يمنع المستخدم المسجّل من فتح صفحات الدخول والتسجيل.
  *
  * هذا الحارس هو مرجع الوجهة بعد نجاح المصادقة: يُعاد تقييمه فور ضبط
