@@ -20,7 +20,8 @@ RUN composer dump-autoload --optimize --no-dev
 
 # Apache serves requests concurrently; a slow AI/mail request no longer
 # blocks the single development-server process used by artisan serve.
-RUN a2enmod rewrite deflate \
+RUN a2dismod mpm_event || true \
+    && a2enmod mpm_prefork rewrite deflate \
     && printf 'Listen ${PORT}\n' > /etc/apache2/ports.conf
 COPY docker/apache-site.conf /etc/apache2/sites-available/000-default.conf
 COPY docker/apache-performance.conf /etc/apache2/conf-available/menhity-performance.conf
