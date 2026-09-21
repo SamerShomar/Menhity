@@ -41,7 +41,7 @@ jobs:
             -e DB_CONNECTION=sqlite -e DB_DATABASE=/app/database/check.sqlite \
             -e CACHE_STORE=file -e SESSION_DRIVER=file -e LOG_CHANNEL=stderr \
             --entrypoint sh menhity-performance -c \
-            'touch /app/database/check.sqlite && chown -R www-data:www-data /app/database && exec ./docker-entrypoint.sh'
+            'ln -s /etc/apache2/mods-available/mpm_worker.load /etc/apache2/mods-enabled/mpm_worker.load && touch /app/database/check.sqlite && chown -R www-data:www-data /app/database && exec ./docker-entrypoint.sh'
           for attempt in $(seq 1 30); do
             if curl -fsS http://localhost:8080/up > /dev/null; then break; fi
             sleep 2
