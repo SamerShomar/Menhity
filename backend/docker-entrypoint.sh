@@ -4,6 +4,14 @@
 # بوضوح في سجل النشر بدل أن تموت الحاوية صامتة فيظهر «Healthcheck failure».
 set -e
 
+# Reconcile the module set at startup as well as during the image build.
+# Apache requires exactly one MPM; mod_php uses prefork.
+a2dismod mpm_event mpm_worker
+a2enmod mpm_prefork
+PORT=${PORT:-8080}
+export PORT
+apache2ctl -t
+
 fail() {
   echo ""
   echo "════════════════════════════════════════════"
