@@ -81,8 +81,9 @@ export default function DocumentImprovementPage() {
     </form>
     {selected?.result && <section className="glass mt-6 space-y-4 rounded-2xl p-6" aria-live="polite">
       {selected.result.valid === false ? <>
-        <h2 className="text-xl font-bold">تنويه</h2>
-        <p>{selected.result.notice}</p>
+        <Alert tone="danger" title="تنويه">
+          {selected.result.notice}
+        </Alert>
         {selected.result.suggested_kind ? <ButtonLink to={`/tools/improve?kind=${selected.result.suggested_kind}`}>الانتقال إلى الأداة الصحيحة</ButtonLink> : null}
       </> : <>
       <h2 className="text-xl font-bold">نتيجة المراجعة</h2><p>{selected.result.summary}</p>
