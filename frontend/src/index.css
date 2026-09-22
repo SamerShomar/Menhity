@@ -207,7 +207,7 @@
  * الإحساس الزجاجي يأتي من التمويه والحافة واللمعة لا من كشف ما وراءه.
  */
 @utility glass-header {
-  background-color: rgb(var(--glass-tint) / 0.82);
+  background-color: rgb(var(--glass-tint));
   background-image: var(--glass-sheen);
   backdrop-filter: blur(var(--glass-blur-header)) saturate(180%) brightness(1.04);
   -webkit-backdrop-filter: blur(var(--glass-blur-header)) saturate(180%) brightness(1.04);
@@ -269,7 +269,7 @@
  * فعّالاً تحت هذا التفضيل، فلا حاجة لأي استثناء هنا أصلاً.
  */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass, .glass-soft, .glass-strong, .glass-header {
+  .glass, .glass-soft, .glass-strong {
     background-color: rgb(var(--glass-tint) / 0.96);
     background-image: none;
   }
