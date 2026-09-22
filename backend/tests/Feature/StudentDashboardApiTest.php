@@ -204,7 +204,7 @@ class StudentDashboardApiTest extends TestCase
 
     public function test_an_enhancer_tool_requires_input_text(): void
     {
-        AiTool::create(['key' => 'cv-enhancer', 'name_ar' => 'تحسين السيرة الذاتية', 'sort_order' => 1]);
+        AiTool::firstOrCreate(['key' => 'cv-enhancer'], ['name_ar' => 'تحسين السيرة الذاتية', 'sort_order' => 1]);
 
         $user = $this->student();
 
