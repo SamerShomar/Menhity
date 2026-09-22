@@ -185,7 +185,9 @@ PROMPT;
             'target' => $target,
             'document_text' => $text,
         ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-        $output = trim(preg_replace('/^```(?:json)?\s*|\s*```$/u', '', trim($output)));
+        $trimmedOutput = trim($output);
+        $cleanedOutput = preg_replace('/^```(?:json)?\s*|\s*```$/u', '', $trimmedOutput);
+        $output = trim(is_string($cleanedOutput) ? $cleanedOutput : $trimmedOutput);
         $start = strpos($output, '{');
         $end = strrpos($output, '}');
         if ($start !== false && $end !== false && $end >= $start) {
