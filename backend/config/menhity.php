@@ -47,7 +47,7 @@ return [
              * تسحب Google النماذج القديمة من المستخدمين الجدد دورياً،
              * فيرجع 404 يسمّي البديل. عدّل GEMINI_MODEL وحده عندها.
              */
-            'model' => env('GEMINI_MODEL', 'gemini-3.6-flash'),
+            'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
         ],
 
         'anthropic' => [

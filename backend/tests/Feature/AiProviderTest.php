@@ -25,7 +25,7 @@ class AiProviderTest extends TestCase
             'menhity.ai.cloudflare.account_id' => null,
             'menhity.ai.cloudflare.api_token' => null,
             'menhity.ai.gemini.api_key' => 'test-key',
-            'menhity.ai.gemini.model' => 'gemini-3.6-flash',
+            'menhity.ai.gemini.model' => 'gemini-2.5-flash',
             'menhity.ai.anthropic.api_key' => null,
         ]);
     }
@@ -102,7 +102,7 @@ class AiProviderTest extends TestCase
         Http::assertSent(function (Request $request) {
             $body = $request->data();
 
-            return str_contains($request->url(), 'gemini-3.6-flash:generateContent')
+            return str_contains($request->url(), 'gemini-2.5-flash:generateContent')
                 && $request->hasHeader('x-goog-api-key', 'test-key')
                 && filled(data_get($body, 'system_instruction.parts.0.text'))
                 && str_contains(data_get($body, 'contents.0.parts.0.text'), 'بيانات الملف الأكاديمي')
