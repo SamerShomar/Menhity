@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api, AI_TIMEOUT, parseApiError } from "@/api/client";
-import { Button } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/Alert";
 import { PageHeader } from "@/components/ui/Section";
 
@@ -80,18 +80,24 @@ export default function DocumentImprovementPage() {
       {busy && <p role="status" className="text-sm">جارٍ قراءة الملف وتحسينه؛ قد يستغرق ذلك دقيقتين. أبقِ الصفحة مفتوحة.</p>}
     </form>
     {selected?.result && <section className="glass mt-6 space-y-4 rounded-2xl p-6" aria-live="polite">
+      {selected.result.valid === false ? <>
+        <h2 className="text-xl font-bold">تنويه</h2>
+        <p>{selected.result.notice}</p>
+        {selected.result.suggested_kind ? <ButtonLink to={`/tools/improve?kind=${selected.result.suggested_kind}`}>الانتقال إلى الأداة الصحيحة</ButtonLink> : null}
+      </> : <>
       <h2 className="text-xl font-bold">نتيجة المراجعة</h2><p>{selected.result.summary}</p>
       <h3 className="font-bold">الأخطاء والتعديلات</h3>
       {selected.result.issues.length ? <ul className="list-disc space-y-2 ps-5">{selected.result.issues.map((issue, index) => <li key={index}>{issue}</li>)}</ul> : <p>لم تُسجّل أخطاء تحتاج تعديلاً.</p>}
       <h3 className="font-bold">النسخة المحسّنة</h3><div dir="auto" className="whitespace-pre-wrap rounded-xl bg-white p-4 leading-8">{selected.result.revised_text}</div>
       <Button loading={downloading === selected.id} onClick={() => download(selected)}>تنزيل النسخة المحسّنة Word</Button>
+      </>}
     </section>}
     <section className="mt-8"><div className="flex items-center justify-between gap-3"><h2 className="text-xl font-bold">ملفاتي الأخيرة</h2>
       <Button variant="outline" disabled={busy} onClick={async () => { try { await refresh(); } catch (err) { setError(parseApiError(err).message); } }}>تحديث النتائج</Button></div>
       {loading ? <p className="mt-4">جارٍ تحميل ملفاتك…</p> : !runs.length && <p className="mt-4">ستظهر نتائج ملفاتك هنا بعد رفعها.</p>}
       <div className="mt-4 space-y-3">{runs.map((run) => <div key={run.id} className="glass flex flex-wrap items-center justify-between gap-3 rounded-xl p-4">
         <span>{run.kind === "cv_improve" ? "تحسين سيرة ذاتية" : "تحسين خطاب دافع"} — {new Date(run.created_at).toLocaleDateString("ar")}</span>
-        {run.result ? <Button variant="outline" onClick={() => setSelected(run)}>عرض النتيجة والتنزيل</Button> : <span>{run.status === "running" ? "قيد المعالجة — حدّث النتائج بعد قليل" : "تعذّرت المعالجة؛ يمكنك رفع الملف مجدداً"}</span>}
+        {run.result ? <Button variant="outline" onClick={() => setSelected(run)}>{run.result.valid === false ? "عرض التنويه" : "عرض النتيجة والتنزيل"}</Button> : <span>{run.status === "running" ? "قيد المعالجة — حدّث النتائج بعد قليل" : "تعذّرت المعالجة؛ يمكنك رفع الملف مجدداً"}</span>}
       </div>)}</div>
     </section>
   </div>;

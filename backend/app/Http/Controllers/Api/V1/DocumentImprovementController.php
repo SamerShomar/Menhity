@@ -67,6 +67,7 @@ class DocumentImprovementController extends Controller
         abort_unless($run->user_id === $request->user()->id && ($run->input['document_improvement'] ?? false), 404);
         abort_unless($run->status === AiRunStatus::Success, 409, 'الملف غير جاهز للتنزيل.');
         $result = json_decode($run->output, true, flags: JSON_THROW_ON_ERROR);
+        abort_unless($result['valid'] ?? false, 409, 'لا توجد نسخة محسّنة لهذا النوع من الملفات.');
         return response()->download($documents->docx($result['revised_text']), 'menhity-improved-'.$run->id.'.docx', [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
             'Cache-Control' => 'private, no-store',

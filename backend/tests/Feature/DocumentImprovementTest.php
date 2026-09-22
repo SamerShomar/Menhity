@@ -77,6 +77,32 @@ class DocumentImprovementTest extends TestCase
         $this->getJson('/api/v1/document-improvements/'.$run->id.'/file')->assertStatus(409);
     }
 
+    public function test_a_letter_uploaded_to_the_cv_tool_returns_a_redirect_notice(): void
+    {
+        config(['menhity.ai.provider' => 'gemini', 'menhity.ai.gemini.api_key' => 'fake-key']);
+        Http::fake(['*' => Http::response(['candidates' => [[
+            'finishReason' => 'STOP', 'content' => ['parts' => [['text' => json_encode([
+                'valid' => false,
+                'document_class' => 'letter',
+                'suggested_kind' => 'letter_improve',
+                'notice' => 'هذا خطاب دافع. انتقل إلى تحسين خطاب الدافع.',
+                'summary' => null,
+                'issues' => [],
+                'revised_text' => null,
+            ], JSON_UNESCAPED_UNICODE)]]],
+        ]]])]);
+        Sanctum::actingAs(User::factory()->create());
+
+        $response = $this->postJson('/api/v1/document-improvements', [
+            'kind' => 'cv_improve', 'file' => $this->file(), 'consent' => true,
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('data.result.valid', false)
+            ->assertJsonPath('data.result.suggested_kind', 'letter_improve');
+        $this->getJson('/api/v1/document-improvements/'.$response->json('data.id').'/file')->assertStatus(409);
+    }
+
     public function test_new_manual_improvement_orders_are_rejected(): void
     {
         Sanctum::actingAs(User::factory()->create());

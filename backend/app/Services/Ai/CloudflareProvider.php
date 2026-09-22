@@ -82,7 +82,7 @@ class CloudflareProvider implements AiProvider
             return null;
         }
 
-        if (array_key_exists('summary', $value) && array_key_exists('revised_text', $value)) {
+        if (array_key_exists('valid', $value) && array_key_exists('document_class', $value)) {
             return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         }
 
