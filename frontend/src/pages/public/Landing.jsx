@@ -214,7 +214,7 @@ export default function LandingPage() {
           <SectionHeading
             eyebrow="بإشراف خبير أكاديمي"
             title="صياغة سيرتك الذاتية وخطاب دافعك"
-            description="يعمل فريق منحتي على ملفك بنفسه — من الصفر أو تحسيناً لما لديك — ويسلّمك نسخة جاهزة للتقديم."
+            description="فريق منحتي يكتب ملفك من الصفر، والذكاء الاصطناعي يراجع سيرتك وخطابك الحاليين ويعيد لك نسخة محسّنة."
           />
 
           <div className="mt-8 flex justify-center">

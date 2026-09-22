@@ -7,8 +7,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
 import { cn, formatMoney } from "@/lib/utils";
 
-/** خدمة يدوية واحدة يعمل عليها الفريق ويسلّم ملفاً نهائياً */
-const MANUAL_SERVICES = [
+/** الكتابة من الصفر للفريق، والتحسين عبر الذكاء الاصطناعي */
+const SERVICES = [
   {
     key: "cv_build",
     title: "كتابة سيرة ذاتية من الصفر",
@@ -23,16 +23,16 @@ const MANUAL_SERVICES = [
     key: "cv_improve",
     title: "تحسين سيرة ذاتية",
     description:
-      "أرفق سيرتك الحالية، ويعيد الفريق صياغتها وتنسيقها ويسلّمك النسخة المحسّنة جاهزة للتقديم.",
-    to: "/tools/request?kind=cv_improve",
+      "ارفع سيرتك ليحلّل الذكاء الاصطناعي أخطاءها ويصحّحها، ثم نزّل النسخة المحسّنة مباشرة.",
+    to: "/tools/improve?kind=cv_improve",
     cta: "ارفع سيرتك",
     icon: FileText,
   },
   {
     key: "letter_improve",
     title: "تحسين خطاب دافع",
-    description: "أرفق خطابك، ويراجعه الفريق ليقوّي حججه وربطه بالمنحة وأسلوبه اللغوي.",
-    to: "/tools/request?kind=letter_improve",
+    description: "ارفع خطابك لتحصل على ملاحظات الذكاء الاصطناعي وتصحيحاته وملف Word محسّن.",
+    to: "/tools/improve?kind=letter_improve",
     cta: "ارفع خطابك",
     icon: UserRoundCheck,
   },
@@ -63,13 +63,13 @@ export default function ToolsHubPage() {
       <div className="container-page">
         <SectionHeading
           as="h1"
-          eyebrow="خدمة يدوية بإشراف خبير"
+          eyebrow="كتابة بشرية وتحسين بالذكاء الاصطناعي"
           title="صياغة السيرة الذاتية وخطاب الدافع"
-          description="يعمل فريق منحتي على ملفك بنفسه — من الصفر أو تحسيناً لما لديك — ويسلّمك نسخة جاهزة للتقديم."
+          description="فريق منحتي يكتب سيرتك وخطابك من الصفر، والذكاء الاصطناعي يراجع ملفاتك الحالية ويحسّنها مباشرة."
         />
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {MANUAL_SERVICES.map((service) => (
+          {SERVICES.map((service) => (
             <div key={service.key} className="glass flex flex-col rounded-2xl p-6">
               <span className="grid size-12 place-items-center rounded-xl bg-gold-400/25 text-gold-800">
                 <service.icon className="size-6" />
@@ -92,6 +92,7 @@ export default function ToolsHubPage() {
                   </span>
                 ) : null}
               </div>
+              <p className="mt-2 text-xs font-bold text-navy-700">{service.key.endsWith("improve") ? "بالذكاء الاصطناعي" : "بإشراف فريق منحتي"}</p>
               <p className="mt-2 flex-1 text-[13px] leading-7 text-ink-600">{service.description}</p>
 
               <ButtonLink

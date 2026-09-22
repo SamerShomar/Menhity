@@ -18,6 +18,17 @@ class CvOrderPaymentTest extends TestCase
 {
     use RefreshDatabase;
 
+    private function readyStudent(): User
+    {
+        $user = User::factory()->withProfile()->create();
+        $user->profile->update(['bio' => 'Engineering student applying for postgraduate study.']);
+        $user->profile->educations()->create([
+            'degree' => \App\Enums\DegreeLevel::Bachelor,
+            'major' => 'Engineering', 'institution' => 'University', 'graduation_year' => 2024,
+        ]);
+        return $user;
+    }
+
     private function priceTheService(float $price = 50): void
     {
         $settings = app(SettingsService::class);
@@ -53,7 +64,7 @@ class CvOrderPaymentTest extends TestCase
     {
         $this->priceTheService(75);
 
-        $response = $this->actingAs(User::factory()->withProfile()->create())
+        $response = $this->actingAs($this->readyStudent())
             ->getJson('/api/v1/cv-orders/payment-info')
             ->assertOk();
 
@@ -66,10 +77,10 @@ class CvOrderPaymentTest extends TestCase
     public function test_a_paid_order_is_refused_without_a_transfer_receipt(): void
     {
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
         ])->assertStatus(422);
 
@@ -80,10 +91,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService(60);
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $response = $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
             'payment_note' => 'حوّلت عبر تطبيق البنك.',
@@ -104,10 +115,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService(60);
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -121,10 +132,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -144,11 +155,11 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
         $admin = User::factory()->admin()->create();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -168,10 +179,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -199,10 +210,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -218,10 +229,10 @@ class CvOrderPaymentTest extends TestCase
     public function test_a_free_service_skips_the_transfer_entirely(): void
     {
         Storage::fake('local');
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $response = $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
         ])->assertCreated();
 
@@ -235,13 +246,13 @@ class CvOrderPaymentTest extends TestCase
         app(SettingsService::class)->put(SettingsService::PRICING, [
             'currency' => 'ILS',
             'cv_build' => 0,
-            'cv_improve' => 40,
+            'letter_build' => 40,
             'letter_improve' => 0,
         ]);
 
-        $this->actingAs(User::factory()->withProfile()->create())
+        $this->actingAs($this->readyStudent())
             ->postJson('/api/v1/cv-orders', [
-                'kind' => 'cv_improve',
+                'kind' => 'letter_build',
                 'file' => $this->sourceFile(),
                 'receipt' => $this->receipt(),
             ])
@@ -252,15 +263,15 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
 
-        $this->actingAs(User::factory()->withProfile()->create())
+        $this->actingAs($this->readyStudent())
             ->postJson("/api/v1/cv-orders/{$user->cvOrders()->first()->id}/receipt", [
                 'receipt' => $this->receipt(),
             ])
@@ -283,7 +294,7 @@ class CvOrderPaymentTest extends TestCase
 
         $settings = app(SettingsService::class);
 
-        $this->assertSame(50.0, $settings->priceFor(CvOrderKind::CvImprove));
+        $this->assertSame(35.0, $settings->priceFor(CvOrderKind::LetterBuild));
         $this->assertSame('987654321', $settings->payment()['account_number']);
     }
 
@@ -291,10 +302,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -315,10 +326,10 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $user = User::factory()->withProfile()->create();
+        $user = $this->readyStudent();
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -344,7 +355,7 @@ class CvOrderPaymentTest extends TestCase
     private function paidConfirmedOrder(User $student): CvOrder
     {
         $this->actingAs($student)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => $this->sourceFile(),
             'receipt' => $this->receipt(),
         ])->assertCreated();
@@ -362,7 +373,7 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $student = User::factory()->withProfile()->create();
+        $student = $this->readyStudent();
         $order = $this->paidConfirmedOrder($student);
 
         $this->assertSame(PaymentStatus::Accepted, $order->payment_status);
@@ -381,7 +392,7 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $student = User::factory()->withProfile()->create();
+        $student = $this->readyStudent();
         $order = $this->paidConfirmedOrder($student);
         $admin = User::factory()->admin()->create();
 
@@ -401,7 +412,7 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $student = User::factory()->withProfile()->create();
+        $student = $this->readyStudent();
         $order = $this->paidConfirmedOrder($student);
 
         $this->actingAs(User::factory()->admin()->create())
@@ -416,7 +427,7 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $student = User::factory()->withProfile()->create();
+        $student = $this->readyStudent();
         $order = $this->paidConfirmedOrder($student);
 
         $this->actingAs(User::factory()->admin()->create())
@@ -433,7 +444,7 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $student = User::factory()->withProfile()->create();
+        $student = $this->readyStudent();
         $order = $this->paidConfirmedOrder($student);
         $admin = User::factory()->admin()->create();
 
@@ -464,7 +475,7 @@ class CvOrderPaymentTest extends TestCase
     {
         Storage::fake('local');
         $this->priceTheService();
-        $student = User::factory()->withProfile()->create();
+        $student = $this->readyStudent();
         $order = $this->paidConfirmedOrder($student);
 
         $this->actingAs($student)
@@ -476,7 +487,7 @@ class CvOrderPaymentTest extends TestCase
 
     public function test_students_cannot_set_prices(): void
     {
-        $this->actingAs(User::factory()->withProfile()->create())
+        $this->actingAs($this->readyStudent())
             ->putJson('/api/v1/admin/settings/payment', [
                 'currency' => 'ILS',
                 'prices' => ['cv_build' => 0, 'cv_improve' => 0, 'letter_improve' => 0],

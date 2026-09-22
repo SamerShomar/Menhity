@@ -49,6 +49,7 @@ const SettingsPage = lazy(() => import("@/pages/dashboard/Settings"));
 
 const ToolsHubPage = lazy(() => import("@/pages/tools/ToolsHub"));
 const CvWizardPage = lazy(() => import("@/pages/tools/CvWizard"));
+const DocumentImprovementPage = lazy(() => import("@/pages/tools/DocumentImprovement"));
 const ServiceRequestPage = lazy(() => import("@/pages/tools/ServiceRequest"));
 const CvOrderTrackingPage = lazy(() => import("@/pages/tools/CvOrderTracking"));
 
@@ -131,6 +132,7 @@ export function App() {
                 path="/tools/cv-builder/orders/:id"
                 element={<RedirectToOrder />}
               />
+              <Route path="/tools/improve" element={<DocumentImprovementPage />} />
               <Route path="/tools/request" element={<ServiceRequestPage />} />
             </Route>
           </Route>

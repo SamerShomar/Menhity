@@ -237,7 +237,7 @@ export default function DashboardOverviewPage() {
           <div>
             <p className="font-display font-bold text-navy-800">جهّز سيرتك الذاتية</p>
             <p className="mt-1 text-[13px] leading-7 text-ink-600">
-              اطلب صياغة سيرتك الذاتية أو خطاب دافعك — من الصفر أو تحسيناً لما لديك — بإشراف خبير أكاديمي.
+              اطلب كتابة سيرتك وخطابك من فريق منحتي، أو ارفع ملفك الحالي لتحسينه بالذكاء الاصطناعي.
             </p>
           </div>
         </div>
