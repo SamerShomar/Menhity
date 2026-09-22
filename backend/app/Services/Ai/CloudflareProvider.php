@@ -82,6 +82,10 @@ class CloudflareProvider implements AiProvider
             return null;
         }
 
+        if (array_key_exists('summary', $value) && array_key_exists('revised_text', $value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        }
+
         foreach (['response', 'text', 'generated_text', 'content'] as $key) {
             if (array_key_exists($key, $value)) {
                 $text = $this->textValue($value[$key]);
