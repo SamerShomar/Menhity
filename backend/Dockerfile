@@ -38,8 +38,8 @@ RUN { \
       echo 'opcache.memory_consumption=128'; \
       echo 'opcache.max_accelerated_files=10000'; \
       echo 'max_execution_time=150'; \
-      echo 'upload_max_filesize=6M'; \
-      echo 'post_max_size=8M'; \
+      echo 'upload_max_filesize=10M'; \
+      echo 'post_max_size=12M'; \
     } > /usr/local/etc/php/conf.d/opcache.ini
 
 RUN chmod +x docker-entrypoint.sh \
