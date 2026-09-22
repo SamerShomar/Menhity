@@ -86,6 +86,39 @@ class DocumentImprovementTest extends TestCase
         $this->getJson('/api/v1/cv-orders/payment-info')->assertJsonCount(2, 'data.services');
     }
 
+    public function test_pdf_text_is_extracted_and_image_only_pdf_is_rejected(): void
+    {
+        $service = app(DocumentImprovementService::class);
+        $file = UploadedFile::fake()->createWithContent('cv.pdf', $this->pdf(self::TEXT));
+        $this->assertStringContainsString(self::TEXT, $service->extract($file));
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $service->extract(UploadedFile::fake()->createWithContent('scan.pdf', $this->pdf('')));
+    }
+
+    private function pdf(string $text): string
+    {
+        $stream = "BT /F1 10 Tf 40 700 Td ($text) Tj ET";
+        $objects = [
+            '<< /Type /Catalog /Pages 2 0 R >>',
+            '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+            '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 900 800] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+            '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+            '<< /Length '.strlen($stream).">>\nstream\n".$stream."\nendstream",
+        ];
+        $pdf = "%PDF-1.4\n";
+        $offsets = [0];
+        foreach ($objects as $index => $object) {
+            $offsets[] = strlen($pdf);
+            $pdf .= ($index + 1)." 0 obj\n".$object."\nendobj\n";
+        }
+        $xref = strlen($pdf);
+        $pdf .= "xref\n0 6\n0000000000 65535 f \n";
+        foreach (array_slice($offsets, 1) as $offset) {
+            $pdf .= sprintf("%010d 00000 n \n", $offset);
+        }
+        return $pdf."trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n$xref\n%%EOF";
+    }
+
     public function test_export_escapes_xml_and_round_trips_arabic(): void
     {
         $text = 'سارة أحمد — مهندسة باحثة لديها خبرة في التعليم والعمل المجتمعي. <test> & data';
