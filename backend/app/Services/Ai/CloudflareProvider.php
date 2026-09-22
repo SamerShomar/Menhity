@@ -57,11 +57,11 @@ class CloudflareProvider implements AiProvider
             throw new RuntimeException('خطأ من Cloudflare: '.$this->errorDetail($payload));
         }
 
-        $text = data_get($payload, 'result.response');
+        $text = $this->textValue(data_get($payload, 'result.response'));
 
         // بعض النماذج تعيد المخرجات بصيغة المحادثة بدل حقل response المباشر
         if (blank($text)) {
-            $text = data_get($payload, 'result.choices.0.message.content');
+            $text = $this->textValue(data_get($payload, 'result.choices.0.message.content'));
         }
 
         if (blank($text)) {
@@ -69,6 +69,32 @@ class CloudflareProvider implements AiProvider
         }
 
         return trim($text);
+    }
+
+    /** يحوّل صيغ المخرجات النصية المختلفة إلى نص واحد قبل معالجته. */
+    private function textValue(mixed $value): ?string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (! is_array($value)) {
+            return null;
+        }
+
+        foreach (['response', 'text', 'generated_text', 'content'] as $key) {
+            if (array_key_exists($key, $value)) {
+                $text = $this->textValue($value[$key]);
+                if (filled($text)) {
+                    return $text;
+                }
+            }
+        }
+
+        $parts = array_map(fn ($part) => $this->textValue($part), $value);
+        $parts = array_values(array_filter($parts, fn ($part) => filled($part)));
+
+        return $parts ? implode("\n", $parts) : null;
     }
 
     /**

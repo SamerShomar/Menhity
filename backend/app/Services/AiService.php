@@ -185,6 +185,9 @@ PROMPT;
             'target' => $target,
             'document_text' => $text,
         ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+        if (! is_string($output)) {
+            throw new RuntimeException('أعاد المزوّد استجابة غير نصية. حاول مجدداً.');
+        }
         $trimmedOutput = trim($output);
         $cleanedOutput = preg_replace('/^```(?:json)?\s*|\s*```$/u', '', $trimmedOutput);
         $output = trim(is_string($cleanedOutput) ? $cleanedOutput : $trimmedOutput);

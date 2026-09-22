@@ -247,6 +247,20 @@ class AiProviderTest extends TestCase
         $this->assertSame('نص بصيغة المحادثة', $result['output']);
     }
 
+    public function test_it_reads_cloudflare_text_blocks_returned_as_an_array(): void
+    {
+        $this->useCloudflare();
+        Http::fake(['*' => Http::response([
+            'result' => ['response' => [['text' => 'الجزء الأول'], ['text' => 'الجزء الثاني']]],
+            'success' => true,
+        ])]);
+
+        $result = app(AiService::class)->run('profile-review', $this->profile());
+
+        $this->assertTrue($result['ok']);
+        $this->assertSame("الجزء الأول\nالجزء الثاني", $result['output']);
+    }
+
     public function test_it_surfaces_a_cloudflare_failure_returned_with_a_200_status(): void
     {
         $this->useCloudflare();
