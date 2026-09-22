@@ -33,7 +33,7 @@ class CvOrderController extends Controller
     {
         $currency = $this->settings->currency();
 
-        $services = collect(CvOrderKind::cases())->map(fn (CvOrderKind $kind) => [
+        $services = collect([CvOrderKind::CvBuild, CvOrderKind::LetterBuild])->map(fn (CvOrderKind $kind) => [
             'kind' => $kind->value,
             'label' => $kind->label(),
             'price' => $this->settings->priceFor($kind),
@@ -98,7 +98,7 @@ class CvOrderController extends Controller
         $maxKilobytes = config('menhity.uploads.max_bytes') / 1024;
 
         $validated = $request->validate([
-            'kind' => ['required', Rule::enum(CvOrderKind::class)],
+            'kind' => ['required', Rule::in(['cv_build', 'letter_build'])],
             'file' => ['nullable', 'file', 'mimes:pdf,doc,docx', "max:{$maxKilobytes}"],
             'note' => ['nullable', 'string', 'max:1000'],
             // الإشعار صورة غالباً (لقطة من تطبيق البنك) أو PDF

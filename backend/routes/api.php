@@ -115,6 +115,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('throttle:20,1')
             ->name('ai-tools.run');
 
+        Route::get('document-improvements', [\App\Http\Controllers\Api\V1\DocumentImprovementController::class, 'index']);
+        Route::post('document-improvements', [\App\Http\Controllers\Api\V1\DocumentImprovementController::class, 'store'])->middleware('throttle:3,1');
+        Route::get('document-improvements/{run}/file', [\App\Http\Controllers\Api\V1\DocumentImprovementController::class, 'download']);
+
         /* ---- طلبات صياغة السيرة الذاتية ---- */
         Route::get('cv-orders/payment-info', [CvOrderController::class, 'paymentInfo'])->name('cv-orders.payment-info');
         Route::get('cv-orders/active', [CvOrderController::class, 'active'])->name('cv-orders.active');

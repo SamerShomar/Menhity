@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { FileText, PenLine, Receipt, Sparkles, Upload, UserCheck, Wallet } from "lucide-react";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { PenLine, Receipt, Upload, UserCheck, Wallet } from "lucide-react";
 
 import { PaymentDetails } from "@/components/tools/PaymentDetails";
 import { Alert } from "@/components/ui/Alert";
@@ -19,24 +19,6 @@ import { cn, formatFileSize, formatMoney } from "@/lib/utils";
  * سابقة لديه ليحسّنها.
  */
 const KINDS = [
-  {
-    key: "cv_improve",
-    label: "تحسين سيرة ذاتية",
-    hint: "أرفق سيرتك الحالية ليعيد الفريق صياغتها وتنسيقها.",
-    icon: FileText,
-    requiresFile: true,
-    noteLabel: "ملاحظات للفريق",
-    notePlaceholder: "مثال: أرجو إبراز خبرتي البحثية، وأتقدّم لمنحة ماجستير في هولندا.",
-  },
-  {
-    key: "letter_improve",
-    label: "تحسين خطاب دافع",
-    hint: "أرفق خطابك ليراجعه الفريق ويقوّي حججه وأسلوبه.",
-    icon: Sparkles,
-    requiresFile: true,
-    noteLabel: "ملاحظات للفريق",
-    notePlaceholder: "مثال: أرجو إبراز خبرتي البحثية، وأتقدّم لمنحة ماجستير في هولندا.",
-  },
   {
     key: "letter_build",
     label: "كتابة خطاب دافع من الصفر",
@@ -84,6 +66,8 @@ export default function ServiceRequestPage() {
 
     if (ok) navigate(`/tools/cv-builder/${result.data.id}`);
   };
+
+  if (["cv_improve", "letter_improve"].includes(requestedKind)) return <Navigate to={`/tools/improve?kind=${requestedKind}`} replace />;
 
   if (loadingPayment) return <LoadingBlock className="py-24" />;
 
