@@ -37,7 +37,10 @@ export default function DocumentImprovementPage() {
     const body = new FormData();
     body.append("kind", kind); body.append("file", file); body.append("target", target); body.append("consent", "1");
     try {
-      const { data } = await api.post("/document-improvements", body, { timeout: AI_TIMEOUT });
+      const { data } = await api.post("/document-improvements", body, {
+        timeout: AI_TIMEOUT,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       setSelected(data.data);
       setRuns((previous) => [data.data, ...previous.filter((run) => run.id !== data.data.id)]);
     } catch (err) {
