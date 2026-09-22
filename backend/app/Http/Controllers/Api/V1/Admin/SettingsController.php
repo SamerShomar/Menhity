@@ -50,7 +50,7 @@ class SettingsController extends Controller
                 'site' => config('menhity.site'),
                 'pricing' => $this->settings->pricing(),
                 'payment' => $this->settings->payment(),
-                'services' => collect(CvOrderKind::cases())->map(fn (CvOrderKind $kind) => [
+                'services' => collect([CvOrderKind::CvBuild, CvOrderKind::LetterBuild])->map(fn (CvOrderKind $kind) => [
                     'kind' => $kind->value,
                     'label' => $kind->label(),
                 ])->all(),
@@ -114,7 +114,7 @@ class SettingsController extends Controller
             'instructions' => ['nullable', 'string', 'max:2000'],
         ];
 
-        foreach (CvOrderKind::cases() as $kind) {
+        foreach ([CvOrderKind::CvBuild, CvOrderKind::LetterBuild] as $kind) {
             $rules["prices.{$kind->value}"] = ['required', 'numeric', 'min:0', 'max:100000'];
         }
 
@@ -124,7 +124,7 @@ class SettingsController extends Controller
 
         $pricing = ['currency' => $validated['currency']];
 
-        foreach (CvOrderKind::cases() as $kind) {
+        foreach ([CvOrderKind::CvBuild, CvOrderKind::LetterBuild] as $kind) {
             $pricing[$kind->value] = (float) $validated['prices'][$kind->value];
         }
 

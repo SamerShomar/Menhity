@@ -69,7 +69,7 @@ class DocumentImprovementTest extends TestCase
 
     public function test_invalid_provider_output_cannot_be_downloaded(): void
     {
-        $this->provider();
+        config(['menhity.ai.provider' => 'gemini', 'menhity.ai.gemini.api_key' => 'fake-key']);
         Http::fake(['*' => Http::response(['candidates' => [['content' => ['parts' => [['text' => 'incomplete']]]]]])]);
         Sanctum::actingAs(User::factory()->create());
         $this->postJson('/api/v1/document-improvements', ['kind' => 'letter_improve', 'file' => $this->file(), 'consent' => true])->assertStatus(502);
