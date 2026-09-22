@@ -294,7 +294,7 @@ class CvOrderPaymentTest extends TestCase
 
         $settings = app(SettingsService::class);
 
-        $this->assertSame(50.0, $settings->priceFor(CvOrderKind::CvImprove));
+        $this->assertSame(35.0, $settings->priceFor(CvOrderKind::LetterBuild));
         $this->assertSame('987654321', $settings->payment()['account_number']);
     }
 

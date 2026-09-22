@@ -269,7 +269,7 @@ class StudentDashboardApiTest extends TestCase
 
         // مساران مستقلان — الأول لا يحجب الثاني
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'letter_improve',
+            'kind' => 'letter_build',
             'file' => UploadedFile::fake()->create('letter.pdf', 40, 'application/pdf'),
         ])->assertCreated();
 
@@ -304,9 +304,9 @@ class StudentDashboardApiTest extends TestCase
     {
         $user = $this->student();
 
-        $this->actingAs($user)->postJson('/api/v1/cv-orders', ['kind' => 'cv_improve'])
+        $this->actingAs($user)->postJson('/api/v1/document-improvements', ['kind' => 'cv_improve', 'consent' => true])
             ->assertUnprocessable()
-            ->assertJsonPath('message', 'أرفق ملفك الحالي ليتمكّن الفريق من تحسينه.');
+            ->assertJsonValidationErrors('file');
     }
 
     /**
@@ -349,7 +349,7 @@ class StudentDashboardApiTest extends TestCase
         $this->completeProfile($user);
 
         $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
+            'kind' => 'letter_build',
             'file' => UploadedFile::fake()->create('سيرتي.pdf', 80, 'application/pdf'),
         ])->assertCreated();
 
@@ -406,12 +406,12 @@ class StudentDashboardApiTest extends TestCase
         User::factory()->expert()->create();
         $user = $this->student();
 
-        // التحسين يبدأ من ملف المستخدم، فلا يشترط اكتمال الملف الأكاديمي
-        $response = $this->actingAs($user)->postJson('/api/v1/cv-orders', [
-            'kind' => 'cv_improve',
-            'file' => UploadedFile::fake()->create('سيرتي.pdf', 120, 'application/pdf'),
-            'note' => 'أرجو إبراز خبرتي البحثية.',
-        ])->assertCreated();
+        // Legacy manual improvement orders remain readable and private.
+        $order = app(\App\Services\CvOrderService::class)->submit(
+            $user, $user->profile, \App\Enums\CvOrderKind::CvImprove,
+            UploadedFile::fake()->create('سيرتي.pdf', 120, 'application/pdf'),
+        );
+        $response = $this->actingAs($user)->getJson('/api/v1/cv-orders/'.$order->id)->assertOk();
 
         $this->assertSame('cv_improve', $response->json('data.kind'));
         $this->assertSame('سيرتي.pdf', $response->json('data.source_file_name'));
