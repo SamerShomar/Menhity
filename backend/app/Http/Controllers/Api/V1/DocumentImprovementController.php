@@ -51,7 +51,11 @@ class DocumentImprovementController extends Controller
             throw $e;
         } catch (\Throwable $e) {
             $run?->update(['status' => AiRunStatus::Failed, 'error_message' => 'Document improvement failed']);
-            Log::warning('Document improvement failed', ['run_id' => $run?->id, 'exception' => get_class($e)]);
+            Log::warning('Document improvement failed', [
+                'run_id' => $run?->id,
+                'exception' => get_class($e),
+                'message' => $e->getMessage(),
+            ]);
             return response()->json(['message' => 'تعذّر إكمال التحسين. لم يتم إنشاء ملف نهائي؛ حاول مجدداً لاحقاً.'], 502);
         } finally {
             $lock->release();

@@ -185,7 +185,12 @@ PROMPT;
             'target' => $target,
             'document_text' => $text,
         ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-        $output = preg_replace('/^```(?:json)?\s*|\s*```$/u', '', trim($output));
+        $output = trim(preg_replace('/^```(?:json)?\s*|\s*```$/u', '', trim($output)));
+        $start = strpos($output, '{');
+        $end = strrpos($output, '}');
+        if ($start !== false && $end !== false && $end >= $start) {
+            $output = substr($output, $start, $end - $start + 1);
+        }
         $result = json_decode($output, true);
         $validator = \Illuminate\Support\Facades\Validator::make(is_array($result) ? $result : [], [
             'summary' => ['required', 'string', 'max:4000'],

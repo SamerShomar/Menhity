@@ -42,6 +42,7 @@ class GeminiProvider implements AiProvider
                 'generationConfig' => [
                     'maxOutputTokens' => config('menhity.ai.max_tokens'),
                     'temperature' => 0.7,
+                    'responseMimeType' => 'application/json',
                 ],
             ]);
 

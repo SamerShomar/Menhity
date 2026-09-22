@@ -106,6 +106,7 @@ class AiProviderTest extends TestCase
                 && $request->hasHeader('x-goog-api-key', 'test-key')
                 && filled(data_get($body, 'system_instruction.parts.0.text'))
                 && str_contains(data_get($body, 'contents.0.parts.0.text'), 'بيانات الملف الأكاديمي')
+                && data_get($body, 'generationConfig.responseMimeType') === 'application/json'
                 && data_get($body, 'generationConfig.maxOutputTokens') === config('menhity.ai.max_tokens');
         });
     }
