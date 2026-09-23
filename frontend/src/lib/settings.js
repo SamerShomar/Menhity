@@ -14,3 +14,11 @@ export function normalizeSettings(settings = {}) {
     ),
   };
 }
+
+export function mergeSettingsState(currentSettings = {}, resultSettings = {}, preferredSettings = {}) {
+  return {
+    ...(currentSettings ?? {}),
+    ...(resultSettings ?? {}),
+    ...(preferredSettings ?? {}),
+  };
+}

@@ -22,7 +22,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { TIMEZONES } from "@/lib/constants";
 import { formatDateAr, timeAgoAr } from "@/lib/utils";
-import { normalizeSettings } from "@/lib/settings";
+import { mergeSettingsState, normalizeSettings } from "@/lib/settings";
 
 export default function SettingsPage() {
   // الخصوصية إظهار الملف الأكاديمي للجامعات — مفهوم طالبي لا يخصّ حساباً إدارياً أو خبيراً
@@ -134,13 +134,16 @@ function PrivacyCard() {
       [field]: value,
     });
 
-    setUser((current) => ({ ...current, settings: { ...current.settings, ...next } }));
+    setUser((current) => ({
+      ...current,
+      settings: { ...(current.settings ?? {}), ...next },
+    }));
     const { ok, result } = await submit(next);
     if (ok) {
       setUser((current) => ({
         ...current,
         ...result,
-        settings: result?.settings ?? current.settings,
+        settings: mergeSettingsState(current.settings, result?.settings, next),
       }));
     }
   };
@@ -183,13 +186,16 @@ function NotificationsCard() {
       [field]: value,
     });
 
-    setUser((current) => ({ ...current, settings: { ...current.settings, ...next } }));
+    setUser((current) => ({
+      ...current,
+      settings: { ...(current.settings ?? {}), ...next },
+    }));
     const { ok, result } = await submit(next);
     if (ok) {
       setUser((current) => ({
         ...current,
         ...result,
-        settings: result?.settings ?? current.settings,
+        settings: mergeSettingsState(current.settings, result?.settings, next),
       }));
     }
   };
