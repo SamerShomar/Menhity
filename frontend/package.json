@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "test": "node --test src/api/*.test.js",
+    "test": "node --test src/api/*.test.js src/lib/*.test.js",
     "dev": "vite",
     "build": "vite build",
     "lint": "oxlint",

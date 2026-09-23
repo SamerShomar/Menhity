@@ -22,6 +22,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useApi, useSubmit } from "@/hooks/useApi";
 import { TIMEZONES } from "@/lib/constants";
 import { formatDateAr, timeAgoAr } from "@/lib/utils";
+import { normalizeSettings } from "@/lib/settings";
 
 export default function SettingsPage() {
   // الخصوصية إظهار الملف الأكاديمي للجامعات — مفهوم طالبي لا يخصّ حساباً إدارياً أو خبيراً
@@ -128,11 +129,10 @@ function PrivacyCard() {
   const settings = user?.settings ?? {};
 
   const toggle = async (field, value) => {
-    const next = {
-      profile_visible: settings.profile_visible,
-      share_data_with_universities: settings.share_data_with_universities,
+    const next = normalizeSettings({
+      ...settings,
       [field]: value,
-    };
+    });
 
     setUser((current) => ({ ...current, settings: { ...current.settings, ...next } }));
     const { ok, result } = await submit(next);
@@ -172,12 +172,10 @@ function NotificationsCard() {
   const settings = user?.settings ?? {};
 
   const toggle = async (field, value) => {
-    const next = {
-      notify_new_matches: settings.notify_new_matches,
-      notify_application_status: settings.notify_application_status,
-      notify_news: settings.notify_news,
+    const next = normalizeSettings({
+      ...settings,
       [field]: value,
-    };
+    });
 
     setUser((current) => ({ ...current, settings: { ...current.settings, ...next } }));
     const { ok, result } = await submit(next);
