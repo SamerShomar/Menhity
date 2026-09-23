@@ -136,7 +136,13 @@ function PrivacyCard() {
 
     setUser((current) => ({ ...current, settings: { ...current.settings, ...next } }));
     const { ok, result } = await submit(next);
-    if (ok) setUser((current) => ({ ...current, settings: result }));
+    if (ok) {
+      setUser((current) => ({
+        ...current,
+        ...result,
+        settings: result?.settings ?? current.settings,
+      }));
+    }
   };
 
   return (
@@ -179,7 +185,13 @@ function NotificationsCard() {
 
     setUser((current) => ({ ...current, settings: { ...current.settings, ...next } }));
     const { ok, result } = await submit(next);
-    if (ok) setUser((current) => ({ ...current, settings: result }));
+    if (ok) {
+      setUser((current) => ({
+        ...current,
+        ...result,
+        settings: result?.settings ?? current.settings,
+      }));
+    }
   };
 
   return (
