@@ -303,18 +303,33 @@ function LocaleCard() {
 /* ---------------- الجلسات ---------------- */
 
 function SessionsCard() {
+  const { clearSession } = useAuth();
   const { data, loading, error, reload } = useApi(settingsApi.sessions, []);
   const revoke = useSubmit(settingsApi.revokeSession);
   const revokeAll = useSubmit(settingsApi.revokeAllSessions);
 
   const onRevoke = async (session) => {
-    const { ok } = await revoke.submit(session.id);
-    if (ok) reload(true);
+    const { ok, result } = await revoke.submit(session.id);
+    if (!ok) return;
+
+    if (result?.logged_out) {
+      clearSession();
+      return;
+    }
+
+    reload(true);
   };
 
   const onRevokeAll = async () => {
-    const { ok } = await revokeAll.submit();
-    if (ok) reload(true);
+    const { ok, result } = await revokeAll.submit();
+    if (!ok) return;
+
+    if (result?.logged_out) {
+      clearSession();
+      return;
+    }
+
+    reload(true);
   };
 
   const others = (data ?? []).filter((session) => !session.is_current);
