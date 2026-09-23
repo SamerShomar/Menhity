@@ -382,16 +382,14 @@ function SessionsCard() {
                   </p>
                 </div>
 
-                {!session.is_current ? (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => onRevoke(session)}
-                    disabled={revoke.submitting}
-                  >
-                    إنهاء
-                  </Button>
-                ) : null}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onRevoke(session)}
+                  disabled={revoke.submitting}
+                >
+                  {session.is_current ? "تسجيل الخروج" : "إنهاء"}
+                </Button>
               </li>
             ))}
           </ul>
