@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
 import { authApi } from "@/api/endpoints";
-import { getToken, setToken } from "@/api/client";
+import { getToken, sendKeepalive, setToken } from "@/api/client";
 
 const AuthContext = createContext(null);
 
@@ -14,6 +14,7 @@ export function AuthProvider({ children }) {
    * داخلاً، ولا يصحّ أن يهبط عليها من يدخل بعده — وقد يكون حساباً آخر.
    */
   const [signedOut, setSignedOut] = useState(false);
+  const userId = user?.id;
 
   // استعادة الجلسة عند فتح التطبيق إن وُجد توكن محفوظ
   useEffect(() => {
@@ -41,6 +42,24 @@ export function AuthProvider({ children }) {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!userId) return undefined;
+
+    const heartbeat = () => authApi.presenceHeartbeat().catch(() => undefined);
+    const markOffline = () => sendKeepalive("/presence/offline");
+
+    heartbeat();
+    const interval = window.setInterval(heartbeat, 20_000);
+    window.addEventListener("pagehide", markOffline);
+    window.addEventListener("pageshow", heartbeat);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("pagehide", markOffline);
+      window.removeEventListener("pageshow", heartbeat);
+    };
+  }, [userId]);
 
   const login = useCallback(async (payload) => {
     const data = await authApi.login(payload);

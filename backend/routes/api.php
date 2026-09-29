@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\Expert;
 use App\Http\Controllers\Api\V1\MetaController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\PresenceController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\ProfileItemController;
 use App\Http\Controllers\Api\V1\SavedScholarshipController;
@@ -68,6 +69,8 @@ Route::prefix('v1')->group(function (): void {
         /* ---- الحساب والجلسات ---- */
         Route::get('auth/me', [AuthController::class, 'me'])->name('auth.me');
         Route::post('auth/logout', [AuthController::class, 'logout'])->name('auth.logout');
+        Route::post('presence/heartbeat', [PresenceController::class, 'heartbeat'])->name('presence.heartbeat');
+        Route::post('presence/offline', [PresenceController::class, 'offline'])->name('presence.offline');
         Route::get('auth/verification-status', [EmailVerificationController::class, 'status'])
             ->name('auth.verification-status');
 

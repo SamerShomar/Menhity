@@ -16,7 +16,7 @@ class AdminUsersTest extends TestCase
         $admin = User::factory()->create(['role' => UserRole::Admin]);
         $recentUser = User::factory()->create();
         $staleUser = User::factory()->create();
-        $recentUser->forceFill(['last_seen_at' => now()->subMinute()])->save();
+        $recentUser->forceFill(['last_seen_at' => now()->subSeconds(30)])->save();
         $staleUser->forceFill(['last_seen_at' => now()->subMinutes(10)])->save();
 
         $this->actingAs($admin)
@@ -37,5 +37,21 @@ class AdminUsersTest extends TestCase
             ->assertJsonPath('meta.stats.online', 1);
 
         $this->assertNotNull($admin->fresh()->last_seen_at);
+    }
+
+    public function test_presence_heartbeat_and_offline_requests_update_last_seen(): void
+    {
+        $user = User::factory()->create();
+        $user->forceFill(['last_seen_at' => now()->subMinutes(2)])->save();
+
+        $this->actingAs($user)
+            ->postJson('/api/v1/presence/heartbeat')
+            ->assertOk();
+
+        $this->assertNotNull($user->fresh()->last_seen_at);
+
+        $this->postJson('/api/v1/presence/offline')->assertOk();
+
+        $this->assertNull($user->fresh()->last_seen_at);
     }
 }

@@ -22,6 +22,18 @@ export function setToken(token) {
   }
 }
 
+export function sendKeepalive(url) {
+  const token = getToken();
+  if (!token) return;
+
+  const baseURL = String(api.defaults.baseURL).replace(/\/$/, "");
+  fetch(`${baseURL}${url}`, {
+    method: "POST",
+    headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+    keepalive: true,
+  }).catch(() => undefined);
+}
+
 /** مهلة عامة — بدونها يدور مؤشّر التحميل بلا نهاية إن لم يستجب الخادم */
 export const REQUEST_TIMEOUT = 30_000;
 

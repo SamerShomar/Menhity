@@ -196,7 +196,7 @@ export default function AdminUsersPage() {
         actions={
           <div className="flex items-center gap-2">
             <span
-              title="نشاط خلال آخر 5 دقائق"
+              title="نشاط خلال آخر دقيقة"
               className="inline-flex items-center gap-1.5 rounded-md bg-[color:var(--color-success)]/12 px-2.5 py-1.5 text-xs font-semibold text-[#166534]"
             >
               <span className="size-1.5 rounded-full bg-[#16a34a]" />

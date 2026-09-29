@@ -15,6 +15,7 @@ export const authApi = {
   login: (payload) => api.post("/auth/login", payload).then((r) => r.data),
   me: () => cachedGet("/auth/me").then((r) => r.data.data),
   logout: () => api.post("/auth/logout").then((r) => r.data),
+  presenceHeartbeat: () => api.post("/presence/heartbeat").then((r) => r.data),
   verifyEmail: ({ email, token }) =>
     api.post("/auth/verify-email", { email, token }).then((r) => r.data),
   resendVerification: (payload) => api.post("/auth/resend-verification", payload).then((r) => r.data),
