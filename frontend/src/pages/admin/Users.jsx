@@ -49,7 +49,7 @@ export default function AdminUsersPage() {
   const setRole = useSubmit(({ id, value }) => adminApi.setUserRole(id, value));
 
   useEffect(() => {
-    const interval = window.setInterval(() => reload(true), 30_000);
+    const interval = window.setInterval(() => reload(true), 10_000);
     return () => window.clearInterval(interval);
   }, [reload]);
 
