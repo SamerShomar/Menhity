@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Download, Search, ShieldCheck } from "lucide-react";
 
@@ -47,6 +47,11 @@ export default function AdminUsersPage() {
   const { data, loading, error, reload } = useApi(() => adminApi.users(query), [JSON.stringify(query)]);
   const setStatus = useSubmit(({ id, value, note }) => adminApi.setUserStatus(id, value, note));
   const setRole = useSubmit(({ id, value }) => adminApi.setUserRole(id, value));
+
+  useEffect(() => {
+    const interval = window.setInterval(() => reload(true), 30_000);
+    return () => window.clearInterval(interval);
+  }, [reload]);
 
   const write = (next) => {
     const search = new URLSearchParams();
@@ -196,9 +201,10 @@ export default function AdminUsersPage() {
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
         <StatCard label="إجمالي المستخدمين" value={stats.total ?? 0} />
-        <StatCard label="نشطون" value={stats.active ?? 0} tone="success" />
+        <StatCard label="حسابات نشطة" value={stats.active ?? 0} tone="success" />
+        <StatCard label="نشطون الآن" value={stats.online ?? 1} hint="خلال آخر 5 دقائق" tone="info" />
         <StatCard label="موقوفون" value={stats.suspended ?? 0} tone="danger" />
         <StatCard label="جدد هذا الأسبوع" value={stats.new_this_week ?? 0} tone="info" />
       </div>

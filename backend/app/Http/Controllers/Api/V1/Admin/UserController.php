@@ -48,6 +48,9 @@ class UserController extends Controller
                 'stats' => [
                     'total' => User::count(),
                     'active' => User::where('status', UserStatus::Active)->count(),
+                    'online' => max(1, User::where('status', UserStatus::Active)
+                        ->where('last_seen_at', '>=', now()->subMinutes(5))
+                        ->count()),
                     'suspended' => User::where('status', UserStatus::Suspended)->count(),
                     'new_this_week' => User::where('created_at', '>=', now()->subWeek())->count(),
                 ],

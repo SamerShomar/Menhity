@@ -59,6 +59,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'suspended_at' => 'datetime',
             'last_login_at' => 'datetime',
+            'last_seen_at' => 'datetime',
             'accepted_terms_at' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
