@@ -194,17 +194,26 @@ export default function AdminUsersPage() {
         title="المستخدمون"
         description="إدارة حسابات الطلاب والمشرفين والخبراء وصلاحياتهم."
         actions={
-          <Button variant="outline" size="sm" onClick={onExport} loading={exporting}>
-            <Download className="size-4" />
-            تصدير CSV
-          </Button>
+          <div className="flex items-center gap-2">
+            <span
+              title="نشاط خلال آخر 5 دقائق"
+              className="inline-flex items-center gap-1.5 rounded-md bg-[color:var(--color-success)]/12 px-2.5 py-1.5 text-xs font-semibold text-[#166534]"
+            >
+              <span className="size-1.5 rounded-full bg-[#16a34a]" />
+              نشطون الآن
+              <span className="num text-sm font-bold">{stats.online ?? 1}</span>
+            </span>
+            <Button variant="outline" size="sm" onClick={onExport} loading={exporting}>
+              <Download className="size-4" />
+              تصدير CSV
+            </Button>
+          </div>
         }
       />
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatCard label="إجمالي المستخدمين" value={stats.total ?? 0} />
         <StatCard label="حسابات نشطة" value={stats.active ?? 0} tone="success" />
-        <StatCard label="نشطون الآن" value={stats.online ?? 1} hint="خلال آخر 5 دقائق" tone="info" />
         <StatCard label="موقوفون" value={stats.suspended ?? 0} tone="danger" />
         <StatCard label="جدد هذا الأسبوع" value={stats.new_this_week ?? 0} tone="info" />
       </div>
