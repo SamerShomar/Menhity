@@ -47,7 +47,7 @@ export default function LoginPage() {
     <AuthSplit
       title="تسجيل الدخول"
       description="أهلاً بعودتك — تابع رحلتك نحو المنحة المناسبة."
-      badge="منصة منحتي"
+      badge="منصة بَوْصلة"
       aside={{
         title: "منحتك القادمة على بُعد خطوة واحدة",
         description:

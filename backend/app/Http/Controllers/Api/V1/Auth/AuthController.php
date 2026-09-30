@@ -45,7 +45,7 @@ class AuthController extends Controller
 
             $user->notifications()->create([
                 'type' => NotificationType::System,
-                'title' => 'أهلاً بك في منحتي 👋',
+                'title' => 'أهلاً بك في بَوْصلة 👋',
                 'body' => 'أكمل ملفك الأكاديمي لنبدأ باقتراح المنح الأنسب لك.',
                 'badge_label' => 'جديد',
                 'action_label' => 'إكمال الملف',

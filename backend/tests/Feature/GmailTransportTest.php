@@ -30,7 +30,7 @@ class GmailTransportTest extends TestCase
             'mail.mailers.gmail.client_secret' => 'client-secret',
             'mail.mailers.gmail.refresh_token' => 'refresh-token',
             'mail.from.address' => 'menhity@gmail.com',
-            'mail.from.name' => 'منحتي',
+            'mail.from.name' => 'بَوْصلة',
         ]);
     }
 

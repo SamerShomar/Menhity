@@ -65,7 +65,7 @@ export default function ToolsHubPage() {
           as="h1"
           eyebrow="كتابة بشرية وتحسين بالذكاء الاصطناعي"
           title="صياغة السيرة الذاتية وخطاب الدافع"
-          description="فريق منحتي يكتب سيرتك وخطابك من الصفر، والذكاء الاصطناعي يراجع ملفاتك الحالية ويحسّنها مباشرة."
+          description="فريق بَوْصلة يكتب سيرتك وخطابك من الصفر، والذكاء الاصطناعي يراجع ملفاتك الحالية ويحسّنها مباشرة."
         />
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -92,7 +92,7 @@ export default function ToolsHubPage() {
                   </span>
                 ) : null}
               </div>
-              <p className="mt-2 text-xs font-bold text-navy-700">{service.key.endsWith("improve") ? "بالذكاء الاصطناعي" : "بإشراف فريق منحتي"}</p>
+              <p className="mt-2 text-xs font-bold text-navy-700">{service.key.endsWith("improve") ? "بالذكاء الاصطناعي" : "بإشراف فريق بَوْصلة"}</p>
               <p className="mt-2 flex-1 text-[13px] leading-7 text-ink-600">{service.description}</p>
 
               <ButtonLink

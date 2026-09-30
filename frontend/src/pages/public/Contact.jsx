@@ -51,7 +51,7 @@ export default function ContactPage() {
           <div className="glass rounded-2xl p-6 sm:p-8">
             {success ? (
               <Alert tone="success" className="mb-6" title="وصلتنا رسالتك">
-                شكراً لتواصلك معنا. سيرد عليك فريق منحتي على بريدك الإلكتروني قريباً.
+                شكراً لتواصلك معنا. سيرد عليك فريق بَوْصلة على بريدك الإلكتروني قريباً.
               </Alert>
             ) : null}
 

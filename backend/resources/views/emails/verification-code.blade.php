@@ -21,7 +21,7 @@
 
                     <tr>
                         <td style="background-color:#14306b; padding:24px 32px; text-align:center;">
-                            <span style="color:#ffffff; font-size:22px; font-weight:bold;">منحتي</span>
+                            <span style="color:#ffffff; font-size:22px; font-weight:bold;">بَوْصلة</span>
                             <span style="color:#f6c445; font-size:22px; font-weight:bold;">.</span>
                         </td>
                     </tr>
@@ -52,7 +52,7 @@
 
                             <p style="margin:24px 0 0; font-size:14px; color:#6b7280; line-height:1.8;">
                                 الرمز صالح لمدة <strong style="color:#14306b;">{{ $minutes }}</strong> دقيقة.
-                                لا تشارك هذا الرمز مع أي شخص — فريق منحتي لن يطلبه منك أبداً.
+                                لا تشارك هذا الرمز مع أي شخص — فريق بَوْصلة لن يطلبه منك أبداً.
                             </p>
 
                             <p style="margin:16px 0 0; font-size:14px; color:#6b7280; line-height:1.8;">
@@ -64,7 +64,7 @@
                     <tr>
                         <td style="background-color:#f8f9fb; padding:20px 32px; text-align:center;
                                    font-size:12px; color:#9ca3af; border-top:1px solid #e5e7eb;">
-                            © {{ date('Y') }} منحتي — منصّة المنح الدراسية
+                            © {{ date('Y') }} بَوْصلة — منصّة المنح الدراسية
                         </td>
                     </tr>
                 </table>

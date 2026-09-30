@@ -76,7 +76,7 @@ export default function ServiceRequestPage() {
       <div className="container-page max-w-3xl">
         <PageHeader
           title="طلب خدمة يدوية"
-          description="يعمل فريق منحتي على ملفك بنفسه ويسلّمك نسخة جاهزة."
+          description="يعمل فريق بَوْصلة على ملفك بنفسه ويسلّمك نسخة جاهزة."
         />
 
         {error ? (

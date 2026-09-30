@@ -5,7 +5,7 @@ namespace App\Models;
 use Laravel\Sanctum\PersonalAccessToken as SanctumPersonalAccessToken;
 
 /**
- * توكن الوصول هو "الجلسة" في منحتي — يحمل بيانات الجهاز
+ * توكن الوصول هو "الجلسة" في بَوْصلة — يحمل بيانات الجهاز
  * لتغذية شاشة "الجلسات والأجهزة النشطة" وإتاحة إنهاء أي جهاز على حدة.
  */
 class PersonalAccessToken extends SanctumPersonalAccessToken

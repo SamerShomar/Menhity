@@ -46,7 +46,7 @@ class DocumentImprovementTest extends TestCase
         $response->assertCreated()->assertJsonPath('data.result.revised_text', self::TEXT);
         $id = $response->json('data.id');
         $this->getJson('/api/v1/document-improvements')->assertJsonCount(1, 'data');
-        $this->get('/api/v1/document-improvements/'.$id.'/file')->assertOk()->assertDownload('menhity-improved-'.$id.'.docx');
+        $this->get('/api/v1/document-improvements/'.$id.'/file')->assertOk()->assertDownload('bousla-improved-'.$id.'.docx');
         Sanctum::actingAs(User::factory()->create());
         $this->getJson('/api/v1/document-improvements')->assertJsonCount(0, 'data');
         $this->getJson('/api/v1/document-improvements/'.$id.'/file')->assertNotFound();

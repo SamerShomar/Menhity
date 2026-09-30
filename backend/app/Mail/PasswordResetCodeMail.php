@@ -20,7 +20,7 @@ class PasswordResetCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: "رمز استعادة كلمة المرور في منحتي: {$this->code}",
+            subject: "رمز استعادة كلمة المرور في بَوْصلة: {$this->code}",
             replyTo: array_filter([$this->replyToAddress()]),
         );
     }

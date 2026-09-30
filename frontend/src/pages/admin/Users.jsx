@@ -98,7 +98,7 @@ export default function AdminUsersPage() {
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = `menhity-users-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.download = `bousla-users-${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(link);
       link.click();
       link.remove();

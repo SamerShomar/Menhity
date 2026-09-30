@@ -43,7 +43,7 @@ class MailTestCommand extends Command
         }
 
         // مستخدم غير مخزَّن: الأمر تشخيصي ولا يلمس قاعدة البيانات
-        $user = new User(['name' => 'اختبار منحتي', 'email' => $to]);
+        $user = new User(['name' => 'اختبار بَوْصلة', 'email' => $to]);
 
         try {
             Mail::to($to)->send(new VerifyEmailCodeMail($user, '123456'));

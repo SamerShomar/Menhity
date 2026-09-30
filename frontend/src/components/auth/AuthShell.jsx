@@ -122,7 +122,7 @@ export function AuthSplit({ title, description, badge, children, aside }) {
           </div>
 
           <p className="mt-10 text-xs text-navy-200">
-            © <span className="num">{new Date().getFullYear()}</span> منحتي — جميع الحقوق محفوظة
+            © <span className="num">{new Date().getFullYear()}</span> بَوْصلة — جميع الحقوق محفوظة
           </p>
         </div>
       </aside>
@@ -188,7 +188,7 @@ export function AuthCentered({ title, description, icon, children, className, fo
             </div>
           ) : null}
           <p className="mt-3">
-            © <span className="num">{new Date().getFullYear()}</span> منحتي
+            © <span className="num">{new Date().getFullYear()}</span> بَوْصلة
           </p>
         </div>
       </div>

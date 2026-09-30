@@ -42,7 +42,7 @@ class CvOrderPaymentTest extends TestCase
         ]);
 
         $settings->put(SettingsService::PAYMENT, [
-            'account_holder' => 'منصة منحتي',
+            'account_holder' => 'منصة بَوْصلة',
             'bank_name' => 'بنك فلسطين',
             'account_number' => '123456789',
             'iban' => 'PS00PALS000000000123456789',
@@ -284,7 +284,7 @@ class CvOrderPaymentTest extends TestCase
             ->putJson('/api/v1/admin/settings/payment', [
                 'currency' => 'ILS',
                 'prices' => ['cv_build' => 80, 'cv_improve' => 50, 'letter_improve' => 35, 'letter_build' => 35],
-                'account_holder' => 'منصة منحتي',
+                'account_holder' => 'منصة بَوْصلة',
                 'bank_name' => 'بنك فلسطين',
                 'account_number' => '987654321',
                 'iban' => 'PS00PALS000000000987654321',

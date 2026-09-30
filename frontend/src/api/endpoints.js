@@ -137,7 +137,7 @@ async function downloadFile(url, fallbackName) {
   const link = document.createElement("a");
 
   link.href = objectUrl;
-  link.download = fallbackName ?? "منحتي";
+  link.download = fallbackName ?? "بَوْصلة";
   document.body.appendChild(link);
   link.click();
   link.remove();

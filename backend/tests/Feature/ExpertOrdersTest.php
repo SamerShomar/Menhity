@@ -125,7 +125,7 @@ class ExpertOrdersTest extends TestCase
         );
         app(SettingsService::class)->put(
             SettingsService::PAYMENT,
-            ['account_holder' => 'منحتي', 'bank_name' => 'بنك', 'account_number' => '123', 'iban' => null, 'instructions' => null],
+            ['account_holder' => 'بَوْصلة', 'bank_name' => 'بنك', 'account_number' => '123', 'iban' => null, 'instructions' => null],
         );
 
         $student->profile->update([

@@ -1,9 +1,9 @@
-# مخطّط نشر منحتي على Render — الخطة المجانية
+# مخطّط نشر بَوْصلة على Render — الخطة المجانية
 # قاعدة البيانات خارجية (Neon) فلا تنتهي صلاحيتها بعد 90 يوماً كقواعد Render المجانية.
 
 services:
   - type: web
-    name: menhity-api
+    name: bousla-api
     runtime: docker
     plan: free
     region: frankfurt
@@ -12,7 +12,7 @@ services:
     healthCheckPath: /up
     envVars:
       - key: APP_NAME
-        value: منحتي
+        value: بَوْصلة
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -33,9 +33,9 @@ services:
         value: public
       # القيم التالية تُضبط يدوياً من لوحة Render:
       #   APP_KEY        ← ناتج php artisan key:generate --show
-      #   APP_URL        ← https://menhity-api.onrender.com
+      #   APP_URL        ← https://bousla-api.onrender.com
       #   DB_URL         ← رابط الاتصال من Neon
-      #   FRONTEND_URL   ← https://menhity.pages.dev
+      #   FRONTEND_URL   ← https://bousla.pages.dev
       #   ANTHROPIC_API_KEY (اختياري)
       - key: APP_KEY
         sync: false

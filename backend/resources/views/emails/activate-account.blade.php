@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>فعّل حسابك في منحتي</title>
+    <title>فعّل حسابك في بَوْصلة</title>
 </head>
 <body style="margin:0; padding:0; background-color:#eef1f6;">
     {{-- نصّ المعاينة في صندوق الوارد، مخفيّ داخل الرسالة --}}
@@ -32,7 +32,7 @@
                                              style="display:block; border:0;">
                                     </td>
                                     <td valign="middle">
-                                        <span style="color:#ffffff; font-size:23px; font-weight:bold;">منحتي</span>
+                                        <span style="color:#ffffff; font-size:23px; font-weight:bold;">بَوْصلة</span>
                                     </td>
                                 </tr>
                             </table>
@@ -47,7 +47,7 @@
                                 مرحباً {{ $name }}،
                             </p>
                             <p style="margin:0 0 28px; font-size:15px; color:#334155; line-height:1.9;">
-                                أنشأت حساباً في منحتي. اضغط الزر أدناه لتفعيله وتبدأ باكتشاف المنح المناسبة لك.
+                                أنشأت حساباً في بَوْصلة. اضغط الزر أدناه لتفعيله وتبدأ باكتشاف المنح المناسبة لك.
                             </p>
                         </td>
                     </tr>
@@ -99,7 +99,7 @@
                     <tr>
                         <td style="background-color:#f6f8fb; padding:20px 32px; text-align:center;
                                    font-size:12px; color:#94a3b8; border-top:1px solid #e4e9f1;">
-                            © {{ date('Y') }} منحتي — منصّة المنح الدراسية
+                            © {{ date('Y') }} بَوْصلة — منصّة المنح الدراسية
                         </td>
                     </tr>
                 </table>

@@ -193,7 +193,7 @@ class CvOrderController extends Controller
 
         return Storage::disk('local')->download(
             $cvOrder->final_file_path,
-            $cvOrder->final_file_name ?? "منحتي-{$cvOrder->order_number}.pdf",
+            $cvOrder->final_file_name ?? "بَوْصلة-{$cvOrder->order_number}.pdf",
         );
     }
 

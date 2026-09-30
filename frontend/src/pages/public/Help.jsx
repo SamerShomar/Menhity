@@ -56,7 +56,7 @@ export default function HelpPage() {
           </span>
           <h1 className="mt-4 font-display text-3xl text-navy-800">مركز المساعدة</h1>
           <p className="mx-auto mt-3 max-w-2xl text-[15px] leading-8 text-ink-600">
-            دليل سريع يشرح كيف تستفيد من منحتي خطوة بخطوة.
+            دليل سريع يشرح كيف تستفيد من بَوْصلة خطوة بخطوة.
           </p>
         </header>
 

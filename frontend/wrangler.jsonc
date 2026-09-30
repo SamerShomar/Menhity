@@ -1,8 +1,8 @@
 {
-  // إعداد نشر واجهة منحتي على Cloudflare Workers.
+  // إعداد نشر واجهة بَوْصلة على Cloudflare Workers.
   // الواجهة ملفات ثابتة بعد البناء، وWorkers يقدّمها من مجلد dist مباشرة.
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "menhity",
+  "name": "bousla",
   "compatibility_date": "2026-09-15",
 
   "assets": {

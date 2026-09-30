@@ -186,7 +186,7 @@ export default function LandingPage() {
       <section className="py-14">
         <div className="container-page">
           <SectionHeading
-            eyebrow="كيف تعمل منحتي؟"
+            eyebrow="كيف تعمل بَوْصلة؟"
             title="أربع خطوات من الملف إلى القبول"
             description="رحلة واضحة تبدأ ببيانات ملفك وتنتهي بطلب جاهز للإرسال."
           />
@@ -214,7 +214,7 @@ export default function LandingPage() {
           <SectionHeading
             eyebrow="بإشراف خبير أكاديمي"
             title="صياغة سيرتك الذاتية وخطاب دافعك"
-            description="فريق منحتي يكتب ملفك من الصفر، والذكاء الاصطناعي يراجع سيرتك وخطابك الحاليين ويعيد لك نسخة محسّنة."
+            description="فريق بَوْصلة يكتب ملفك من الصفر، والذكاء الاصطناعي يراجع سيرتك وخطابك الحاليين ويعيد لك نسخة محسّنة."
           />
 
           <div className="mt-8 flex justify-center">
@@ -232,7 +232,7 @@ export default function LandingPage() {
           <div className="container-page text-center">
             <h2 className="font-display text-2xl sm:text-3xl">جاهز لتبدأ رحلتك الدراسية؟</h2>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-8 text-navy-100">
-              أنشئ حسابك مجاناً، أكمل ملفك الأكاديمي، ودع منحتي ترشّح لك المنح الأنسب وتجهّز مستنداتك.
+              أنشئ حسابك مجاناً، أكمل ملفك الأكاديمي، ودع بَوْصلة ترشّح لك المنح الأنسب وتجهّز مستنداتك.
             </p>
             <ButtonLink to="/register" variant="gold" size="lg" className="mt-7">
               ابدأ مجاناً الآن

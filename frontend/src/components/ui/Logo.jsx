@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 /**
- * شعار منحتي: كتاب مفتوح تعلوه طائرة.
+ * شعار بَوْصلة: كتاب مفتوح تعلوه طائرة.
  *
  * مرسوم متجهاً لا صورة نقطية: يكبر بلا تحبّب، وحجمه بالبايتات، ويتلوّن
  * أبيض على الخلفيات الداكنة دون ملف ثانٍ.
@@ -53,7 +53,7 @@ export function LogoMark({ className, tone = "navy" }) {
 
 export function Logo({ tone = "navy", withText = true, className, to = "/" }) {
   return (
-    <Link to={to} className={cn("inline-flex items-center gap-2", className)} aria-label="منحتي">
+    <Link to={to} className={cn("inline-flex items-center gap-2", className)} aria-label="بَوْصلة">
       <LogoMark tone={tone} />
       {withText && (
         <span
@@ -62,7 +62,7 @@ export function Logo({ tone = "navy", withText = true, className, to = "/" }) {
             tone === "white" ? "text-white" : "text-navy-800",
           )}
         >
-          منحتي
+          بَوْصلة
         </span>
       )}
     </Link>

@@ -24,7 +24,7 @@ class ResendTransportTest extends TestCase
             'mail.default' => 'resend',
             'mail.mailers.resend.key' => 'test-key',
             'mail.from.address' => 'no-reply@menhity.com',
-            'mail.from.name' => 'منحتي',
+            'mail.from.name' => 'بَوْصلة',
         ]);
     }
 
@@ -78,7 +78,7 @@ class ResendTransportTest extends TestCase
     public function test_it_attaches_a_reply_to_when_configured(): void
     {
         $this->useResend();
-        config(['mail.reply_to.address' => 'nebal@example.com', 'mail.reply_to.name' => 'منحتي']);
+        config(['mail.reply_to.address' => 'nebal@example.com', 'mail.reply_to.name' => 'بَوْصلة']);
         Http::fake(['api.resend.com/*' => Http::response(['id' => 'msg_1'])]);
 
         $this->send();

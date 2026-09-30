@@ -180,7 +180,7 @@ export function AdminLayout() {
 
         <footer className="glass-soft rounded-none border-x-0 border-b-0 px-4 py-4 sm:px-6">
           <p className="text-[11.5px] text-ink-400">
-            منصة منحتي — لوحة الإدارة الأكاديمية
+            منصة بَوْصلة — لوحة الإدارة الأكاديمية
           </p>
         </footer>
       </div>

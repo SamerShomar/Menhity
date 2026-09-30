@@ -8,9 +8,9 @@
 
 ## Local measurements
 
-Live HTTP inspection on 2026-09-20 confirmed the production frontend at
-`https://menhity.pages.dev/` still serves a 600,800-byte JavaScript entry point
-and calls `https://menhity-api-production-fad3.up.railway.app/api/v1`.
+Live HTTP inspection on 2026-09-20 confirmed the then-current production frontend at
+`https://menhity.pages.dev/` still served a 600,800-byte JavaScript entry point
+and called `https://menhity-api-production-fad3.up.railway.app/api/v1`.
 The public metadata, statistics and scholarship endpoints returned HTTP 200.
 An authorization-header preflight returned HTTP 204 with
 `Access-Control-Max-Age: 0`. The proposed config now uses 600 seconds to avoid

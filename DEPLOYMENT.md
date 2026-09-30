@@ -1,4 +1,4 @@
-# نشر منحتي مجاناً
+# نشر بَوْصلة مجاناً
 
 دليل خطوة بخطوة لرفع المشروع على الإنترنت **بلا أي تكلفة**.
 
@@ -20,7 +20,7 @@
 ## الخطوة ١ — قاعدة البيانات على Neon
 
 1. سجّل في [neon.tech](https://neon.tech) بحساب GitHub.
-2. **Create project** ← اسمه `menhity` ← اختر أقرب منطقة لك (`Frankfurt` مناسبة للمنطقة العربية).
+2. **Create project** ← اسمه `bousla` ← اختر أقرب منطقة لك (`Frankfurt` مناسبة للمنطقة العربية).
 3. من صفحة المشروع انسخ **Connection string**. يبدو هكذا:
 
 ```
@@ -51,7 +51,7 @@ php artisan key:generate --show
 
 | الحقل | القيمة |
 |---|---|
-| Name | `menhity-api` |
+| Name | `bousla-api` |
 | Region | `Frankfurt` |
 | Root Directory | `backend` |
 | Runtime | `Docker` |
@@ -63,16 +63,16 @@ php artisan key:generate --show
 
 | المتغيّر | القيمة |
 |---|---|
-| `APP_NAME` | `منحتي` |
+| `APP_NAME` | `بَوْصلة` |
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | `false` |
 | `APP_KEY` | المفتاح من الخطوة (أ) |
-| `APP_URL` | `https://menhity-api.onrender.com` |
+| `APP_URL` | `https://bousla-api.onrender.com` |
 | `APP_LOCALE` | `ar` |
 | `LOG_CHANNEL` | `stderr` |
 | `DB_CONNECTION` | `pgsql` |
 | `DB_URL` | رابط Neon من الخطوة ١ |
-| `FRONTEND_URL` | `https://menhity.pages.dev` (اضبطه بعد الخطوة ٣) |
+| `FRONTEND_URL` | `https://bousla.pages.dev` (اضبطه بعد الخطوة ٣) |
 | `SESSION_DRIVER` | `database` |
 | `CACHE_STORE` | `database` |
 | `QUEUE_CONNECTION` | `database` |
@@ -83,7 +83,7 @@ php artisan key:generate --show
 
 ### د) تحقّق
 
-افتح `https://menhity-api.onrender.com/api/v1/stats` — لازم يظهر JSON بالأرقام.
+افتح `https://bousla-api.onrender.com/api/v1/stats` — لازم يظهر JSON بالأرقام.
 
 > بعد نجاح أول نشر، **غيّر `SEED_ON_DEPLOY` إلى `false`** حتى لا تُزرع البيانات
 > التجريبية مجدداً مع كل نشر.
@@ -98,7 +98,7 @@ php artisan key:generate --show
 
 | الحقل | القيمة |
 |---|---|
-| Project name | `menhity` |
+| Project name | `bousla` |
 | Production branch | `main` |
 | Framework preset | `Vite` |
 | Build command | `npm run build` |
@@ -109,11 +109,11 @@ php artisan key:generate --show
 
 | المتغيّر | القيمة |
 |---|---|
-| `VITE_API_URL` | `https://menhity-api.onrender.com/api/v1` |
+| `VITE_API_URL` | `https://bousla-api.onrender.com/api/v1` |
 
 5. **Save and Deploy**.
 
-ستحصل على رابط مثل `https://menhity.pages.dev`.
+ستحصل على رابط مثل `https://bousla.pages.dev`.
 
 ### أغلق الدائرة
 
@@ -124,7 +124,7 @@ php artisan key:generate --show
 
 ## الخطوة ٤ — النطاق (اختياري)
 
-النطاق الفرعي `menhity.pages.dev` مجاني ويعمل فوراً. لنطاق خاص:
+النطاق الفرعي `bousla.pages.dev` مجاني ويعمل فوراً. لنطاق خاص:
 
 **نطاق مجاني للطلاب**: [GitHub Student Developer Pack](https://education.github.com/pack)
 يمنح نطاق `.me` مجاناً لسنة من Namecheap، إضافةً إلى أرصدة أخرى. يحتاج إثبات قيد جامعي.
@@ -190,7 +190,7 @@ backend
 
 | المتغيّر | القيمة |
 |---|---|
-| `APP_NAME` | `منحتي` |
+| `APP_NAME` | `بَوْصلة` |
 | `APP_ENV` | `production` |
 | `APP_DEBUG` | `false` |
 | `APP_KEY` | ناتج `php artisan key:generate --show` |
@@ -212,7 +212,7 @@ backend
 ### ٤. ولّد الرابط العام
 
 **Settings** ← **Networking** ← **Generate Domain**.
-ستحصل على رابط مثل `https://menhity-production.up.railway.app`.
+ستحصل على رابط عام يولّده Railway؛ استخدم العنوان الظاهر في لوحة الخدمة، ولا تفترض أن الاسم يتبع اسم المشروع.
 
 انسخه وضعه في `APP_URL`، ثم أعد النشر.
 
@@ -226,7 +226,7 @@ backend
 رصيد Railway. اضبط فقط:
 
 - في Cloudflare: `VITE_API_URL` = `https://<رابط Railway>/api/v1`
-- في Railway: `FRONTEND_URL` = `https://menhity.pages.dev`
+- في Railway: `FRONTEND_URL` = `https://bousla.pages.dev`
 
 ولو أردت وضعها على Railway أيضاً: **New** ← **GitHub Repo** ← نفس المستودع،
 Root Directory = `frontend`، وستكتشف Railway مشروع Vite وتبنيه تلقائياً.
@@ -286,7 +286,7 @@ Resend يرفض الإرسال من نطاق لا تملكه.
 | `MAIL_MAILER` | `resend` |
 | `RESEND_API_KEY` | مفتاح Resend من الخطوة ١ |
 | `MAIL_FROM_ADDRESS` | `no-reply@yourdomain.com` (أو `onboarding@resend.dev`) |
-| `MAIL_FROM_NAME` | `منحتي` |
+| `MAIL_FROM_NAME` | `بَوْصلة` |
 | `MAIL_REPLY_TO_ADDRESS` | بريدك الحقيقي (اختياري) |
 
 احفظ وانتظر إعادة النشر.
@@ -362,7 +362,7 @@ Gmail نفسه بتوقيع Google، وهو أفضل تسليم ممكن بلا 
 #### ٢. شاشة الموافقة
 
 1. **APIs & Services ← OAuth consent screen** (تظهر أيضاً باسم **Google Auth Platform**).
-2. نوع المستخدمين **External**، اسم التطبيق `منحتي`، بريد الدعم بريدك، ثم **Save**.
+2. نوع المستخدمين **External**، اسم التطبيق `بَوْصلة`، بريد الدعم بريدك، ثم **Save**.
 3. **Audience ← Publish app** ثم **Confirm**. لا تحتاج مراجعة Google لاستخدامك أنت،
    لكن **بدون النشر يبقى التطبيق في وضع Testing وينتهي رمز الربط بعد سبعة أيام** فيتوقف الإرسال.
 
@@ -380,7 +380,7 @@ php artisan menhity:gmail-auth
 ```
 
 يسألك عن المعرّف والسرّ، ثم يطبع رابطاً: افتحه، سجّل الدخول بحساب Gmail،
-واقبل. إن ظهرت شاشة **Google hasn't verified this app** فاضغط **Advanced ← Go to منحتي**
+واقبل. إن ظهرت شاشة **Google hasn't verified this app** فاضغط **Advanced ← Go to بَوْصلة**
 — فالتطبيق تطبيقك أنت. يعود المتصفح إلى الطرفية تلقائياً ويطبع الأمر:
 
 ```
@@ -389,7 +389,7 @@ GMAIL_CLIENT_ID=…
 GMAIL_CLIENT_SECRET=…
 GMAIL_REFRESH_TOKEN=…
 MAIL_FROM_ADDRESS=you@gmail.com
-MAIL_FROM_NAME=منحتي
+MAIL_FROM_NAME=بَوْصلة
 ```
 
 > إن لم يعد المتصفح إلى الطرفية (WSL أو جهاز آخر) فسيطلب الأمر منك لصق الرابط
@@ -410,7 +410,7 @@ php artisan menhity:mail-test your@email.com
 
 > **المفاتيح الثلاثة سرّية** كما كلمة المرور: مكانها لوحة الاستضافة وحدها.
 > لإلغاء الربط في أي وقت: [myaccount.google.com/permissions](https://myaccount.google.com/permissions)
-> ← منحتي ← **Remove access**، ثم احذف المتغيّرات.
+> ← بَوْصلة ← **Remove access**، ثم احذف المتغيّرات.
 
 ### ج) SMTP حيث لا يُحجب
 
@@ -430,7 +430,7 @@ php artisan menhity:mail-test your@email.com
 | `MAIL_USERNAME` | بريدك الكامل على Gmail |
 | `MAIL_PASSWORD` | الـ 16 محرفاً **بلا مسافات** |
 | `MAIL_FROM_ADDRESS` | نفس بريدك على Gmail |
-| `MAIL_FROM_NAME` | `منحتي` |
+| `MAIL_FROM_NAME` | `بَوْصلة` |
 
 > **Gmail يقدّم المنفذين 587 و465 فقط.** المنفذ `2587` الذي يظهر في إعداد Resend
 > خاص بـ Resend وحده، ومع `smtp.gmail.com` لا يستجيب أبداً — وهذا بالضبط ما

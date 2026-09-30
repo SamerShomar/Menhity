@@ -225,7 +225,7 @@ function NotificationsCard() {
         )}
         <Switch
           label="أخبار المنصة"
-          description="مغلق افتراضياً — رسائل عن المزايا الجديدة في منحتي."
+          description="مغلق افتراضياً — رسائل عن المزايا الجديدة في بَوْصلة."
           checked={Boolean(settings.notify_news)}
           onChange={(value) => toggle("notify_news", value)}
         />

@@ -9,7 +9,7 @@ const VALUES = [
   {
     icon: HeartHandshake,
     title: "مجانية بالكامل",
-    description: "كل خدمات منحتي — من البحث إلى صياغة السيرة الذاتية — متاحة دون أي رسوم.",
+    description: "كل خدمات بَوْصلة — من البحث إلى صياغة السيرة الذاتية — متاحة دون أي رسوم.",
   },
   {
     icon: ShieldCheck,
@@ -49,7 +49,7 @@ export default function AboutPage() {
             </span>
             <h2 className="mt-4 font-display text-2xl text-navy-800">أن لا يضيع طالب فرصته بسبب المعلومة</h2>
             <p className="mt-4 text-[15px] leading-8 text-ink-600">
-              وُلدت فكرة «منحتي» من مشكلة يعرفها كل طالب عربي: المنح موجودة، لكنها متناثرة بين مئات المواقع
+              وُلدت فكرة «بَوْصلة» من مشكلة يعرفها كل طالب عربي: المنح موجودة، لكنها متناثرة بين مئات المواقع
               بلغات مختلفة وشروط معقّدة. جمعناها في مكان واحد، وترجمناها إلى لغة مفهومة، وأضفنا إليها أدوات
               تجهّز ملفك للتقديم.
             </p>
@@ -59,7 +59,7 @@ export default function AboutPage() {
               <div>
                 <p className="font-bold text-navy-800">رؤيتنا</p>
                 <p className="mt-1 text-[13px] leading-7 text-ink-600">
-                  أن تكون منحتي المرجع العربي الأول للمنح الدراسية، وأن يصل كل طالب إلى الفرصة التي تناسب
+                  أن تكون بَوْصلة المرجع العربي الأول للمنح الدراسية، وأن يصل كل طالب إلى الفرصة التي تناسب
                   قدراته، لا التي يصادفها بالمصادفة.
                 </p>
               </div>
@@ -72,7 +72,7 @@ export default function AboutPage() {
 
       <section className="py-14">
         <div className="container-page">
-          <SectionHeading eyebrow="قيمنا" title="على ماذا نبني منحتي" />
+          <SectionHeading eyebrow="قيمنا" title="على ماذا نبني بَوْصلة" />
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {VALUES.map((value) => (
@@ -92,7 +92,7 @@ export default function AboutPage() {
         <div className="container-page rounded-3xl bg-navy-700 px-6 py-12 text-center text-white">
           <h2 className="font-display text-2xl">لديك سؤال أو اقتراح؟</h2>
           <p className="mx-auto mt-3 max-w-xl text-[15px] leading-8 text-navy-100">
-            فريق منحتي يقرأ كل رسالة. تواصل معنا وسنرد عليك في أقرب وقت.
+            فريق بَوْصلة يقرأ كل رسالة. تواصل معنا وسنرد عليك في أقرب وقت.
           </p>
           <ButtonLink to="/contact" variant="gold" size="lg" className="mt-6">
             تواصل معنا

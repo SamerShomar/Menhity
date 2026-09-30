@@ -110,7 +110,7 @@ class GmailAuthCommand extends Command
             'GMAIL_CLIENT_SECRET' => $clientSecret,
             'GMAIL_REFRESH_TOKEN' => $result['refresh_token'],
             'MAIL_FROM_ADDRESS' => $result['email'] ?? '<بريد حساب Gmail الذي خوّلته>',
-            'MAIL_FROM_NAME' => config('app.name', 'منحتي'),
+            'MAIL_FROM_NAME' => config('app.name', 'بَوْصلة'),
         ];
 
         foreach ($variables as $key => $value) {
@@ -189,7 +189,7 @@ class GmailAuthCommand extends Command
                 return false;
             }
 
-            $this->respond($connection, 200, 'تم ربط حساب Gmail بمنحتي ✓ — يمكنك إغلاق هذه النافذة والعودة إلى الطرفية.');
+            $this->respond($connection, 200, 'تم ربط حساب Gmail ببَوْصلة ✓ — يمكنك إغلاق هذه النافذة والعودة إلى الطرفية.');
 
             return $query['code'];
         }
@@ -222,7 +222,7 @@ class GmailAuthCommand extends Command
     private function respond($connection, int $status, string $text): void
     {
         $reason = [200 => 'OK', 400 => 'Bad Request', 404 => 'Not Found'][$status] ?? 'OK';
-        $body = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>منحتي</title></head>'
+        $body = '<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>بَوْصلة</title></head>'
             .'<body style="font-family:sans-serif;display:grid;place-items:center;min-height:90vh;font-size:1.25rem">'
             .'<p>'.htmlspecialchars($text, ENT_QUOTES, 'UTF-8').'</p></body></html>';
 

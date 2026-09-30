@@ -221,7 +221,7 @@ export default function ScholarshipDetailPage() {
                 </ul>
 
                 <Alert tone="info" className="mt-4">
-                  يجهّز فريق منحتي سيرتك الذاتية وخطاب دافعك بإشراف خبير أكاديمي — تصفّح{" "}
+                  يجهّز فريق بَوْصلة سيرتك الذاتية وخطاب دافعك بإشراف خبير أكاديمي — تصفّح{" "}
                   <Link to="/tools" className="font-bold underline">
                     خدمة صياغة السيرة الذاتية وخطاب الدافع
                   </Link>

@@ -55,7 +55,7 @@ export default function DocumentImprovementPage() {
       const { data } = await api.get(`/document-improvements/${run.id}/file`, { responseType: "blob" });
       const url = URL.createObjectURL(data);
       const link = document.createElement("a");
-      link.href = url; link.download = `menhity-improved-${run.id}.docx`;
+      link.href = url; link.download = `bousla-improved-${run.id}.docx`;
       document.body.appendChild(link); link.click(); link.remove();
       setTimeout(() => URL.revokeObjectURL(url), 10000);
     } catch (err) { setError(parseApiError(err).message); }

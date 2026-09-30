@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 /**
- * توكن Sanctum هو "الجلسة" في منحتي، فنضيف إليه بيانات الجهاز
+ * توكن Sanctum هو "الجلسة" في بَوْصلة، فنضيف إليه بيانات الجهاز
  * ليتمكّن المستخدم من رؤية أجهزته النشطة وإنهاء أي منها.
  */
 return new class extends Migration

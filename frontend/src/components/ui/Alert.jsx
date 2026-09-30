@@ -32,8 +32,8 @@ export function Alert({ tone = "info", title, className, children }) {
   );
 }
 
-/** صندوق "نصيحة منحتي" أسفل خطوات الويزرد */
-export function TipBox({ title = "نصيحة منحتي للقبول", children }) {
+/** صندوق "نصيحة بَوْصلة" أسفل خطوات الويزرد */
+export function TipBox({ title = "نصيحة بَوْصلة للقبول", children }) {
   return (
     <div className="glass-soft flex items-start gap-3 rounded-xl px-4 py-3">
       <span className="mt-0.5 text-lg leading-none">💡</span>

@@ -20,7 +20,7 @@ class VerifyEmailCodeMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'فعّل حسابك في منحتي',
+            subject: 'فعّل حسابك في بَوْصلة',
             replyTo: array_filter([$this->replyToAddress()]),
         );
     }
