@@ -158,31 +158,29 @@ export function AuthSplit({ title, description, badge, children, aside }) {
  */
 export function AuthCentered({ title, description, icon, children, className, footer = true }) {
   return (
-    <div className="relative min-h-dvh overflow-hidden">
-      <SkyScene className="absolute inset-0 h-full w-full" />
-
-      <div className="relative flex min-h-dvh flex-col px-4 py-8">
+    <div className="min-h-dvh bg-[linear-gradient(135deg,#f7f9fc_0%,#eaf3fb_100%)]">
+      <div className="flex min-h-dvh flex-col px-4 py-8">
         <div className="mb-auto">
-          <Logo tone="white" />
+          <Logo />
         </div>
 
         <div className={cn("mx-auto w-full max-w-md", className)}>
-          <div className="rounded-3xl bg-white/95 p-6 shadow-xl ring-1 ring-white/40 backdrop-blur sm:p-8">
+          <div className="glass-strong rounded-3xl p-6 sm:p-8">
             <AuthCardHeader title={title} description={description} icon={icon} />
             {children}
           </div>
         </div>
 
-        <div className="mt-auto pt-8 text-center text-xs text-white/80">
+        <div className="mt-auto pt-8 text-center text-xs text-ink-500">
           {footer ? (
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <Link to="/privacy" className="hover:text-white hover:underline">
+              <Link to="/privacy" className="hover:text-navy-800 hover:underline">
                 سياسة الخصوصية
               </Link>
-              <Link to="/terms" className="hover:text-white hover:underline">
+              <Link to="/terms" className="hover:text-navy-800 hover:underline">
                 شروط الاستخدام
               </Link>
-              <Link to="/contact" className="hover:text-white hover:underline">
+              <Link to="/contact" className="hover:text-navy-800 hover:underline">
                 تواصل معنا
               </Link>
             </div>

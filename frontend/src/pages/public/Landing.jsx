@@ -72,37 +72,36 @@ export default function LandingPage() {
   return (
     <div>
       {/* ============ البطل ============ */}
-      <section className="relative overflow-hidden bg-navy-700 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(246,196,69,0.18),transparent_55%)]" />
+      <section className="relative overflow-hidden bg-[linear-gradient(110deg,#f7f9fc_0%,#eaf3fb_100%)] text-navy-900">
 
         <div className="container-page relative grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
           <div className="animate-fade-up">
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold text-gold-200">
-              <Sparkles className="size-4" />
+            <span className="inline-flex items-center gap-2 rounded-full bg-navy-700/8 px-4 py-1.5 text-sm font-semibold text-navy-700">
+              <Sparkles className="size-4 text-navy-500" />
               مجاناً بالكامل — بدعم الذكاء الاصطناعي
             </span>
 
-            <h1 className="mt-5 font-display text-3xl leading-[1.4] sm:text-4xl lg:text-[2.75rem]">
+            <h1 className="mt-5 font-display text-3xl leading-[1.4] text-navy-900 sm:text-4xl lg:text-[2.75rem]">
               منحتك الدراسية تبدأ من هنا
             </h1>
 
-            <p className="mt-4 max-w-xl text-base leading-8 text-navy-100 sm:text-lg">
+            <p className="mt-4 max-w-xl text-base leading-8 text-ink-600 sm:text-lg">
               {site.description}
             </p>
 
             <form onSubmit={onSearch} className="mt-7 flex flex-col gap-3 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="pointer-events-none absolute top-1/2 start-4 size-5 -translate-y-1/2 text-white/60" />
+                <Search className="pointer-events-none absolute top-1/2 start-4 size-5 -translate-y-1/2 text-ink-400" />
                 <input
                   type="search"
                   value={term}
                   onChange={(event) => setTerm(event.target.value)}
                   placeholder="ابحث عن منحة، دولة، أو تخصص…"
                   aria-label="ابحث عن منحة"
-                  className="h-13 w-full rounded-xl border border-white/25 bg-white/15 backdrop-blur-lg text-white placeholder:text-white/65 focus:bg-white/22 focus:ring-2 focus:ring-gold-400/70 focus:outline-none py-3.5 ps-12 pe-4 text-sm"
+                  className="glass-soft h-13 w-full rounded-xl border border-white/80 bg-white/70 py-3.5 ps-12 pe-4 text-sm text-ink-900 placeholder:text-ink-400 focus:bg-white/90 focus:ring-2 focus:ring-navy-400/40 focus:outline-none"
                 />
               </div>
-              <Button type="submit" variant="gold" size="lg">
+              <Button type="submit" size="lg">
                 ابحث الآن
               </Button>
             </form>
@@ -110,15 +109,15 @@ export default function LandingPage() {
             {/* على الهاتف يمتدّ الزرّان بعرض الشاشة بدل صفٍّ متعرّج */}
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               {!isAuthenticated ? (
-                <ButtonLink to="/register" size="lg" className="bg-white text-navy-700 hover:bg-navy-500/10">
+                <ButtonLink to="/register" size="lg">
                   أنشئ حسابك مجاناً
                 </ButtonLink>
               ) : (
-                <ButtonLink to="/dashboard" size="lg" className="bg-white text-navy-700 hover:bg-navy-500/10">
+                <ButtonLink to="/dashboard" size="lg">
                   اذهب للوحة التحكم
                 </ButtonLink>
               )}
-              <ButtonLink to="/scholarships" size="lg" variant="onDark">
+              <ButtonLink to="/scholarships" size="lg" variant="outline">
                 تصفّح كل المنح
                 <ArrowLeft className="size-4" />
               </ButtonLink>
@@ -132,19 +131,19 @@ export default function LandingPage() {
       </section>
 
       {/* ============ الأرقام ============ */}
-      <section className="border-b border-ink-900/8 py-10">
+      <section className="bg-navy-800 py-8 text-white">
         <div className="container-page grid grid-cols-2 gap-6 lg:grid-cols-4">
           {STAT_LABELS.map((stat) => (
             <div key={stat.key} className="flex items-center gap-3.5">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-navy-500/10 text-navy-700">
+              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-white/10 text-gold-300">
                 <stat.icon className="size-6" />
               </span>
               <div className="min-w-0">
-                <p className="num font-display text-2xl font-extrabold text-navy-800">
+                <p className="num font-display text-2xl font-extrabold text-white">
                   {formatNumber(stats?.[stat.key] ?? 0)}
                   <span className="text-gold-500">+</span>
                 </p>
-                <p className="text-[13px] text-ink-500">{stat.label}</p>
+                <p className="text-[13px] text-navy-100">{stat.label}</p>
               </div>
             </div>
           ))}
