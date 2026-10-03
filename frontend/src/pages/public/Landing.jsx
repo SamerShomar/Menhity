@@ -2,24 +2,25 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
+  BadgeCheck,
   BellRing,
+  Clock3,
   FileCheck2,
   GraduationCap,
   Globe2,
   Search,
+  SearchCheck,
   Sparkles,
   Target,
   UserRoundPlus,
   Users,
 } from "lucide-react";
 
-import { HeroScene } from "@/components/public/HeroScene";
 import { ScholarshipCard, ScholarshipCardSkeleton } from "@/components/scholarships/ScholarshipCard";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { SectionHeading } from "@/components/ui/Section";
 import { metaApi, scholarshipApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
-import { useMeta } from "@/context/MetaContext";
 import { useApi } from "@/hooks/useApi";
 import { useSaved } from "@/hooks/useSaved";
 import { formatNumber } from "@/lib/utils";
@@ -54,8 +55,30 @@ const STEPS = [
   },
 ];
 
+const FEATURES = [
+  {
+    icon: BadgeCheck,
+    title: "منح تناسبك بدقة",
+    description: "نرتّب الفرص حسب مستواك وتخصصك واللغات التي تتقنها.",
+  },
+  {
+    icon: SearchCheck,
+    title: "بحث شامل ومرن",
+    description: "اكتشف المنح حسب الدولة والتخصص والمرحلة والتمويل.",
+  },
+  {
+    icon: Clock3,
+    title: "لا تفوّت المواعيد",
+    description: "تابع مواعيد التقديم واحصل على تنبيهات قبل إغلاقها.",
+  },
+  {
+    icon: Sparkles,
+    title: "أدوات ذكية مساعدة",
+    description: "جهّز سيرتك وخطابك وراجع مستنداتك بسهولة.",
+  },
+];
+
 export default function LandingPage() {
-  const site = useMeta().site;
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isSaved, toggle } = useSaved();
@@ -72,21 +95,28 @@ export default function LandingPage() {
   return (
     <div>
       {/* ============ البطل ============ */}
-      <section className="relative overflow-hidden bg-[linear-gradient(110deg,#f7f9fc_0%,#eaf3fb_100%)] text-navy-900">
+      <section className="relative isolate overflow-hidden bg-[#f4f8fc] text-navy-900">
+        <img
+          src="/images/graduates-hero.jpg"
+          alt=""
+          fetchPriority="high"
+          className="absolute inset-0 size-full object-cover object-[38%_center] lg:object-center"
+        />
+        <div className="absolute inset-0 bg-gradient-to-l from-[#f4f8fc] via-[#f4f8fc]/95 to-[#f4f8fc]/5" />
 
-        <div className="container-page relative grid items-center gap-10 py-14 lg:grid-cols-2 lg:py-20">
+        <div className="container-page relative grid min-h-[520px] items-center gap-8 py-12 lg:grid-cols-2 lg:py-16">
           <div className="animate-fade-up">
-            <span className="inline-flex items-center gap-2 rounded-full bg-navy-700/8 px-4 py-1.5 text-sm font-semibold text-navy-700">
+            <span className="inline-flex items-center gap-2 rounded-full border border-navy-700/10 bg-white/75 px-4 py-1.5 text-sm font-semibold text-navy-700 shadow-sm backdrop-blur">
               <Sparkles className="size-4 text-navy-500" />
-              مجاناً بالكامل — بدعم الذكاء الاصطناعي
+              فرصتك الأكاديمية تبدأ بخطوة
             </span>
 
-            <h1 className="mt-5 font-display text-3xl leading-[1.4] text-navy-900 sm:text-4xl lg:text-[2.75rem]">
-              منحتك الدراسية تبدأ من هنا
+            <h1 className="mt-5 max-w-xl font-display text-3xl leading-[1.4] text-navy-900 sm:text-4xl lg:text-[2.75rem]">
+              كانت المنحة حلماً… <span className="text-navy-600">وبَوْصلة تجعلها أقرب</span>
             </h1>
 
-            <p className="mt-4 max-w-xl text-base leading-8 text-ink-600 sm:text-lg">
-              {site.description}
+            <p className="mt-4 max-w-lg text-base leading-8 text-ink-600 sm:text-lg">
+              اكتشف فرصاً دراسية حول العالم، واعثر على المنح التي تناسب طموحك، واستعد للتقديم بثقة.
             </p>
 
             <form onSubmit={onSearch} className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -124,34 +154,60 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className="hidden justify-center lg:flex">
-            <HeroScene className="w-full max-w-lg" />
-          </div>
+          <div className="hidden lg:block" aria-hidden="true" />
         </div>
       </section>
 
       {/* ============ الأرقام ============ */}
-      <section className="bg-navy-800 py-8 text-white">
-        <div className="container-page grid grid-cols-2 gap-6 lg:grid-cols-4">
-          {STAT_LABELS.map((stat) => (
-            <div key={stat.key} className="flex items-center gap-3.5">
-              <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-white/10 text-gold-300">
-                <stat.icon className="size-6" />
-              </span>
-              <div className="min-w-0">
-                <p className="num font-display text-2xl font-extrabold text-white">
-                  {formatNumber(stats?.[stat.key] ?? 0)}
-                  <span className="text-gold-500">+</span>
-                </p>
-                <p className="text-[13px] text-navy-100">{stat.label}</p>
+      <section className="relative z-10 -mt-7 pb-8 text-white sm:-mt-10">
+        <div className="container-page">
+          <div className="grid grid-cols-2 gap-5 rounded-2xl bg-navy-800 px-5 py-6 shadow-[0_18px_45px_-20px_rgba(11,26,61,0.65)] sm:px-8 lg:grid-cols-4 lg:gap-6">
+            {STAT_LABELS.map((stat) => (
+              <div key={stat.key} className="flex items-center gap-3.5">
+                <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-white/10 text-gold-300 sm:size-12">
+                  <stat.icon className="size-5 sm:size-6" />
+                </span>
+                <div className="min-w-0">
+                  <p className="num font-display text-xl font-extrabold text-white sm:text-2xl">
+                    {formatNumber(stats?.[stat.key] ?? 0)}
+                    <span className="text-gold-400">+</span>
+                  </p>
+                  <p className="text-xs text-navy-100 sm:text-[13px]">{stat.label}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ مزايا المنصة ============ */}
+      <section className="py-12 sm:py-14">
+        <div className="container-page">
+          <SectionHeading
+            eyebrow="كل ما تحتاجه لرحلتك"
+            title="فرصتك القادمة أقرب مما تتخيّل"
+            description="من البحث عن المنحة المناسبة إلى تجهيز طلبك ومتابعة مواعيده — كل شيء في مكان واحد."
+          />
+
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map((feature) => (
+              <article
+                key={feature.title}
+                className="rounded-2xl border border-navy-100/80 bg-white/80 p-5 shadow-[0_8px_28px_-22px_rgba(16,37,85,0.4)] transition hover:-translate-y-1 hover:shadow-lg"
+              >
+                <span className="grid size-11 place-items-center rounded-xl bg-navy-50 text-navy-700">
+                  <feature.icon className="size-5" />
+                </span>
+                <h3 className="mt-4 font-display text-base font-bold text-navy-800">{feature.title}</h3>
+                <p className="mt-2 text-[13px] leading-6 text-ink-600">{feature.description}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ============ المنح المميزة ============ */}
-      <section className="py-14">
+      <section className="bg-white/45 py-14">
         <div className="container-page">
           <SectionHeading
             eyebrow="فرص مختارة"
@@ -209,18 +265,30 @@ export default function LandingPage() {
 
       {/* ============ الخدمة اليدوية ============ */}
       <section className="py-14">
-        <div className="container-page">
-          <SectionHeading
-            eyebrow="بإشراف خبير أكاديمي"
-            title="صياغة سيرتك الذاتية وخطاب دافعك"
-            description="فريق بَوْصلة يكتب ملفك من الصفر، والذكاء الاصطناعي يراجع سيرتك وخطابك الحاليين ويعيد لك نسخة محسّنة."
+        <div className="container-page grid items-center gap-8 lg:grid-cols-2 lg:gap-12">
+          <img
+            src="/images/student-success.jpg"
+            alt=""
+            loading="lazy"
+            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-[0_24px_55px_-30px_rgba(16,37,85,0.55)]"
           />
-
-          <div className="mt-8 flex justify-center">
-            <ButtonLink to="/tools" variant="gold" size="lg">
-              تعرّف على الخدمة
-              <ArrowLeft className="size-4" />
-            </ButtonLink>
+          <div className="max-w-xl">
+            <p className="mb-2 text-[13px] font-bold tracking-wide text-gold-600">بإشراف خبير أكاديمي</p>
+            <h2 className="font-display text-2xl font-extrabold leading-snug text-ink-900 sm:text-[28px]">
+              مستعد لتبدأ رحلتك الأكاديمية؟
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-ink-600 sm:text-[15px]">
+              أنشئ ملفك، واكتشف المنح المناسبة، واستفد من أدوات تساعدك على تجهيز سيرتك وخطاب الدافع قبل التقديم.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <ButtonLink to="/scholarships" size="lg">
+                اكتشف فرصتك الآن
+                <ArrowLeft className="size-4" />
+              </ButtonLink>
+              <ButtonLink to="/tools" variant="outline" size="lg">
+                استكشف الأدوات الذكية
+              </ButtonLink>
+            </div>
           </div>
         </div>
       </section>
@@ -229,7 +297,7 @@ export default function LandingPage() {
       {!isAuthenticated ? (
         <section className="bg-navy-700 py-14 text-white">
           <div className="container-page text-center">
-            <h2 className="font-display text-2xl sm:text-3xl">جاهز لتبدأ رحلتك الدراسية؟</h2>
+            <h2 className="font-display text-2xl sm:text-3xl">خطوتك التالية تبدأ من هنا</h2>
             <p className="mx-auto mt-3 max-w-2xl text-base leading-8 text-navy-100">
               أنشئ حسابك مجاناً، أكمل ملفك الأكاديمي، ودع بَوْصلة ترشّح لك المنح الأنسب وتجهّز مستنداتك.
             </p>

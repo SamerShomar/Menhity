@@ -11,6 +11,11 @@ const URGENCY_TONE = {
   open: "success",
 };
 
+const COUNTRY_COVERS = {
+  DE: "/images/germany-campus.png",
+  TR: "/images/turkey-flag.png",
+};
+
 /**
  * بطاقة منحة.
  * علم الدولة في شريط علوي منفصل حتى لا يتداخل الإيموجي مع العنوان العربي.
@@ -28,6 +33,7 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
     levels = [],
     match_score: matchScore,
   } = scholarship;
+  const countryCover = COUNTRY_COVERS[countryCode];
 
   return (
     <article
@@ -36,21 +42,23 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
         className,
       )}
     >
-      {/* شريط العلم والدولة */}
-      <div className="flex items-center justify-between gap-3 bg-navy-500/10 px-4 py-3">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <span className="text-2xl leading-none" aria-hidden="true">
-            {countryFlag(countryCode)}
-          </span>
-          <span className="truncate text-sm font-semibold text-navy-800">{country}</span>
-        </div>
+      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-navy-700 to-navy-900">
+        {countryCover ? (
+          <img
+            src={countryCover}
+            alt=""
+            loading="lazy"
+            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0b1a3d]/90 via-navy-900/15 to-navy-900/10" />
 
-        <div className="flex items-center gap-2">
+        <div className="absolute inset-x-4 top-3 flex items-center justify-between gap-2">
           {typeof matchScore === "number" ? (
-            <Badge tone="gold">
+            <Badge tone="gold" className="relative z-10">
               مطابقة <span className="num">{matchScore}%</span>
             </Badge>
-          ) : null}
+          ) : <span />}
 
           {onToggleSave ? (
             <button
@@ -63,6 +71,13 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
               {saved ? <BookmarkCheck className="size-4 text-navy-700" /> : <Bookmark className="size-4" />}
             </button>
           ) : null}
+        </div>
+
+        <div className="absolute inset-x-4 bottom-4 flex min-w-0 items-center gap-2.5 text-white">
+          <span className="text-2xl leading-none" aria-hidden="true">
+            {countryFlag(countryCode)}
+          </span>
+          <span className="truncate text-sm font-bold drop-shadow">{country}</span>
         </div>
       </div>
 
@@ -109,8 +124,8 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
 /** هيكل تحميل بنفس أبعاد البطاقة */
 export function ScholarshipCardSkeleton() {
   return (
-    <div className="h-[260px] animate-pulse overflow-hidden glass rounded-2xl">
-      <div className="h-12 bg-ink-900/8" />
+    <div className="h-[340px] animate-pulse overflow-hidden glass rounded-2xl">
+      <div className="h-40 bg-ink-900/8" />
       <div className="space-y-3 p-4">
         <div className="h-4 w-3/4 rounded bg-ink-900/8" />
         <div className="h-3 w-1/2 rounded bg-ink-900/8" />
