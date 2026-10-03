@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LockKeyhole, Mail } from "lucide-react";
 
 import { AuthSplit } from "@/components/auth/AuthShell";
 import { SocialButtons } from "@/components/auth/SocialButtons";
@@ -45,6 +46,7 @@ export default function LoginPage() {
 
   return (
     <AuthSplit
+      asideSide="left"
       title="تسجيل الدخول"
       description="أهلاً بعودتك — تابع رحلتك نحو المنحة المناسبة."
       badge="منصة بَوْصلة"
@@ -52,11 +54,6 @@ export default function LoginPage() {
         title: "منحتك القادمة على بُعد خطوة واحدة",
         description:
           "سجّل دخولك لمتابعة المنح المطابقة لملفك، ومواعيد التقديم، وحالة طلب صياغة سيرتك الذاتية.",
-        points: [
-          "منح مطابقة لمستواك وتخصصك ولغتك",
-          "تنبيهات قبل إغلاق باب التقديم",
-          "أدوات ذكاء اصطناعي تجهّز ملفك مجاناً",
-        ],
       }}
     >
       {notice ? (
@@ -78,6 +75,7 @@ export default function LoginPage() {
           name="email"
           autoComplete="email"
           placeholder="name@example.com"
+          icon={<Mail className="size-4" />}
           required
           value={form.email}
           onChange={change("email")}
@@ -89,6 +87,7 @@ export default function LoginPage() {
           name="password"
           autoComplete="current-password"
           placeholder="••••••••"
+          icon={<LockKeyhole className="size-4" />}
           required
           value={form.password}
           onChange={change("password")}

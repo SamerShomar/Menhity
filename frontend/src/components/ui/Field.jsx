@@ -65,7 +65,7 @@ export function Input({ label, error, hint, icon, required, labelHint, className
   );
 }
 
-export function PasswordInput({ label, error, hint, required, className, inputClassName, id, ...props }) {
+export function PasswordInput({ label, error, hint, icon, required, className, inputClassName, id, ...props }) {
   const autoId = useId();
   const fieldId = id ?? autoId;
   const [visible, setVisible] = useState(false);
@@ -82,9 +82,14 @@ export function PasswordInput({ label, error, hint, required, className, inputCl
           id={fieldId}
           type={visible ? "text" : "password"}
           aria-invalid={error ? true : undefined}
-          className={cn(FIELD_BASE, "h-11 pe-11", inputClassName)}
+          className={cn(FIELD_BASE, "h-11 pe-11", icon && "pe-16", inputClassName)}
           {...props}
         />
+        {icon && (
+          <span className="pointer-events-none absolute inset-y-0 end-10 flex items-center text-ink-400">
+            {icon}
+          </span>
+        )}
         <button
           type="button"
           onClick={() => setVisible((value) => !value)}

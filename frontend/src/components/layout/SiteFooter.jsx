@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Mail, MapPin, Phone } from "lucide-react";
 
-import { LogoMark, } from "@/components/ui/Logo";
+import { Logo } from "@/components/ui/Logo";
 import { FacebookIcon, InstagramIcon, LinkedinIcon } from "@/components/ui/Icon";
 import { useMeta } from "@/context/MetaContext";
 import { FOOTER_LINKS } from "@/lib/constants";
@@ -19,10 +19,7 @@ export function SiteFooter() {
       <div className="container-page py-12">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2">
-              <LogoMark tone="white" className="size-8" />
-              <span className="font-display text-xl font-extrabold text-gold-400">{site.name}</span>
-            </div>
+            <Logo tone="white" markClassName="size-24 rounded-xl bg-white p-1" />
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-navy-200">{site.description}</p>
 
             <div className="mt-5 flex items-center gap-2">

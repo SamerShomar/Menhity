@@ -34,11 +34,22 @@ function AppleIcon() {
   );
 }
 
+function FacebookIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
+      <path
+        fill="#1877F2"
+        d="M24 12a12 12 0 1 0-13.875 11.85v-8.38H7.08V12h3.045V9.36c0-3.006 1.79-4.668 4.53-4.668 1.312 0 2.685.234 2.685.234v2.953h-1.512c-1.49 0-1.953.925-1.953 1.875V12h3.323l-.531 3.47h-2.792v8.38A12.002 12.002 0 0 0 24 12Z"
+      />
+    </svg>
+  );
+}
+
 export function SocialButtons({ label = "أو تابع باستخدام" }) {
   const [notice, setNotice] = useState(false);
 
   const buttonClass =
-    "flex flex-1 items-center justify-center gap-2 rounded-xl border border-ink-900/12 bg-white/55 backdrop-blur-md px-4 py-2.5 text-sm font-semibold text-ink-700 transition hover:border-navy-300 hover:bg-white/55";
+    "grid size-11 place-items-center rounded-full border border-ink-900/12 bg-white transition hover:border-navy-300 hover:bg-navy-50";
 
   return (
     <div className="mt-6">
@@ -48,20 +59,21 @@ export function SocialButtons({ label = "أو تابع باستخدام" }) {
         <span className="h-px flex-1 bg-ink-200" />
       </div>
 
-      <div className="mt-4 flex gap-3">
-        <button type="button" className={buttonClass} onClick={() => setNotice(true)}>
+      <div className="mt-4 flex justify-center gap-3">
+        <button type="button" className={buttonClass} onClick={() => setNotice(true)} aria-label="جوجل" title="جوجل">
           <GoogleIcon />
-          جوجل
         </button>
-        <button type="button" className={buttonClass} onClick={() => setNotice(true)}>
+        <button type="button" className={buttonClass} onClick={() => setNotice(true)} aria-label="آبل" title="آبل">
           <AppleIcon />
-          آبل
+        </button>
+        <button type="button" className={buttonClass} onClick={() => setNotice(true)} aria-label="فيسبوك" title="فيسبوك">
+          <FacebookIcon />
         </button>
       </div>
 
       {notice ? (
         <p className="mt-3 rounded-xl bg-gold-400/18 backdrop-blur-md px-3 py-2 text-center text-xs leading-6 text-gold-800">
-          الدخول عبر جوجل وآبل غير مُفعّل بعد في هذه النسخة. استخدم البريد الإلكتروني وكلمة المرور.
+          تسجيل الدخول عبر جوجل وآبل وفيسبوك غير مُفعّل بعد. استخدم البريد الإلكتروني وكلمة المرور.
         </p>
       ) : null}
     </div>

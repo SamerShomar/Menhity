@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Check, X } from "lucide-react";
+import { Check, LockKeyhole, Mail, UserRound, X } from "lucide-react";
 
 import { AuthSplit } from "@/components/auth/AuthShell";
 import { SocialButtons } from "@/components/auth/SocialButtons";
@@ -60,6 +60,7 @@ export default function RegisterPage() {
 
   return (
     <AuthSplit
+      asideSide="right"
       title="إنشاء حساب جديد"
       description="أنشئ ملفك الأكاديمي مرة واحدة، ودع بَوْصلة تبحث عن المنح المناسبة لك."
       badge="مجاناً بالكامل"
@@ -67,11 +68,6 @@ export default function RegisterPage() {
         title: "ابدأ رحلتك الدراسية مع بَوْصلة",
         description:
           "ملف أكاديمي واحد يكفي للتقديم على عشرات المنح — ونحن نرشّح لك الأنسب ونجهّز سيرتك الذاتية مجاناً.",
-        points: [
-          "مطابقة ذكية بين ملفك وشروط كل منحة",
-          "صياغة السيرة الذاتية وخطاب التحفيز",
-          "متابعة مستنداتك ومواعيدك في مكان واحد",
-        ],
       }}
     >
       {error ? (
@@ -86,6 +82,7 @@ export default function RegisterPage() {
           name="name"
           autoComplete="name"
           placeholder="مثال: سارة أحمد"
+          icon={<UserRound className="size-4" />}
           required
           value={form.name}
           onChange={change("name")}
@@ -98,6 +95,7 @@ export default function RegisterPage() {
           name="email"
           autoComplete="email"
           placeholder="name@example.com"
+          icon={<Mail className="size-4" />}
           required
           value={form.email}
           onChange={change("email")}
@@ -110,6 +108,7 @@ export default function RegisterPage() {
             name="password"
             autoComplete="new-password"
             placeholder="••••••••"
+            icon={<LockKeyhole className="size-4" />}
             required
             value={form.password}
             onChange={change("password")}
@@ -146,6 +145,7 @@ export default function RegisterPage() {
           name="password_confirmation"
           autoComplete="new-password"
           placeholder="••••••••"
+          icon={<LockKeyhole className="size-4" />}
           required
           value={form.password_confirmation}
           onChange={change("password_confirmation")}

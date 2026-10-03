@@ -7,37 +7,6 @@ import { cn } from "@/lib/utils";
    مشاهد SVG — بديل الصور الفوتوغرافية في ملف التصميم
    ============================================================ */
 
-/** طالب متخرّج أمام مبنى جامعي — لوحة جانبية لشاشتَي الدخول والتسجيل */
-export function GraduationScene({ className }) {
-  return (
-    <svg viewBox="0 0 320 300" className={className} role="presentation" aria-hidden="true">
-      <defs>
-        <linearGradient id="auth-gold" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffd25f" />
-          <stop offset="100%" stopColor="#e5ac1c" />
-        </linearGradient>
-      </defs>
-
-      <circle cx="160" cy="150" r="132" fill="#ffffff" opacity="0.06" />
-      <circle cx="160" cy="150" r="96" fill="#ffffff" opacity="0.05" />
-
-      {/* قبعة التخرج */}
-      <g transform="translate(60 64)">
-        <polygon points="100,0 200,42 100,84 0,42" fill="#f8fafc" />
-        <path d="M42 58v40c0 12 26 21 58 21s58-9 58-21V58l-58 26z" fill="#cbd3df" />
-        <path d="M186 48v58" stroke="url(#auth-gold)" strokeWidth="6" strokeLinecap="round" />
-        <circle cx="186" cy="114" r="10" fill="url(#auth-gold)" />
-      </g>
-
-      {/* شهادة */}
-      <g transform="translate(86 226)">
-        <rect width="148" height="24" rx="12" fill="#f8fafc" opacity="0.92" />
-        <rect x="54" y="6" width="40" height="12" rx="6" fill="url(#auth-gold)" />
-      </g>
-    </svg>
-  );
-}
-
 /** خلفية سماء وغيوم — لشاشات استعادة كلمة المرور */
 export function SkyScene({ className }) {
   return (
@@ -89,51 +58,49 @@ export function AuthCardHeader({ title, description, icon }) {
  * شاشة مقسومة: نموذج على جانب ولوحة ترحيب كحلية على الجانب الآخر.
  * تُستخدم في تسجيل الدخول وإنشاء الحساب.
  */
-export function AuthSplit({ title, description, badge, children, aside }) {
+export function AuthSplit({ title, description, badge, children, aside, asideSide = "right" }) {
+  const asideOnLeft = asideSide === "left";
+
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[1fr_minmax(0,520px)]">
-      {/* اللوحة الكحلية — تظهر على اليمين في RTL */}
-      <aside className="relative hidden overflow-hidden bg-navy-800/92 backdrop-blur-xl lg:block">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_18%,rgba(246,196,69,0.16),transparent_58%)]" />
-
-        <div className="relative flex h-full flex-col p-10 text-white">
-          <Logo tone="white" />
-
-          <GraduationScene className="mx-auto my-8 w-full max-w-[260px] shrink" />
-
-          <div className="mt-auto max-w-md">
+    <div className="min-h-dvh bg-white lg:grid lg:grid-cols-2" dir="ltr">
+      <aside
+        dir="rtl"
+        className={cn(
+          "relative hidden min-h-dvh flex-col items-center justify-center overflow-hidden bg-navy-900 px-8 py-12 text-white lg:flex lg:px-14",
+          asideOnLeft ? "lg:order-1" : "lg:order-2",
+        )}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_28%,rgba(246,196,69,0.14),transparent_54%)]" />
+        <div className="relative z-10 mx-auto flex w-full max-w-lg flex-col items-center text-center">
+          <Logo tone="white" markClassName="size-36 rounded-3xl bg-white p-2 shadow-xl" />
+          <div className="mt-12">
             {badge ? (
               <span className="mb-4 inline-flex rounded-full bg-gold-400/20 px-4 py-1.5 text-sm font-semibold text-gold-200">
                 {badge}
               </span>
             ) : null}
             <h2 className="font-display text-3xl leading-snug">{aside?.title}</h2>
-            <p className="mt-4 text-base leading-8 text-navy-100">{aside?.description}</p>
-            {aside?.points?.length ? (
-              <ul className="mt-6 space-y-3 text-sm text-navy-100">
-                {aside.points.map((point) => (
-                  <li key={point} className="flex items-start gap-3">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-gold-400" />
-                    <span>{point}</span>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
+            <p className="mx-auto mt-4 max-w-md text-base leading-8 text-navy-100">{aside?.description}</p>
           </div>
-
-          <p className="mt-10 text-xs text-navy-200">
-            © <span className="num">{new Date().getFullYear()}</span> بَوْصلة — جميع الحقوق محفوظة
-          </p>
         </div>
+        <p className="absolute inset-x-0 bottom-7 text-center text-xs text-navy-200">
+          © <span className="num">{new Date().getFullYear()}</span> بَوْصلة — جميع الحقوق محفوظة
+        </p>
       </aside>
 
       {/* النموذج */}
-      <main className="flex min-h-dvh flex-col justify-center px-4 py-10 sm:px-8">
-        <div className="mx-auto w-full max-w-md">
-          <div className="mb-8 flex justify-center lg:hidden">
-            <Logo />
+      <main
+        dir="rtl"
+        className={cn(
+          "order-1 flex min-h-dvh flex-col justify-center px-4 py-8 sm:px-8 lg:px-12",
+          asideOnLeft ? "lg:order-2" : "lg:order-1",
+        )}
+      >
+        <div className="mx-auto w-full max-w-[440px]">
+          <div className="mb-5 flex justify-center">
+            <Logo markClassName="size-24" />
           </div>
-          <div className="glass-strong rounded-3xl p-6 sm:p-8">
+          <div>
             <AuthCardHeader title={title} description={description} />
             {children}
           </div>
