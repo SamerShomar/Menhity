@@ -8,6 +8,7 @@ use App\Enums\DocumentKind;
 use App\Enums\NotificationType;
 use App\Enums\UserRole;
 use App\Models\AiTool;
+use App\Models\Document;
 use App\Models\Scholarship;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -108,6 +109,7 @@ class StudentDashboardApiTest extends TestCase
 
     public function test_a_user_can_upload_and_delete_a_document(): void
     {
+        Storage::fake('local');
         Storage::fake('public');
         $user = $this->student();
 
@@ -117,16 +119,48 @@ class StudentDashboardApiTest extends TestCase
         ])->assertCreated();
 
         $documentId = $response->json('data.id');
+        $document = Document::findOrFail($documentId);
+
+        Storage::disk('local')->assertExists($document->path);
+        Storage::disk('public')->assertMissing($document->path);
+        $this->assertSame(route('documents.file', $document, false), $response->json('data.url'));
 
         $this->actingAs($user)->getJson('/api/v1/documents')->assertOk()->assertJsonCount(1, 'data');
+        $this->actingAs($user)->get("/api/v1/documents/{$documentId}/file")
+            ->assertOk()
+            ->assertHeader('Cache-Control', 'no-store, private')
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
 
         $this->actingAs($user)->deleteJson("/api/v1/documents/{$documentId}")->assertOk();
+        Storage::disk('local')->assertMissing($document->path);
+        Storage::disk('public')->assertMissing($document->path);
         $this->actingAs($user)->getJson('/api/v1/documents')->assertJsonCount(0, 'data');
+    }
+
+    public function test_legacy_public_documents_are_downloaded_only_through_the_owner_route(): void
+    {
+        Storage::fake('local');
+        Storage::fake('public');
+        $owner = $this->student();
+        $path = 'documents/legacy.pdf';
+        Storage::disk('public')->put($path, 'legacy private document');
+
+        $document = $owner->documents()->create([
+            'kind' => DocumentKind::Cv,
+            'original_name' => 'legacy.pdf',
+            'stored_name' => 'legacy.pdf',
+            'mime_type' => 'application/pdf',
+            'size_bytes' => 23,
+            'path' => $path,
+        ]);
+
+        $this->actingAs($owner)->get("/api/v1/documents/{$document->id}/file")->assertOk();
+        $this->actingAs($this->student())->get("/api/v1/documents/{$document->id}/file")->assertNotFound();
     }
 
     public function test_an_oversized_or_unsupported_file_is_rejected(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $user = $this->student();
 
         $this->actingAs($user)->postJson('/api/v1/documents', [
@@ -137,7 +171,7 @@ class StudentDashboardApiTest extends TestCase
 
     public function test_a_user_cannot_delete_another_users_document(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $owner = $this->student();
         $intruder = $this->student();
 
@@ -146,7 +180,27 @@ class StudentDashboardApiTest extends TestCase
             'kind' => DocumentKind::Cv->value,
         ])->json('data.id');
 
+        $this->actingAs($intruder)->get("/api/v1/documents/{$documentId}/file")->assertNotFound();
         $this->actingAs($intruder)->deleteJson("/api/v1/documents/{$documentId}")->assertForbidden();
+    }
+
+    public function test_a_guest_cannot_download_a_private_document(): void
+    {
+        Storage::fake('local');
+        $user = $this->student();
+        $path = 'documents/private.pdf';
+        Storage::disk('local')->put($path, 'private document');
+
+        $document = $user->documents()->create([
+            'kind' => DocumentKind::Cv,
+            'original_name' => 'cv.pdf',
+            'stored_name' => 'private.pdf',
+            'mime_type' => 'application/pdf',
+            'size_bytes' => 16,
+            'path' => $path,
+        ]);
+
+        $this->getJson("/api/v1/documents/{$document->id}/file")->assertUnauthorized();
     }
 
     public function test_notifications_are_listed_with_tab_counts_and_can_be_marked_read(): void

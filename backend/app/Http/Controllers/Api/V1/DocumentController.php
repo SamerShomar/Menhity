@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Validation\Rule;
 
 class DocumentController extends Controller
@@ -35,7 +36,7 @@ class DocumentController extends Controller
         $file = $validated['file'];
 
         // اسم مخزّن عشوائي يمنع تضارب الأسماء وتجاوز المسار
-        $path = $file->store('documents', 'public');
+        $path = $file->store('documents', 'local');
 
         $document = $request->user()->documents()->create([
             'kind' => $validated['kind'],
@@ -49,11 +50,25 @@ class DocumentController extends Controller
         return new DocumentResource($document);
     }
 
+    /** تنزيل مستند خاص بعد التحقق من ملكيته */
+    public function download(Request $request, Document $document): StreamedResponse
+    {
+        abort_unless($document->user_id === $request->user()->id, 404);
+        $disk = Storage::disk('local')->exists($document->path) ? 'local' : 'public';
+        abort_unless(Storage::disk($disk)->exists($document->path), 404);
+
+        return Storage::disk($disk)->download($document->path, $document->original_name, [
+            'Cache-Control' => 'private, no-store',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
     /** حذف مستند */
     public function destroy(Request $request, Document $document): JsonResponse
     {
         abort_unless($document->user_id === $request->user()->id, 403);
 
+        Storage::disk('local')->delete($document->path);
         Storage::disk('public')->delete($document->path);
         $document->delete();
 

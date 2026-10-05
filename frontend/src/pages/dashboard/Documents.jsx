@@ -27,6 +27,7 @@ export default function DocumentsPage() {
 
   const { data, loading, error, reload } = useApi(documentApi.list, []);
   const upload = useSubmit((file) => documentApi.upload(file, kind || "other"));
+  const download = useSubmit((document) => documentApi.download(document.id, document.original_name));
   const remove = useSubmit(documentApi.remove);
 
   const allowed = meta.uploads?.mimes ?? ["pdf", "doc", "docx", "png", "jpg", "jpeg"];
@@ -141,6 +142,7 @@ export default function DocumentsPage() {
       {/* القائمة */}
       {error ? <Alert tone="danger">{error}</Alert> : null}
       {remove.error ? <Alert tone="danger">{remove.error}</Alert> : null}
+      {download.error ? <Alert tone="danger">{download.error}</Alert> : null}
 
       {loading ? (
         <LoadingBlock />
@@ -172,15 +174,15 @@ export default function DocumentsPage() {
                   </div>
 
                   <div className="flex shrink-0 gap-1">
-                    <a
-                      href={document.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <button
+                      type="button"
+                      onClick={() => download.submit(document)}
+                      disabled={download.submitting}
                       aria-label={`فتح ${document.original_name}`}
-                      className="grid size-9 place-items-center rounded-lg text-ink-400 hover:bg-navy-500/10 hover:text-navy-700"
+                      className="grid size-9 place-items-center rounded-lg text-ink-400 hover:bg-navy-500/10 hover:text-navy-700 disabled:opacity-50"
                     >
                       <Download className="size-4" />
-                    </a>
+                    </button>
                     <button
                       type="button"
                       onClick={() => onRemove(document)}

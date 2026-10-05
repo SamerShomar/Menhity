@@ -59,6 +59,7 @@ export const documentApi = {
       .post("/documents", form, { headers: { "Content-Type": "multipart/form-data" } })
       .then((r) => r.data.data);
   },
+  download: (id, name) => downloadFile(`/documents/${id}/file`, name),
   remove: (id) => api.delete(`/documents/${id}`).then((r) => r.data),
 };
 

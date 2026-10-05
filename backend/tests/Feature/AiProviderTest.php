@@ -266,18 +266,25 @@ class AiProviderTest extends TestCase
         $this->useCloudflare();
         Http::fake(['*' => Http::response([
             'result' => ['response' => [
+                'valid' => true,
+                'document_class' => 'cv',
+                'suggested_kind' => null,
+                'notice' => null,
                 'summary' => 'مراجعة مختصرة',
                 'issues' => ['تحسين الوضوح'],
-                'revised_text' => 'هذا نص مستند تمت مراجعته وتحسينه دون تغيير الحقائق.',
+                'revised_text' => 'هذا نص مستند تمت مراجعته وتحسينه دون تغيير الحقائق أو حذف أي معلومة مهمة.',
             ]],
             'success' => true,
         ])]);
 
-        $result = app(AiService::class)->run('profile-review', $this->profile());
+        $result = app(AiService::class)->improveDocument(
+            'cv_improve',
+            'خبرة أكاديمية سابقة ومهارات متعددة في البحث والتواصل.',
+            null,
+        );
 
-        $this->assertTrue($result['ok']);
-        $this->assertJson($result['output']);
-        $this->assertSame('مراجعة مختصرة', json_decode($result['output'], true)['summary']);
+        $this->assertTrue($result['valid']);
+        $this->assertSame('مراجعة مختصرة', $result['summary']);
     }
 
     public function test_it_surfaces_a_cloudflare_failure_returned_with_a_200_status(): void

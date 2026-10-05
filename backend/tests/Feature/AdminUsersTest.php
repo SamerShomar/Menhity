@@ -54,4 +54,21 @@ class AdminUsersTest extends TestCase
 
         $this->assertNull($user->fresh()->last_seen_at);
     }
+
+    public function test_user_export_neutralizes_spreadsheet_formulas(): void
+    {
+        $admin = User::factory()->create(['role' => UserRole::Admin]);
+        User::factory()->create([
+            'name' => '=HYPERLINK("https://example.com","click")',
+            'email' => '@SUM(1,1)',
+        ]);
+
+        $csv = $this->actingAs($admin)
+            ->get('/api/v1/admin/users/export')
+            ->assertOk()
+            ->streamedContent();
+
+        $this->assertStringContainsString("'=HYPERLINK", $csv);
+        $this->assertStringContainsString("'@SUM", $csv);
+    }
 }

@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\DocumentKind;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 
 class Document extends Model
 {
@@ -28,7 +27,7 @@ class Document extends Model
 
     public function url(): string
     {
-        return Storage::disk('public')->url($this->path);
+        return route('documents.file', $this, false);
     }
 
     /** 2.4 MB */

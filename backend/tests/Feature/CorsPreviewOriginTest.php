@@ -28,7 +28,7 @@ class CorsPreviewOriginTest extends TestCase
     public function test_the_production_frontend_and_its_preview_subdomains_are_allowed(): void
     {
         config(['cors.allowed_origins' => ['https://bousla.pages.dev']]);
-        config(['cors.allowed_origins_patterns' => ['#^https://[a-z0-9-]+\.menhity\.pages\.dev$#i']]);
+        config(['cors.allowed_origins_patterns' => ['#^https://[a-z0-9-]+\.bousla\.pages\.dev$#i']]);
 
         $this->assertTrue($this->allows('https://bousla.pages.dev'));
         $this->assertTrue($this->allows('https://40f971e8.bousla.pages.dev'));
@@ -38,7 +38,7 @@ class CorsPreviewOriginTest extends TestCase
     public function test_an_unrelated_origin_is_still_refused(): void
     {
         config(['cors.allowed_origins' => ['https://bousla.pages.dev']]);
-        config(['cors.allowed_origins_patterns' => ['#^https://[a-z0-9-]+\.menhity\.pages\.dev$#i']]);
+        config(['cors.allowed_origins_patterns' => ['#^https://[a-z0-9-]+\.bousla\.pages\.dev$#i']]);
 
         $this->assertFalse($this->allows('https://bousla.pages.dev.evil.com'));
         $this->assertFalse($this->allows('https://example.com'));

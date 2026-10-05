@@ -123,6 +123,13 @@ class UserController extends Controller
 
         return response()->streamDownload(function (): void {
             $handle = fopen('php://output', 'wb');
+            $safeCell = static function (mixed $value): string {
+                $value = (string) ($value ?? '');
+
+                return preg_match('/^[\x00-\x20]*[=+\-@]/u', $value) === 1
+                    ? "'{$value}"
+                    : $value;
+            };
 
             // BOM حتى يفتح Excel الملف بترميز UTF-8 ويعرض العربية بشكل صحيح
             fwrite($handle, "\xEF\xBB\xBF");
@@ -132,9 +139,9 @@ class UserController extends Controller
                 'الدولة', 'اكتمال الملف %', 'تاريخ التسجيل', 'آخر دخول',
             ]);
 
-            User::with('profile')->chunk(200, function ($users) use ($handle): void {
+            User::with('profile')->chunk(200, function ($users) use ($handle, $safeCell): void {
                 foreach ($users as $user) {
-                    fputcsv($handle, [
+                    fputcsv($handle, array_map($safeCell, [
                         $user->name,
                         $user->email,
                         $user->phone ?? '',
@@ -144,7 +151,7 @@ class UserController extends Controller
                         $user->profile?->completion_percent ?? 0,
                         $user->created_at?->toDateString(),
                         $user->last_login_at?->toDateString() ?? '',
-                    ]);
+                    ]));
                 }
             });
 

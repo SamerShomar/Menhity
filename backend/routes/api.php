@@ -97,6 +97,7 @@ Route::prefix('v1')->group(function (): void {
         /* ---- المستندات ---- */
         Route::get('documents', [DocumentController::class, 'index'])->name('documents.index');
         Route::post('documents', [DocumentController::class, 'store'])->name('documents.store');
+        Route::get('documents/{document}/file', [DocumentController::class, 'download'])->name('documents.file');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 
         /* ---- الإشعارات ---- */
