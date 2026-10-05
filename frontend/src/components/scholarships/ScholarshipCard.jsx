@@ -13,7 +13,6 @@ const URGENCY_TONE = {
 
 const COUNTRY_COVERS = {
   DE: "/images/germany-campus.png",
-  TR: "/images/turkey-flag.png",
 };
 
 /**
@@ -74,7 +73,7 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
         </div>
 
         <div className="absolute inset-x-4 bottom-4 flex min-w-0 items-center gap-2.5 text-white">
-          <span className="text-2xl leading-none" aria-hidden="true">
+          <span className="flag-emoji text-2xl" aria-hidden="true">
             {countryFlag(countryCode)}
           </span>
           <span className="truncate text-sm font-bold drop-shadow">{country}</span>

@@ -105,7 +105,7 @@ export default function ScholarshipDetailPage() {
             <div className="min-w-0">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold">
-                  <span className="text-lg leading-none" aria-hidden="true">
+                  <span className="flag-emoji text-lg" aria-hidden="true">
                     {countryFlag(scholarship.country_code)}
                   </span>
                   {scholarship.country_name_ar}

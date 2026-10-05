@@ -17,7 +17,7 @@ export function BarList({ items, valueLabel = "", color = CHART_COLORS[0], class
         <li key={item.label}>
           <div className="flex items-center justify-between gap-3 text-[12.5px]">
             <span className="min-w-0 truncate font-medium text-ink-700">
-              {item.prefix ? <span className="me-1.5">{item.prefix}</span> : null}
+              {item.prefix ? <span className="flag-emoji me-1.5">{item.prefix}</span> : null}
               {item.label}
             </span>
             <span className="num shrink-0 font-bold text-ink-800">

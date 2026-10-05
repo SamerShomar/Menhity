@@ -176,7 +176,7 @@ export default function DashboardOverviewPage() {
                 {data.upcoming_deadlines.map((item) => (
                   <li key={item.id} className="flex items-center justify-between gap-3 py-3">
                     <Link to={`/scholarships/${item.slug}`} className="flex min-w-0 items-center gap-2.5">
-                      <span className="text-lg leading-none" aria-hidden="true">
+                      <span className="flag-emoji text-lg" aria-hidden="true">
                         {countryFlag(item.country_code)}
                       </span>
                       <span className="truncate text-[13px] font-semibold text-navy-800 hover:underline">

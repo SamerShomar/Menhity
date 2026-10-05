@@ -70,7 +70,7 @@ export default function AdminScholarshipsPage() {
             {row.title_ar}
           </Link>
           <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-ink-500">
-            <span aria-hidden="true">{countryFlag(row.country_code)}</span>
+            <span className="flag-emoji text-sm" aria-hidden="true">{countryFlag(row.country_code)}</span>
             {row.country_name_ar} · {row.provider}
           </p>
         </div>

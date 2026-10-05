@@ -34,7 +34,7 @@ function CheckRow({ checked, onChange, label, count, prefix }) {
         className="size-4 shrink-0 cursor-pointer rounded border-ink-300 accent-navy-700"
       />
       {prefix ? (
-        <span className="text-base leading-none" aria-hidden="true">
+        <span className="flag-emoji text-base" aria-hidden="true">
           {prefix}
         </span>
       ) : null}

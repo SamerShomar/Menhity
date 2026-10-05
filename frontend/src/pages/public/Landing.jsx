@@ -100,9 +100,14 @@ export default function LandingPage() {
           src="/images/graduates-hero.jpg"
           alt=""
           fetchPriority="high"
-          className="absolute inset-0 size-full object-cover object-[38%_center] lg:object-center"
+          className="absolute inset-0 size-full object-cover object-[38%_0%] lg:inset-y-0 lg:left-0 lg:right-auto lg:h-full lg:w-[58%] lg:object-[55%_center]"
+          style={{
+            WebkitMaskImage: "linear-gradient(to right, #000 0%, #000 68%, transparent 100%)",
+            maskImage: "linear-gradient(to right, #000 0%, #000 68%, transparent 100%)",
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-[#f4f8fc] via-[#f4f8fc]/95 to-[#f4f8fc]/5" />
+        <div className="absolute inset-0 bg-gradient-to-l from-[#f4f8fc] via-[#f4f8fc]/95 to-[#f4f8fc]/5 lg:hidden" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-[#f4f8fc]/70 to-transparent lg:h-24" />
 
         <div className="container-page relative grid min-h-[520px] items-center gap-8 py-12 lg:grid-cols-2 lg:py-16">
           <div className="animate-fade-up">
@@ -270,7 +275,7 @@ export default function LandingPage() {
             src="/images/student-success.jpg"
             alt=""
             loading="lazy"
-            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-[0_24px_55px_-30px_rgba(16,37,85,0.55)]"
+            className="aspect-[4/3] w-full rounded-3xl object-cover object-[center_40%] shadow-[0_24px_55px_-30px_rgba(16,37,85,0.55)]"
           />
           <div className="max-w-xl">
             <p className="mb-2 text-[13px] font-bold tracking-wide text-gold-600">بإشراف خبير أكاديمي</p>
