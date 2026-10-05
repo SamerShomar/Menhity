@@ -57,9 +57,9 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
               onClick={() => onToggleSave(scholarship)}
               aria-label={saved ? "إزالة من المحفوظات" : "حفظ المنحة"}
               aria-pressed={Boolean(saved)}
-              className="relative z-10 grid size-8 place-items-center rounded-lg glass text-ink-400 transition hover:text-navy-700"
+              className="relative z-10 grid size-9 place-items-center rounded-lg border border-white/50 bg-navy-900/75 text-white shadow-md backdrop-blur-sm transition hover:bg-navy-900"
             >
-              {saved ? <BookmarkCheck className="size-4 text-navy-700" /> : <Bookmark className="size-4" />}
+              {saved ? <BookmarkCheck className="size-4 text-gold-300" /> : <Bookmark className="size-4 text-white" />}
             </button>
           ) : null}
         </div>
