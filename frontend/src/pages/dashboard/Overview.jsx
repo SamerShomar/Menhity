@@ -13,6 +13,7 @@ import {
 import { ScholarshipCard, ScholarshipCardSkeleton } from "@/components/scholarships/ScholarshipCard";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 import { ButtonLink } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -22,7 +23,7 @@ import { dashboardApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
 import { useSaved } from "@/hooks/useSaved";
-import { countryFlag, deadlineLabel, formatFileSize } from "@/lib/utils";
+import { deadlineLabel, formatFileSize } from "@/lib/utils";
 
 export default function DashboardOverviewPage() {
   const { user } = useAuth();
@@ -176,9 +177,7 @@ export default function DashboardOverviewPage() {
                 {data.upcoming_deadlines.map((item) => (
                   <li key={item.id} className="flex items-center justify-between gap-3 py-3">
                     <Link to={`/scholarships/${item.slug}`} className="flex min-w-0 items-center gap-2.5">
-                      <span className="flag-emoji text-lg" aria-hidden="true">
-                        {countryFlag(item.country_code)}
-                      </span>
+                      <CountryFlag code={item.country_code} className="text-lg" />
                       <span className="truncate text-[13px] font-semibold text-navy-800 hover:underline">
                         {item.title_ar}
                       </span>

@@ -5,6 +5,7 @@ import { Pencil, Plus, Search, Star, Trash2 } from "lucide-react";
 import { DataTable } from "@/components/admin/DataTable";
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Pagination } from "@/components/ui/Pagination";
@@ -13,7 +14,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { adminApi } from "@/api/endpoints";
 import { useEnum } from "@/context/MetaContext";
 import { useApi, useSubmit } from "@/hooks/useApi";
-import { cn, countryFlag, deadlineLabel, formatDateAr } from "@/lib/utils";
+import { cn, deadlineLabel, formatDateAr } from "@/lib/utils";
 
 export default function AdminScholarshipsPage() {
   const [params, setParams] = useSearchParams();
@@ -70,7 +71,7 @@ export default function AdminScholarshipsPage() {
             {row.title_ar}
           </Link>
           <p className="mt-0.5 flex items-center gap-1.5 text-[12px] text-ink-500">
-            <span className="flag-emoji text-sm" aria-hidden="true">{countryFlag(row.country_code)}</span>
+            <CountryFlag code={row.country_code} className="text-sm" />
             {row.country_name_ar} · {row.provider}
           </p>
         </div>

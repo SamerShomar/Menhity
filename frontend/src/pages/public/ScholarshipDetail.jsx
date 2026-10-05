@@ -19,6 +19,7 @@ import {
 
 import { Alert } from "@/components/ui/Alert";
 import { Badge } from "@/components/ui/Badge";
+import { CountryFlag } from "@/components/ui/CountryFlag";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
@@ -27,7 +28,7 @@ import { scholarshipApi } from "@/api/endpoints";
 import { useAuth } from "@/context/AuthContext";
 import { useApi } from "@/hooks/useApi";
 import { useSaved } from "@/hooks/useSaved";
-import { countryFlag, deadlineLabel, formatDateAr, formatGpa, formatNumber } from "@/lib/utils";
+import { deadlineLabel, formatDateAr, formatGpa, formatNumber } from "@/lib/utils";
 
 const URGENCY_TONE = { closed: "danger", urgent: "danger", soon: "warning", open: "success" };
 
@@ -105,9 +106,7 @@ export default function ScholarshipDetailPage() {
             <div className="min-w-0">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold">
-                  <span className="flag-emoji text-lg" aria-hidden="true">
-                    {countryFlag(scholarship.country_code)}
-                  </span>
+                  <CountryFlag code={scholarship.country_code} className="text-lg" />
                   {scholarship.country_name_ar}
                 </span>
                 <Badge tone={URGENCY_TONE[scholarship.deadline_urgency] ?? "neutral"} onDark dot>

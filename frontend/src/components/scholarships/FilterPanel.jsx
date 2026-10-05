@@ -2,7 +2,8 @@ import { useState } from "react";
 import { ChevronDown, RotateCcw } from "lucide-react";
 
 import { useEnum } from "@/context/MetaContext";
-import { cn, countryFlag } from "@/lib/utils";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { cn } from "@/lib/utils";
 
 function FilterGroup({ title, children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen);
@@ -24,7 +25,7 @@ function FilterGroup({ title, children, defaultOpen = true }) {
   );
 }
 
-function CheckRow({ checked, onChange, label, count, prefix }) {
+function CheckRow({ checked, onChange, label, count, countryCode }) {
   return (
     <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-ink-700 hover:text-navy-700">
       <input
@@ -33,11 +34,7 @@ function CheckRow({ checked, onChange, label, count, prefix }) {
         onChange={onChange}
         className="size-4 shrink-0 cursor-pointer rounded border-ink-300 accent-navy-700"
       />
-      {prefix ? (
-        <span className="flag-emoji text-base" aria-hidden="true">
-          {prefix}
-        </span>
-      ) : null}
+      {countryCode ? <CountryFlag code={countryCode} className="text-base" /> : null}
       <span className="min-w-0 flex-1 truncate">{label}</span>
       {typeof count === "number" ? <span className="num text-xs text-ink-400">{count}</span> : null}
     </label>
@@ -96,7 +93,7 @@ export function FilterPanel({ filters, facets, onToggle, onReset, className }) {
               key={country.code}
               label={country.name}
               count={country.count}
-              prefix={countryFlag(country.code)}
+              countryCode={country.code}
               checked={has("country", country.code)}
               onChange={() => onToggle("country", country.code)}
             />

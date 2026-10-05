@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Bookmark, BookmarkCheck, Building2, CalendarDays, GraduationCap, Wallet } from "lucide-react";
 
 import { Badge } from "@/components/ui/Badge";
-import { cn, countryFlag, deadlineLabel } from "@/lib/utils";
+import { CountryFlag } from "@/components/ui/CountryFlag";
+import { cn, deadlineLabel } from "@/lib/utils";
 
 const URGENCY_TONE = {
   closed: "danger",
@@ -17,7 +18,7 @@ const COUNTRY_COVERS = {
 
 /**
  * بطاقة منحة.
- * علم الدولة في شريط علوي منفصل حتى لا يتداخل الإيموجي مع العنوان العربي.
+ * علم الدولة في شريط علوي منفصل حتى لا يتداخل مع العنوان العربي.
  */
 export function ScholarshipCard({ scholarship, saved, onToggleSave, className }) {
   const {
@@ -73,9 +74,7 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
         </div>
 
         <div className="absolute inset-x-4 bottom-4 flex min-w-0 items-center gap-2.5 text-white">
-          <span className="flag-emoji text-2xl" aria-hidden="true">
-            {countryFlag(countryCode)}
-          </span>
+          <CountryFlag code={countryCode} className="text-2xl" />
           <span className="truncate text-sm font-bold drop-shadow">{country}</span>
         </div>
       </div>

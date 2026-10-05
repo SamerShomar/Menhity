@@ -9,7 +9,7 @@ import { StatCard } from "@/components/ui/StatCard";
 import { LoadingBlock } from "@/components/ui/Spinner";
 import { adminApi } from "@/api/endpoints";
 import { useApi } from "@/hooks/useApi";
-import { countryFlag, timeAgoAr } from "@/lib/utils";
+import { timeAgoAr } from "@/lib/utils";
 
 /** لون ثابت لكل حالة نشر حتى لا يتغيّر معناه بين الرسوم */
 const STATUS_COLOR = {
@@ -92,7 +92,7 @@ export default function AdminReportsPage() {
               items={(data?.by_country ?? []).slice(0, 8).map((item) => ({
                 label: item.label,
                 value: item.value,
-                prefix: countryFlag(item.code),
+                countryCode: item.code,
               }))}
               valueLabel="منحة"
               color={CHART_COLORS[0]}
@@ -116,7 +116,7 @@ export default function AdminReportsPage() {
               items={(data?.top_saved ?? []).map((item) => ({
                 label: item.label,
                 value: item.value,
-                prefix: countryFlag(item.country_code),
+                countryCode: item.country_code,
               }))}
               valueLabel="حفظ"
               color={CHART_COLORS[2]}

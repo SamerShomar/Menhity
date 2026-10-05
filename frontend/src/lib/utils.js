@@ -142,18 +142,6 @@ export function formatFileSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-/** تحويل رمز الدولة (ISO-3166 alpha-2) إلى علم إيموجي: TR ← 🇹🇷 */
-export function countryFlag(code) {
-  if (!code || code.length !== 2) return "🌍";
-  const upper = code.toUpperCase();
-  if (upper === "EU") return "🇪🇺";
-  const base = 0x1f1e6;
-  return String.fromCodePoint(
-    base + (upper.charCodeAt(0) - 65),
-    base + (upper.charCodeAt(1) - 65),
-  );
-}
-
 /** الأحرف الأولى من الاسم للأفاتار النصي */
 export function initials(name) {
   const parts = String(name ?? "").trim().split(/\s+/).filter(Boolean);
