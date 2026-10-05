@@ -12,10 +12,6 @@ const URGENCY_TONE = {
   open: "success",
 };
 
-const COUNTRY_COVERS = {
-  DE: "/images/germany-campus.png",
-};
-
 /**
  * بطاقة منحة.
  * علم الدولة في شريط علوي منفصل حتى لا يتداخل مع العنوان العربي.
@@ -33,8 +29,6 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
     levels = [],
     match_score: matchScore,
   } = scholarship;
-  const countryCover = COUNTRY_COVERS[countryCode];
-
   return (
     <article
       className={cn(
@@ -43,14 +37,11 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
       )}
     >
       <div className="relative h-40 overflow-hidden bg-gradient-to-br from-navy-700 to-navy-900">
-        {countryCover ? (
-          <img
-            src={countryCover}
-            alt=""
-            loading="lazy"
-            className="absolute inset-0 size-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : null}
+        <CountryFlag
+          code={countryCode}
+          className="absolute inset-0 !h-full !w-full !rounded-none transition duration-500 group-hover:scale-105"
+          style={{ backgroundSize: "cover", backgroundPosition: "center" }}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-[#0b1a3d]/90 via-navy-900/15 to-navy-900/10" />
 
         <div className="absolute inset-x-4 top-3 flex items-center justify-between gap-2">
@@ -74,7 +65,6 @@ export function ScholarshipCard({ scholarship, saved, onToggleSave, className })
         </div>
 
         <div className="absolute inset-x-4 bottom-4 flex min-w-0 items-center gap-2.5 text-white">
-          <CountryFlag code={countryCode} className="text-2xl" />
           <span className="truncate text-sm font-bold drop-shadow">{country}</span>
         </div>
       </div>
